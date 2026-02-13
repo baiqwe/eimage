@@ -16,7 +16,6 @@
     "shadcn",
     "tanstack-query",
     "store",
-    "oRPC",
     "form",
     "resume"
   ]
