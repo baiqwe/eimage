@@ -1,0 +1,23 @@
+{
+  "projectName": "mkfast-template",
+  "mode": "file-router",
+  "typescript": true,
+  "packageManager": "pnpm",
+  "tailwind": true,
+  "addOnOptions": {},
+  "git": true,
+  "version": 1,
+  "framework": "react-cra",
+  "chosenAddOns": [
+    "biome",
+    "cloudflare",
+    "better-auth",
+    "table",
+    "shadcn",
+    "tanstack-query",
+    "store",
+    "oRPC",
+    "form",
+    "resume"
+  ]
+}
