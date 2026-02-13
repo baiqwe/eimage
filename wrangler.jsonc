@@ -1,17 +1,15 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "mkfast-template",
-	"compatibility_date": "2025-09-02",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
-	"main": "./src/server.ts",
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "mkfast-db",
-			"database_id": "71d527ac-1cfa-4b10-bd95-fd18d779457d",
-			"remote": true
-		}
-	]
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mkfast-template",
+  "compatibility_date": "2025-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "./src/server.ts",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "mkfast-db",
+      "database_id": "71d527ac-1cfa-4b10-bd95-fd18d779457d",
+      "migrations_dir": "./src/db/migrations"
+    }
+  ]
 }
