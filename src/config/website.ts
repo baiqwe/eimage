@@ -65,7 +65,7 @@ export const websiteConfig: WebsiteConfig = {
       'MkFast <support@mksaas.link>',
   },
   newsletter: {
-    enable: false,
+    enable: true,
     provider: 'resend',
     autoSubscribeAfterSignUp: false,
   },

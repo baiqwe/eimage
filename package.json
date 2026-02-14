@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
+    "@beehiiv/sdk": "^0.1.9",
     "@cloudflare/vite-plugin": "^1.13.8",
     "@faker-js/faker": "^10.0.0",
     "@hookform/resolvers": "^5.2.2",

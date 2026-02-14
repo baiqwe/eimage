@@ -1,55 +1,125 @@
 import { websiteConfig } from '@/config/website'
 import { HeaderSection } from '@/components/layout/header-section'
-import { Input } from '@/components/ui/input'
+import { FormError } from '@/components/shared/form-error'
 import { Button } from '@/components/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2Icon, Send } from 'lucide-react'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+const schema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+})
+
+type FormData = z.infer<typeof schema>
 
 export function NewsletterCard() {
   const enabled = websiteConfig.newsletter?.enable ?? false
-  const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>(
-    'idle'
-  )
+  const [error, setError] = useState<string | undefined>()
+  const [success, setSuccess] = useState(false)
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '' },
+  })
+
+  const isPending = form.formState.isSubmitting
+
+  async function onSubmit(data: FormData) {
+    setError(undefined)
+    setSuccess(false)
+    try {
+      const res = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email }),
+      })
+      const json = (await res.json()) as { success?: boolean; error?: string }
+      if (json.success) {
+        setSuccess(true)
+        form.reset()
+      } else {
+        const msg = json.error ?? 'Failed to subscribe to the newsletter'
+        setError(msg)
+      }
+    } catch (err) {
+      console.error('Newsletter subscription error:', err)
+      setError('Failed to subscribe to the newsletter')
+    }
+  }
 
   if (!enabled) return null
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setStatus('loading')
-    // Placeholder: wire to your newsletter API
-    setTimeout(() => setStatus('done'), 500)
-  }
 
   return (
     <div className="w-full rounded-lg bg-muted/50 p-16">
       <div className="flex flex-col items-center justify-center gap-8">
         <HeaderSection
-          title="NEWSLETTER"
+          title="Newsletter"
           subtitle="Stay in the loop"
           description="Get product updates and tips in your inbox."
         />
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex w-full max-w-md flex-col gap-2 sm:flex-row"
-        >
-          <Input
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="flex-1"
-            required
-          />
-          <Button type="submit" disabled={status === 'loading'}>
-            {status === 'loading' ? 'Subscribing…' : 'Subscribe'}
-          </Button>
-        </form>
-        {status === 'done' && (
-          <p className="text-sm text-muted-foreground">
-            Thanks for subscribing!
-          </p>
-        )}
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex w-full max-w-md flex-col items-center gap-4"
+          >
+            <div className="flex w-full items-center">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem className="relative w-full space-y-0">
+                    <FormLabel className="sr-only">Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="you@example.com"
+                        className="h-12 rounded-r-none border-r-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary focus:border-2 focus:border-r-0"
+                        {...field}
+                      />
+                    </FormControl>
+                    <div className="absolute -bottom-6 left-0">
+                      <FormMessage className="text-destructive text-sm" />
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                className="h-12 rounded-l-none cursor-pointer"
+                disabled={isPending}
+              >
+                {isPending ? (
+                  <Loader2Icon className="size-6 animate-spin" aria-hidden />
+                ) : (
+                  <Send className="size-6" aria-hidden />
+                )}
+                <span className="sr-only">Subscribe</span>
+              </Button>
+            </div>
+            {error && (
+              <div className="w-full">
+                <FormError message={error} />
+              </div>
+            )}
+            {success && (
+              <p className="text-muted-foreground text-sm">
+                Thanks for subscribing!
+              </p>
+            )}
+          </form>
+        </Form>
       </div>
     </div>
   )
