@@ -18,7 +18,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-const m = messages.newsletterBlock;
+const m = messages.newsletter;
 const schema = z.object({
   email: z.string().email(m.emailInvalid),
 });

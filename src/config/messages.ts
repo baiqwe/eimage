@@ -282,7 +282,7 @@ export const messages = {
     error: 'Failed to subscribe',
   },
 
-  newsletterBlock: {
+  newsletter: {
     title: 'Newsletter',
     subtitle: 'Stay in the loop',
     description: 'Get product updates and tips in your inbox.',
