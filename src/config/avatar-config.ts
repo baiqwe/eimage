@@ -1,3 +1,8 @@
+import {
+  IconCreditCard,
+  IconLayoutDashboard,
+  IconSettings2,
+} from '@tabler/icons-react'
 import { Routes } from '@/routes'
 import type { MenuItemConfig } from './types'
 
@@ -9,17 +14,17 @@ export function getAvatarLinks(): MenuItemConfig[] {
     {
       title: 'Dashboard',
       href: Routes.Dashboard,
-      icon: 'LayoutDashboard',
+      icon: IconLayoutDashboard,
     },
     {
       title: 'Billing',
       href: Routes.SettingsBilling,
-      icon: 'CreditCard',
+      icon: IconCreditCard,
     },
     {
       title: 'Settings',
       href: Routes.SettingsProfile,
-      icon: 'Settings2',
+      icon: IconSettings2,
     },
   ]
 }

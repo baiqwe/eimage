@@ -1,9 +1,19 @@
+import {
+  IconBuilding,
+  IconChecklist,
+  IconCookie,
+  IconFileText,
+  IconLayout2,
+  IconMail,
+  IconMailbox,
+  IconShieldCheck,
+} from '@tabler/icons-react'
 import { Routes } from '@/routes'
 import type { MenuItemConfig } from './types'
 import { websiteConfig } from './website'
 
 /**
- * Navbar links (English only, no i18n). Icon keys for UI to map to components.
+ * Navbar links (English only, no i18n). Icons are Tabler icon components.
  */
 export function getNavbarLinks(): MenuItemConfig[] {
   const links: MenuItemConfig[] = [
@@ -23,56 +33,56 @@ export function getNavbarLinks(): MenuItemConfig[] {
         title: 'About',
         description: 'Learn more about us',
         href: Routes.About,
-        icon: 'Building',
+        icon: IconBuilding,
         external: false,
       },
       {
         title: 'Contact',
         description: 'Get in touch',
         href: Routes.Contact,
-        icon: 'Mail',
+        icon: IconMail,
         external: false,
       },
       {
         title: 'Waitlist',
         description: 'Join the waitlist',
         href: Routes.Waitlist,
-        icon: 'Mailbox',
+        icon: IconMailbox,
         external: false,
       },
       {
         title: 'Roadmap',
         description: 'Product roadmap',
         href: Routes.Roadmap,
-        icon: 'SquareKanban',
+        icon: IconLayout2,
         external: false,
       },
       {
         title: 'Changelog',
         description: 'Release notes',
         href: Routes.Changelog,
-        icon: 'ListChecks',
+        icon: IconChecklist,
         external: false,
       },
       {
         title: 'Cookie Policy',
         description: 'Cookie policy',
         href: Routes.CookiePolicy,
-        icon: 'Cookie',
+        icon: IconCookie,
         external: false,
       },
       {
         title: 'Privacy Policy',
         description: 'Privacy policy',
         href: Routes.PrivacyPolicy,
-        icon: 'ShieldCheck',
+        icon: IconShieldCheck,
         external: false,
       },
       {
         title: 'Terms of Service',
         description: 'Terms of service',
         href: Routes.TermsOfService,
-        icon: 'FileText',
+        icon: IconFileText,
         external: false,
       },
     ],

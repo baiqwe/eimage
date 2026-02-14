@@ -1,17 +1,27 @@
-import { Link } from '@tanstack/react-router'
+import { websiteConfig } from '@/config/website'
 import { cn } from '@/lib/utils'
 
 export function Logo({ className }: { className?: string }) {
+  const logoLight =
+    websiteConfig.metadata?.images?.logoLight ?? '/logo.png'
+  const logoDark =
+    websiteConfig.metadata?.images?.logoDark ?? logoLight
   return (
-    <Link to="/">
+    <>
       <img
-        src="/logo.png"
+        src={logoLight}
         alt="Logo"
-        title="Logo"
-        width={96}
-        height={96}
-        className={cn('size-8 rounded-md', className)}
+        className={cn('size-8 rounded-md dark:hidden', className)}
+        width={32}
+        height={32}
       />
-    </Link>
+      <img
+        src={logoDark}
+        alt="Logo"
+        className={cn('size-8 rounded-md hidden dark:block', className)}
+        width={32}
+        height={32}
+      />
+    </>
   )
 }

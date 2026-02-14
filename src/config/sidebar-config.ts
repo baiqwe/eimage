@@ -1,9 +1,20 @@
+import {
+  IconBell,
+  IconCoin,
+  IconCreditCard,
+  IconLayoutDashboard,
+  IconLock,
+  IconSettings,
+  IconSettings2,
+  IconUserCircle,
+  IconUsersGroup,
+} from '@tabler/icons-react'
 import { Routes } from '@/routes'
 import type { MenuItemConfig } from './types'
 import { websiteConfig } from './website'
 
 /**
- * Dashboard sidebar links (English only). Icon keys for UI to map.
+ * Dashboard sidebar links (English only). Icons are Tabler icon components.
  */
 export function getSidebarLinks(): MenuItemConfig[] {
   const creditsEnabled = websiteConfig.credits?.enableCredits ?? false
@@ -11,18 +22,18 @@ export function getSidebarLinks(): MenuItemConfig[] {
   return [
     {
       title: 'Dashboard',
-      icon: 'LayoutDashboard',
+      icon: IconLayoutDashboard,
       href: Routes.Dashboard,
       external: false,
     },
     {
       title: 'Admin',
-      icon: 'Settings',
+      icon: IconSettings,
       authorizeOnly: ['admin'],
       items: [
         {
           title: 'Users',
-          icon: 'UsersRound',
+          icon: IconUsersGroup,
           href: Routes.AdminUsers,
           external: false,
         },
@@ -30,17 +41,17 @@ export function getSidebarLinks(): MenuItemConfig[] {
     },
     {
       title: 'Settings',
-      icon: 'Settings2',
+      icon: IconSettings2,
       items: [
         {
           title: 'Profile',
-          icon: 'CircleUserRound',
+          icon: IconUserCircle,
           href: Routes.SettingsProfile,
           external: false,
         },
         {
           title: 'Billing',
-          icon: 'CreditCard',
+          icon: IconCreditCard,
           href: Routes.SettingsBilling,
           external: false,
         },
@@ -48,7 +59,7 @@ export function getSidebarLinks(): MenuItemConfig[] {
           ? [
               {
                 title: 'Credits',
-                icon: 'Coins',
+                icon: IconCoin,
                 href: Routes.SettingsCredits,
                 external: false,
               } as MenuItemConfig,
@@ -56,13 +67,13 @@ export function getSidebarLinks(): MenuItemConfig[] {
           : []),
         {
           title: 'Security',
-          icon: 'LockKeyhole',
+          icon: IconLock,
           href: Routes.SettingsSecurity,
           external: false,
         },
         {
           title: 'Notifications',
-          icon: 'Bell',
+          icon: IconBell,
           href: Routes.SettingsNotifications,
           external: false,
         },

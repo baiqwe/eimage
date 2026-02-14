@@ -1,6 +1,8 @@
 /**
- * Config types (no React, no i18n). Used by website and other config modules.
+ * Config types (no i18n). Used by website and other config modules.
+ * Icon is React component (e.g. from @tabler/icons-react) for menu items.
  */
+import type { ComponentType } from 'react'
 
 export interface UiConfig {
   mode?: {
@@ -172,12 +174,12 @@ export interface WebsiteConfig {
   credits?: CreditsConfig
 }
 
-/** Menu item for navbar/sidebar/footer (icon as string key for UI to map) */
+/** Menu item for navbar/sidebar/footer. */
 export interface MenuItemConfig {
   title: string
   description?: string
   href?: string
-  icon?: string
+  icon?: ComponentType<{ className?: string }>
   external?: boolean
   authorizeOnly?: string[]
   items?: MenuItemConfig[]
