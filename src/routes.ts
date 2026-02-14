@@ -2,15 +2,17 @@ import { websiteConfig } from './config/website';
 
 export const Routes = {
   Root: '/',
+  // Auth routes
   Login: '/auth/login',
   Register: '/auth/register',
   AuthError: '/auth/error',
   ForgotPassword: '/auth/forgot-password',
   ResetPassword: '/auth/reset-password',
+  // Legal routes
   TermsOfService: '/terms',
   PrivacyPolicy: '/privacy',
-  Dashboard: '/dashboard',
-  // Marketing & app routes (for config links)
+  CookiePolicy: '/cookie',
+  // Marketing routes
   Features: '/features',
   Pricing: '/pricing',
   Blog: '/blog',
@@ -18,16 +20,14 @@ export const Routes = {
   About: '/about',
   Contact: '/contact',
   Waitlist: '/waitlist',
-  Roadmap: '/roadmap',
-  Changelog: '/changelog',
-  FAQ: '/faq',
-  CookiePolicy: '/cookie-policy',
-  // Settings
+  // Settings routes
+  Dashboard: '/dashboard',
   SettingsProfile: '/dashboard/settings/profile',
   SettingsBilling: '/dashboard/settings/billing',
   SettingsCredits: '/dashboard/settings/credits',
   SettingsSecurity: '/dashboard/settings/security',
   SettingsNotifications: '/dashboard/settings/notifications',
+  // Admin routes
   AdminUsers: '/dashboard/admin/users',
 } as const;
 

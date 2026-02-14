@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as CookiePolicyRouteImport } from './routes/cookie-policy'
+import { Route as CookieRouteImport } from './routes/cookie'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
@@ -48,9 +48,9 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CookiePolicyRoute = CookiePolicyRouteImport.update({
-  id: '/cookie-policy',
-  path: '/cookie-policy',
+const CookieRoute = CookieRouteImport.update({
+  id: '/cookie',
+  path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -155,7 +155,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
-  '/cookie-policy': typeof CookiePolicyRoute
+  '/cookie': typeof CookieRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
@@ -180,7 +180,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
-  '/cookie-policy': typeof CookiePolicyRoute
+  '/cookie': typeof CookieRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
@@ -206,7 +206,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
-  '/cookie-policy': typeof CookiePolicyRoute
+  '/cookie': typeof CookieRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
@@ -233,7 +233,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
-    | '/cookie-policy'
+    | '/cookie'
     | '/privacy'
     | '/terms'
     | '/waitlist'
@@ -258,7 +258,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
-    | '/cookie-policy'
+    | '/cookie'
     | '/privacy'
     | '/terms'
     | '/waitlist'
@@ -283,7 +283,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
-    | '/cookie-policy'
+    | '/cookie'
     | '/privacy'
     | '/terms'
     | '/waitlist'
@@ -309,7 +309,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRouteWithChildren
   ContactRoute: typeof ContactRoute
-  CookiePolicyRoute: typeof CookiePolicyRoute
+  CookieRoute: typeof CookieRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   WaitlistRoute: typeof WaitlistRoute
@@ -348,11 +348,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cookie-policy': {
-      id: '/cookie-policy'
-      path: '/cookie-policy'
-      fullPath: '/cookie-policy'
-      preLoaderRoute: typeof CookiePolicyRouteImport
+    '/cookie': {
+      id: '/cookie'
+      path: '/cookie'
+      fullPath: '/cookie'
+      preLoaderRoute: typeof CookieRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -514,7 +514,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRouteWithChildren,
   ContactRoute: ContactRoute,
-  CookiePolicyRoute: CookiePolicyRoute,
+  CookieRoute: CookieRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   WaitlistRoute: WaitlistRoute,

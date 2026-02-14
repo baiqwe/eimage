@@ -3,11 +3,11 @@ import Container from '@/components/layout/container';
 import { PageMarkdown } from '@/components/page/page-markdown';
 import { getPageBySlug } from '@/lib/pages';
 
-export const Route = createFileRoute('/cookie-policy')({
-  component: CookiePolicyPage,
+export const Route = createFileRoute('/cookie')({
+  component: CookiePage,
 });
 
-function CookiePolicyPage() {
+function CookiePage() {
   const page = getPageBySlug('cookie-policy');
   if (!page) {
     return (
