@@ -19,12 +19,16 @@ import { websiteConfig } from '@/config/website';
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import appCss from '../styles.css?url';
 
-/** Marketing pages: Navbar + main + Footer. Dashboard: full-screen app shell only. */
+/**
+ * Root layout: auth and dashboard use their own layouts (no marketing shell).
+ * Only marketing pages get Navbar + main + Footer.
+ */
 function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname }) ?? '';
+  const isAuth = pathname.startsWith('/auth');
   const isDashboard = pathname.startsWith('/dashboard');
 
-  if (isDashboard) {
+  if (isAuth || isDashboard) {
     return <>{children}</>;
   }
 
