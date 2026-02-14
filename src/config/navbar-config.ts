@@ -1,9 +1,7 @@
 import {
   IconBuilding,
-  IconChecklist,
   IconCookie,
   IconFileText,
-  IconLayout2,
   IconMail,
   IconMailbox,
   IconShieldCheck,
@@ -48,20 +46,6 @@ export function getNavbarLinks(): MenuItemConfig[] {
         description: 'Join the waitlist',
         href: Routes.Waitlist,
         icon: IconMailbox,
-        external: false,
-      },
-      {
-        title: 'Roadmap',
-        description: 'Product roadmap',
-        href: Routes.Roadmap,
-        icon: IconLayout2,
-        external: false,
-      },
-      {
-        title: 'Changelog',
-        description: 'Release notes',
-        href: Routes.Changelog,
-        icon: IconChecklist,
         external: false,
       },
       {

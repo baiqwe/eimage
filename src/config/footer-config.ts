@@ -19,10 +19,7 @@ export function getFooterLinks(): MenuItemConfig[] {
   if (websiteConfig.docs?.enable) {
     resourcesItems.push({ title: 'Docs', href: Routes.Docs, external: false })
   }
-  resourcesItems.push(
-    { title: 'Changelog', href: Routes.Changelog, external: false },
-    { title: 'Roadmap', href: Routes.Roadmap, external: false }
-  )
+  // Changelog and Roadmap removed from footer
 
   const companyItems: MenuItemConfig[] = [
     { title: 'About', href: Routes.About, external: false },
