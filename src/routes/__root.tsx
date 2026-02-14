@@ -13,7 +13,7 @@ import { TailwindIndicator } from '@/components/layout/tailwind-indicator';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
 import { NotFound } from '@/components/layout/not-found';
-import { Toaster } from '@/components/layout/sonner';
+import { Toaster } from '@/components/layout/toaster';
 import { websiteConfig } from '@/config/website';
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import appCss from '../styles.css?url';

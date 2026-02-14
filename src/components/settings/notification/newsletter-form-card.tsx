@@ -1,4 +1,4 @@
-import { FormError } from '@/components/shared/form-error';
+import { FormError } from '@/components/layout/form-error';
 import {
   Card,
   CardContent,
@@ -27,7 +27,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { IconLoader2 } from '@tabler/icons-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
+
+const MESSAGES = {
+  emailRequired: 'Email is required to subscribe to the newsletter',
+  subscribeSuccess: 'Successfully subscribed to the newsletter',
+  unsubscribeSuccess: 'Successfully unsubscribed from the newsletter',
+  error: 'An error occurred while updating your subscription',
+} as const;
 
 interface NewsletterFormCardProps {
   className?: string;
@@ -62,15 +70,23 @@ export function NewsletterFormCard({ className }: NewsletterFormCardProps) {
   if (!currentUser) return null;
 
   const handleSubscriptionChange = async (value: boolean) => {
-    if (!currentUser.email) return;
+    if (!currentUser.email) {
+      toast.error(MESSAGES.emailRequired);
+      return;
+    }
     try {
       if (value) {
         await subscribeMutation.mutateAsync(currentUser.email);
+        toast.success(MESSAGES.subscribeSuccess);
       } else {
         await unsubscribeMutation.mutateAsync(currentUser.email);
+        toast.success(MESSAGES.unsubscribeSuccess);
       }
     } catch (err) {
       console.error('newsletter subscription error:', err);
+      const message =
+        err instanceof Error ? err.message : MESSAGES.error;
+      toast.error(message);
       form.setValue('subscribed', newsletterStatus?.subscribed ?? false);
     }
   };

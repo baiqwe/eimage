@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 interface UpdateNameCardProps {
@@ -59,11 +60,13 @@ export function UpdateNameCard({ className }: UpdateNameCardProps) {
         },
         onResponse: () => { setIsSaving(false); },
         onSuccess: () => {
+          toast.success('Name updated successfully');
           refetch();
           form.reset();
         },
         onError: (ctx) => {
           setError(`${ctx.error.status}: ${ctx.error.message}`);
+          toast.error('Failed to update name');
         },
       },
     );

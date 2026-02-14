@@ -19,6 +19,7 @@ import {
 import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';
 
 export function DeleteAccountCard() {
@@ -44,11 +45,13 @@ export function DeleteAccountCard() {
           setShowConfirmation(false);
         },
         onSuccess: () => {
+          toast.success('Account deleted successfully');
           refetch();
           navigate({ to: '/' });
         },
         onError: (ctx) => {
           setError(`${ctx.error.status}: ${ctx.error.message}`);
+          toast.error('Failed to delete account');
         },
       },
     );

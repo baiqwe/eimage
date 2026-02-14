@@ -23,6 +23,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { IconEye, IconEyeOff } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 interface UpdatePasswordCardProps {
@@ -59,9 +60,13 @@ export function UpdatePasswordCard({ className }: UpdatePasswordCardProps) {
       {
         onRequest: () => { setIsSaving(true); setError(''); },
         onResponse: () => { setIsSaving(false); },
-        onSuccess: () => { form.reset(); },
+        onSuccess: () => {
+          toast.success('Password updated successfully');
+          form.reset();
+        },
         onError: (ctx) => {
           setError(`${ctx.error.status}: ${ctx.error.message}`);
+          toast.error('Failed to update password');
         },
       },
     );
