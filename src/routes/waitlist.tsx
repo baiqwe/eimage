@@ -1,10 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
-import Container from '@/components/layout/container'
-import { WaitlistFormCard } from '@/components/waitlist/waitlist-form-card'
+import { createFileRoute } from '@tanstack/react-router';
+import Container from '@/components/layout/container';
+import { WaitlistFormCard } from '@/components/waitlist/waitlist-form-card';
 
 export const Route = createFileRoute('/waitlist')({
   component: WaitlistPage,
-})
+});
 
 function WaitlistPage() {
   return (
@@ -21,5 +21,5 @@ function WaitlistPage() {
         <WaitlistFormCard />
       </div>
     </Container>
-  )
+  );
 }

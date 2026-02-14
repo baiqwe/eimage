@@ -1,4 +1,4 @@
-import { ScriptInject } from './script-inject'
+import { ScriptInject } from './script-inject';
 
 /**
  * Ahrefs Analytics
@@ -6,9 +6,9 @@ import { ScriptInject } from './script-inject'
  * Set VITE_AHREFS_WEBSITE_ID in .env.production
  */
 export function AhrefsAnalytics() {
-  if (!import.meta.env.PROD) return null
-  const websiteId = import.meta.env.VITE_AHREFS_WEBSITE_ID
-  if (!websiteId) return null
+  if (!import.meta.env.PROD) return null;
+  const websiteId = import.meta.env.VITE_AHREFS_WEBSITE_ID;
+  if (!websiteId) return null;
 
   return (
     <ScriptInject
@@ -16,5 +16,5 @@ export function AhrefsAnalytics() {
       async
       dataAttributes={{ key: websiteId }}
     />
-  )
+  );
 }

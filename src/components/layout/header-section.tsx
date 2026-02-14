@@ -1,18 +1,18 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 interface HeaderSectionProps {
-  id?: string
-  title?: string
-  titleAs?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p'
-  titleClassName?: string
-  subtitle?: string
-  subtitleAs?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p'
-  subtitleClassName?: string
-  description?: string
-  descriptionAs?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p'
-  descriptionClassName?: string
-  className?: string
-  children?: React.ReactNode
+  id?: string;
+  title?: string;
+  titleAs?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p';
+  titleClassName?: string;
+  subtitle?: string;
+  subtitleAs?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p';
+  subtitleClassName?: string;
+  description?: string;
+  descriptionAs?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p';
+  descriptionClassName?: string;
+  className?: string;
+  children?: React.ReactNode;
 }
 
 export function HeaderSection({
@@ -29,16 +29,13 @@ export function HeaderSection({
   className,
   children,
 }: HeaderSectionProps) {
-  const TitleComponent = titleAs
-  const SubtitleComponent = subtitleAs
-  const DescriptionComponent = descriptionAs
+  const TitleComponent = titleAs;
+  const SubtitleComponent = subtitleAs;
+  const DescriptionComponent = descriptionAs;
   return (
     <div
       id={id}
-      className={cn(
-        'flex flex-col items-center text-center gap-4',
-        className
-      )}
+      className={cn('flex flex-col items-center text-center gap-4', className)}
     >
       {title ? (
         <TitleComponent
@@ -72,5 +69,5 @@ export function HeaderSection({
       ) : null}
       {children}
     </div>
-  )
+  );
 }

@@ -1,5 +1,10 @@
-import { HeaderSection } from '@/components/layout/header-section'
-import { IconActivity, IconBolt, IconCompass, IconMail } from '@tabler/icons-react'
+import { HeaderSection } from '@/components/layout/header-section';
+import {
+  IconActivity,
+  IconBolt,
+  IconCompass,
+  IconMail,
+} from '@tabler/icons-react';
 
 export default function Features2Section() {
   return (
@@ -57,5 +62,5 @@ export default function Features2Section() {
         </div>
       </div>
     </section>
-  )
+  );
 }

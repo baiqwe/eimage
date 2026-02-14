@@ -1,45 +1,45 @@
-import { getNavbarLinks } from '@/config/navbar-config'
-import { authClient } from '@/lib/auth-client'
-import { Routes } from '@/routes'
-import { buttonVariants } from '@/components/ui/button'
-import { Button } from '@/components/ui/button'
+import { getNavbarLinks } from '@/config/navbar-config';
+import { authClient } from '@/lib/auth-client';
+import { Routes } from '@/routes';
+import { buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible'
-import { Link, useLocation } from '@tanstack/react-router'
-import { IconChevronRight, IconMenu2, IconX } from '@tabler/icons-react'
-import * as React from 'react'
-import { useEffect, useState } from 'react'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Logo } from '@/components/layout/logo'
-import { ModeSwitcher } from '@/components/layout/mode-switcher'
-import { UserButton } from '@/components/layout/user-button'
-import { cn } from '@/lib/utils'
+} from '@/components/ui/collapsible';
+import { Link, useLocation } from '@tanstack/react-router';
+import { IconChevronRight, IconMenu2, IconX } from '@tabler/icons-react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Logo } from '@/components/layout/logo';
+import { ModeSwitcher } from '@/components/layout/mode-switcher';
+import { UserButton } from '@/components/layout/user-button';
+import { cn } from '@/lib/utils';
 
-const APP_NAME = 'MkFast'
+const APP_NAME = 'MkFast';
 
 export function NavbarMobile({
   className,
   ...other
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const [open, setOpen] = React.useState(false)
-  const location = useLocation()
-  const pathname = location.pathname
-  const [mounted, setMounted] = useState(false)
-  const { data: session, isPending } = authClient.useSession()
-  const currentUser = session?.user
+  const [open, setOpen] = React.useState(false);
+  const location = useLocation();
+  const pathname = location.pathname;
+  const [mounted, setMounted] = useState(false);
+  const { data: session, isPending } = authClient.useSession();
+  const currentUser = session?.user;
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-    setOpen(false)
-  }, [pathname])
+    setOpen(false);
+  }, [pathname]);
 
-  if (!mounted) return null
+  if (!mounted) return null;
 
   return (
     <>
@@ -114,7 +114,7 @@ export function NavbarMobile({
                         (sub.href === '/'
                           ? pathname === '/'
                           : pathname.startsWith(sub.href))
-                    )
+                    );
 
                 return (
                   <li key={item.title} className="py-1">
@@ -142,7 +142,7 @@ export function NavbarMobile({
                             {item.items.map((subItem) => {
                               const isSubActive =
                                 subItem.href &&
-                                pathname.startsWith(subItem.href)
+                                pathname.startsWith(subItem.href);
                               return (
                                 <li key={subItem.title}>
                                   <Link
@@ -159,18 +159,17 @@ export function NavbarMobile({
                                     className={cn(
                                       'flex w-full items-center gap-4 rounded-md p-2 text-sm',
                                       'text-muted-foreground hover:text-foreground',
-                                      isSubActive && 'font-semibold text-foreground'
+                                      isSubActive &&
+                                        'font-semibold text-foreground'
                                     )}
                                   >
-                                    {subItem.icon
-                                      ? (
-                                          <subItem.icon className="size-4 shrink-0" />
-                                        )
-                                      : null}
+                                    {subItem.icon ? (
+                                      <subItem.icon className="size-4 shrink-0" />
+                                    ) : null}
                                     {subItem.title}
                                   </Link>
                                 </li>
-                              )
+                              );
                             })}
                           </ul>
                         </CollapsibleContent>
@@ -179,9 +178,7 @@ export function NavbarMobile({
                       <Link
                         to={item.href ?? '#'}
                         target={item.external ? '_blank' : undefined}
-                        rel={
-                          item.external ? 'noopener noreferrer' : undefined
-                        }
+                        rel={item.external ? 'noopener noreferrer' : undefined}
                         onClick={() => setOpen(false)}
                         className={cn(
                           'flex w-full items-center rounded-md p-2 text-base',
@@ -193,12 +190,12 @@ export function NavbarMobile({
                       </Link>
                     )}
                   </li>
-                )
+                );
               })}
             </ul>
           </div>
         </div>
       )}
     </>
-  )
+  );
 }

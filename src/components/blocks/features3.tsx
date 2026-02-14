@@ -1,4 +1,4 @@
-import { HeaderSection } from '@/components/layout/header-section'
+import { HeaderSection } from '@/components/layout/header-section';
 import {
   IconBolt,
   IconCpu,
@@ -6,7 +6,7 @@ import {
   IconPencil,
   IconSettings,
   IconSparkles,
-} from '@tabler/icons-react'
+} from '@tabler/icons-react';
 
 const items = [
   {
@@ -39,7 +39,7 @@ const items = [
     title: 'AI-ready',
     description: 'Integrate LLMs and agents easily.',
   },
-]
+];
 
 export default function Features3Section() {
   return (
@@ -68,5 +68,5 @@ export default function Features3Section() {
         </div>
       </div>
     </section>
-  )
+  );
 }

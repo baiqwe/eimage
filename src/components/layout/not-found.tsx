@@ -1,7 +1,7 @@
-import { Link } from '@tanstack/react-router'
-import { Logo } from '@/components/layout/logo'
-import { buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { Link } from '@tanstack/react-router';
+import { Logo } from '@/components/layout/logo';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export function NotFound() {
   return (
@@ -18,5 +18,5 @@ export function NotFound() {
         Back to Home
       </Link>
     </div>
-  )
+  );
 }

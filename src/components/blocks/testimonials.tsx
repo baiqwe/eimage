@@ -1,6 +1,6 @@
-import { HeaderSection } from '@/components/layout/header-section'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Card, CardContent } from '@/components/ui/card'
+import { HeaderSection } from '@/components/layout/header-section';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
 
 const testimonials = [
   {
@@ -14,8 +14,7 @@ const testimonials = [
     name: 'John Smith',
     role: 'Founder, Startup',
     image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-    quote:
-      'The best SaaS starter we evaluated. Auth and billing just work.',
+    quote: 'The best SaaS starter we evaluated. Auth and billing just work.',
   },
   {
     name: 'Alex Chen',
@@ -23,7 +22,7 @@ const testimonials = [
     image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
     quote: 'Clean code, great DX. We extended it for our use case easily.',
   },
-]
+];
 
 export default function TestimonialsSection() {
   return (
@@ -63,5 +62,5 @@ export default function TestimonialsSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

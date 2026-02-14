@@ -1,32 +1,32 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import Container from '@/components/layout/container'
-import { MarkdownBody } from '@/components/blog/markdown-body'
-import { getPostBySlug } from '@/lib/blog'
-import { websiteConfig } from '@/config/website'
-import { ArrowLeftIcon } from 'lucide-react'
+import { createFileRoute, Link } from '@tanstack/react-router';
+import Container from '@/components/layout/container';
+import { MarkdownBody } from '@/components/blog/markdown-body';
+import { getPostBySlug } from '@/lib/blog';
+import { websiteConfig } from '@/config/website';
+import { ArrowLeftIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/blog/$slug')({
   component: BlogPostPage,
-})
+});
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  })
+  });
 }
 
 function BlogPostPage() {
-  const { slug } = Route.useParams()
-  const post = getPostBySlug(slug)
+  const { slug } = Route.useParams();
+  const post = getPostBySlug(slug);
 
   if (!websiteConfig.blog?.enable) {
     return (
       <Container className="py-16">
         <p className="text-center text-muted-foreground">Blog is disabled.</p>
       </Container>
-    )
+    );
   }
 
   if (!post) {
@@ -43,10 +43,10 @@ function BlogPostPage() {
           </Link>
         </div>
       </Container>
-    )
+    );
   }
 
-  const dateFormatted = formatDate(post.date)
+  const dateFormatted = formatDate(post.date);
 
   return (
     <div className="flex flex-col gap-8 pb-16">
@@ -105,5 +105,5 @@ function BlogPostPage() {
         </div>
       </Container>
     </div>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-import { AuthCard } from '@/components/auth/auth-card'
-import { FormError } from '@/components/shared/form-error'
-import { FormSuccess } from '@/components/shared/form-success'
-import { Button } from '@/components/ui/button'
+import { AuthCard } from '@/components/auth/auth-card';
+import { FormError } from '@/components/shared/form-error';
+import { FormSuccess } from '@/components/shared/form-success';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -9,18 +9,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { websiteConfig } from '@/config/website'
-import { authClient } from '@/lib/auth-client'
-import { getBaseUrl } from '@/lib/urls'
-import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/routes'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import { SocialLoginButton } from './social-login-button'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { websiteConfig } from '@/config/website';
+import { authClient } from '@/lib/auth-client';
+import { getBaseUrl } from '@/lib/urls';
+import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/routes';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { SocialLoginButton } from './social-login-button';
 
 const message = {
   createAccount: 'Create an account',
@@ -35,39 +35,43 @@ const message = {
   nameRequired: 'Please enter your name',
   emailRequired: 'Please enter your email',
   passwordRequired: 'Please enter your password',
-} as const
+} as const;
 
 interface RegisterFormProps {
-  callbackUrl?: string
+  callbackUrl?: string;
 }
 
-export function RegisterForm({ callbackUrl: propCallbackUrl }: RegisterFormProps) {
+export function RegisterForm({
+  callbackUrl: propCallbackUrl,
+}: RegisterFormProps) {
   const paramCallbackUrl =
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('callbackUrl')
-      : null
-  const defaultCallbackUrl = `${getBaseUrl()}${DEFAULT_LOGIN_REDIRECT}`
+      : null;
+  const defaultCallbackUrl = `${getBaseUrl()}${DEFAULT_LOGIN_REDIRECT}`;
   const callbackUrl =
     propCallbackUrl ??
-    (paramCallbackUrl ? `${getBaseUrl()}${paramCallbackUrl}` : defaultCallbackUrl)
+    (paramCallbackUrl
+      ? `${getBaseUrl()}${paramCallbackUrl}`
+      : defaultCallbackUrl);
 
-  const [error, setError] = useState<string | undefined>('')
-  const [success, setSuccess] = useState<string | undefined>('')
-  const [isPending, setIsPending] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string | undefined>('');
+  const [success, setSuccess] = useState<string | undefined>('');
+  const [isPending, setIsPending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const credentialLoginEnabled = websiteConfig.auth.enableCredentialLogin
+  const credentialLoginEnabled = websiteConfig.auth.enableCredentialLogin;
 
   const RegisterSchema = z.object({
     email: z.string().email({ message: message.emailRequired }),
     password: z.string().min(1, { message: message.passwordRequired }),
     name: z.string().min(1, { message: message.nameRequired }),
-  })
+  });
 
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: { email: '', password: '', name: '' },
-  })
+  });
 
   const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
     await authClient.signUp.email(
@@ -79,22 +83,22 @@ export function RegisterForm({ callbackUrl: propCallbackUrl }: RegisterFormProps
       },
       {
         onRequest: () => {
-          setIsPending(true)
-          setError('')
-          setSuccess('')
+          setIsPending(true);
+          setError('');
+          setSuccess('');
         },
         onResponse: () => setIsPending(false),
         onSuccess: () => setSuccess(message.checkEmail),
         onError: (ctx) => {
-          setError(`${ctx.error.status}: ${ctx.error.message}`)
+          setError(`${ctx.error.status}: ${ctx.error.message}`);
         },
-      },
-    )
-  }
+      }
+    );
+  };
 
   const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev)
-  }
+    setShowPassword((prev) => !prev);
+  };
 
   return (
     <AuthCard
@@ -205,5 +209,5 @@ export function RegisterForm({ callbackUrl: propCallbackUrl }: RegisterFormProps
         />
       </div>
     </AuthCard>
-  )
+  );
 }

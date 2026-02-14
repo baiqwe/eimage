@@ -1,26 +1,25 @@
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import type { QueryClient } from '@tanstack/react-query'
+import { TanStackDevtools } from '@tanstack/react-devtools';
+import type { QueryClient } from '@tanstack/react-query';
 import {
   createRootRouteWithContext,
   HeadContent,
   Scripts,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { Analytics } from '@/components/analytics/analytics'
-import { ThemeProvider } from '@/components/layout/theme-provider'
-import { Navbar } from '@/components/layout/navbar'
-import { Footer } from '@/components/layout/footer'
-import { NotFound } from '@/components/layout/not-found'
-import { websiteConfig } from '@/config/website'
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-import StoreDevtools from '../lib/demo-store-devtools'
-import appCss from '../styles.css?url'
+} from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { Analytics } from '@/components/analytics/analytics';
+import { ThemeProvider } from '@/components/layout/theme-provider';
+import { Navbar } from '@/components/layout/navbar';
+import { Footer } from '@/components/layout/footer';
+import { NotFound } from '@/components/layout/not-found';
+import { websiteConfig } from '@/config/website';
+import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
+import StoreDevtools from '../lib/demo-store-devtools';
+import appCss from '../styles.css?url';
 
-const DEFAULT_THEME =
-  websiteConfig.ui?.mode?.defaultMode ?? 'system'
+const DEFAULT_THEME = websiteConfig.ui?.mode?.defaultMode ?? 'system';
 
 interface MyRouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -46,7 +45,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
   shellComponent: RootDocument,
-})
+});
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -69,21 +68,21 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </div>
           </ThemeProvider>
           <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-            StoreDevtools,
-          ]}
+            config={{
+              position: 'bottom-right',
+            }}
+            plugins={[
+              {
+                name: 'Tanstack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+              TanStackQueryDevtools,
+              StoreDevtools,
+            ]}
           />
           <Scripts />
         </Analytics>
       </body>
     </html>
-  )
+  );
 }

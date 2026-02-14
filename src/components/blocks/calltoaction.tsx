@@ -1,6 +1,6 @@
-import { buttonVariants } from '@/components/ui/button'
-import { Link } from '@tanstack/react-router'
-import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button';
+import { Link } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
 
 export default function CallToActionSection() {
   return (
@@ -32,5 +32,5 @@ export default function CallToActionSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

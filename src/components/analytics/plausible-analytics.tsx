@@ -1,4 +1,4 @@
-import { ScriptInject } from './script-inject'
+import { ScriptInject } from './script-inject';
 
 /**
  * Plausible Analytics
@@ -6,16 +6,10 @@ import { ScriptInject } from './script-inject'
  * Set VITE_PLAUSIBLE_DOMAIN and VITE_PLAUSIBLE_SCRIPT in .env.production
  */
 export function PlausibleAnalytics() {
-  if (!import.meta.env.PROD) return null
-  const domain = import.meta.env.VITE_PLAUSIBLE_DOMAIN
-  const script = import.meta.env.VITE_PLAUSIBLE_SCRIPT
-  if (!domain || !script) return null
+  if (!import.meta.env.PROD) return null;
+  const domain = import.meta.env.VITE_PLAUSIBLE_DOMAIN;
+  const script = import.meta.env.VITE_PLAUSIBLE_SCRIPT;
+  if (!domain || !script) return null;
 
-  return (
-    <ScriptInject
-      src={script}
-      defer
-      dataAttributes={{ domain }}
-    />
-  )
+  return <ScriptInject src={script} defer dataAttributes={{ domain }} />;
 }

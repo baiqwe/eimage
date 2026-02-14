@@ -1,4 +1,4 @@
-import { ScriptInject } from './script-inject'
+import { ScriptInject } from './script-inject';
 
 /**
  * DataFast Analytics
@@ -6,10 +6,10 @@ import { ScriptInject } from './script-inject'
  * Set VITE_DATAFAST_DOMAIN and VITE_DATAFAST_WEBSITE_ID in .env.production
  */
 export function DataFastAnalytics() {
-  if (!import.meta.env.PROD) return null
-  const domain = import.meta.env.VITE_DATAFAST_DOMAIN
-  const websiteId = import.meta.env.VITE_DATAFAST_WEBSITE_ID
-  if (!domain || !websiteId) return null
+  if (!import.meta.env.PROD) return null;
+  const domain = import.meta.env.VITE_DATAFAST_DOMAIN;
+  const websiteId = import.meta.env.VITE_DATAFAST_WEBSITE_ID;
+  if (!domain || !websiteId) return null;
 
   return (
     <ScriptInject
@@ -17,5 +17,5 @@ export function DataFastAnalytics() {
       defer
       dataAttributes={{ websiteId, domain }}
     />
-  )
+  );
 }

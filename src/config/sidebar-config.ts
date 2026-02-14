@@ -8,16 +8,16 @@ import {
   IconSettings2,
   IconUserCircle,
   IconUsersGroup,
-} from '@tabler/icons-react'
-import { Routes } from '@/routes'
-import type { MenuItemConfig } from './types'
-import { websiteConfig } from './website'
+} from '@tabler/icons-react';
+import { Routes } from '@/routes';
+import type { MenuItemConfig } from './types';
+import { websiteConfig } from './website';
 
 /**
  * Dashboard sidebar links (English only). Icons are Tabler icon components.
  */
 export function getSidebarLinks(): MenuItemConfig[] {
-  const creditsEnabled = websiteConfig.credits?.enableCredits ?? false
+  const creditsEnabled = websiteConfig.credits?.enableCredits ?? false;
 
   return [
     {
@@ -79,5 +79,5 @@ export function getSidebarLinks(): MenuItemConfig[] {
         },
       ],
     },
-  ]
+  ];
 }

@@ -1,4 +1,4 @@
-import { HeaderSection } from '@/components/layout/header-section'
+import { HeaderSection } from '@/components/layout/header-section';
 
 export default function StatsSection() {
   return (
@@ -28,5 +28,5 @@ export default function StatsSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

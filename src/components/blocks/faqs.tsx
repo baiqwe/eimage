@@ -1,10 +1,10 @@
-import { HeaderSection } from '@/components/layout/header-section'
+import { HeaderSection } from '@/components/layout/header-section';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion'
+} from '@/components/ui/accordion';
 
 const faqItems = [
   {
@@ -37,7 +37,7 @@ const faqItems = [
     answer:
       'Email support is included for all plans. Pro and above get priority support.',
   },
-]
+];
 
 export default function FaqSection() {
   return (
@@ -51,11 +51,13 @@ export default function FaqSection() {
         />
 
         <div className="mx-auto mt-12 max-w-4xl">
-          <Accordion
-            className="w-full rounded-2xl border px-8 py-3 shadow-sm"
-          >
+          <Accordion className="w-full rounded-2xl border px-8 py-3 shadow-sm">
             {faqItems.map((item) => (
-              <AccordionItem key={item.id} value={item.id} className="border-dashed">
+              <AccordionItem
+                key={item.id}
+                value={item.id}
+                className="border-dashed"
+              >
                 <AccordionTrigger className="cursor-pointer text-base hover:no-underline">
                   {item.question}
                 </AccordionTrigger>
@@ -70,5 +72,5 @@ export default function FaqSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

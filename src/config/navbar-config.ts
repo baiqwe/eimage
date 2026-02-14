@@ -5,10 +5,10 @@ import {
   IconMail,
   IconMailbox,
   IconShieldCheck,
-} from '@tabler/icons-react'
-import { Routes } from '@/routes'
-import type { MenuItemConfig } from './types'
-import { websiteConfig } from './website'
+} from '@tabler/icons-react';
+import { Routes } from '@/routes';
+import type { MenuItemConfig } from './types';
+import { websiteConfig } from './website';
 
 /**
  * Navbar links (English only, no i18n). Icons are Tabler icon components.
@@ -17,12 +17,12 @@ export function getNavbarLinks(): MenuItemConfig[] {
   const links: MenuItemConfig[] = [
     { title: 'Features', href: Routes.Features, external: false },
     { title: 'Pricing', href: Routes.Pricing, external: false },
-  ]
+  ];
   if (websiteConfig.blog?.enable) {
-    links.push({ title: 'Blog', href: Routes.Blog, external: false })
+    links.push({ title: 'Blog', href: Routes.Blog, external: false });
   }
   if (websiteConfig.docs?.enable) {
-    links.push({ title: 'Docs', href: Routes.Docs, external: false })
+    links.push({ title: 'Docs', href: Routes.Docs, external: false });
   }
   links.push({
     title: 'Pages',
@@ -70,6 +70,6 @@ export function getNavbarLinks(): MenuItemConfig[] {
         external: false,
       },
     ],
-  })
-  return links
+  });
+  return links;
 }

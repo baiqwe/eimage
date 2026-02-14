@@ -11,8 +11,8 @@ import {
   IconBrandYoutube,
   IconMail,
   IconBrandTelegram,
-} from '@tabler/icons-react'
-import type { SocialLinkItem } from '@/config/social-config'
+} from '@tabler/icons-react';
+import type { SocialLinkItem } from '@/config/social-config';
 
 const iconMap: Record<
   SocialLinkItem['key'],
@@ -30,16 +30,16 @@ const iconMap: Record<
   tiktok: IconBrandTiktok,
   telegram: IconBrandTelegram,
   email: IconMail,
-}
+};
 
 export function SocialIcon({
   iconKey,
   className,
 }: {
-  iconKey: SocialLinkItem['key']
-  className?: string
+  iconKey: SocialLinkItem['key'];
+  className?: string;
 }) {
-  const Icon = iconMap[iconKey]
-  if (!Icon) return null
-  return <Icon className={className} />
+  const Icon = iconMap[iconKey];
+  if (!Icon) return null;
+  return <Icon className={className} />;
 }

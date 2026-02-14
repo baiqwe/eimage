@@ -1,23 +1,23 @@
-import { createFileRoute } from '@tanstack/react-router'
-import Container from '@/components/layout/container'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { buttonVariants } from '@/components/ui/button'
-import { websiteConfig } from '@/config/website'
-import { cn } from '@/lib/utils'
-import { MailIcon, TwitterIcon } from 'lucide-react'
+import { createFileRoute } from '@tanstack/react-router';
+import Container from '@/components/layout/container';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { buttonVariants } from '@/components/ui/button';
+import { websiteConfig } from '@/config/website';
+import { cn } from '@/lib/utils';
+import { MailIcon, TwitterIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/about')({
   component: AboutPage,
-})
+});
 
 function AboutPage() {
-  const twitter = websiteConfig.metadata?.social?.twitter
-  const supportEmail = websiteConfig.mail?.supportEmail
+  const twitter = websiteConfig.metadata?.social?.twitter;
+  const supportEmail = websiteConfig.mail?.supportEmail;
   const supportEmailHref = supportEmail?.includes('<')
     ? supportEmail.replace(/^[^<]*<([^>]*)>.*$/, 'mailto:$1')
     : supportEmail
-    ? `mailto:${supportEmail}`
-    : undefined
+      ? `mailto:${supportEmail}`
+      : undefined;
 
   return (
     <Container className="py-16 px-4">
@@ -85,5 +85,5 @@ function AboutPage() {
         </div>
       </div>
     </Container>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-const DEFAULT_BASE_URL = "http://localhost:3000";
+const DEFAULT_BASE_URL = 'http://localhost:3000';
 
 /**
  * Get the base URL. Value comes from Vite at build/dev time:

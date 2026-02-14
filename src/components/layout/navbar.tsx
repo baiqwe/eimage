@@ -1,9 +1,9 @@
-import { getNavbarLinks } from '@/config/navbar-config'
-import { useScroll } from '@/hooks/use-scroll'
-import { authClient } from '@/lib/auth-client'
-import { cn } from '@/lib/utils'
-import { Routes } from '@/routes'
-import { buttonVariants } from '@/components/ui/button'
+import { getNavbarLinks } from '@/config/navbar-config';
+import { useScroll } from '@/hooks/use-scroll';
+import { authClient } from '@/lib/auth-client';
+import { cn } from '@/lib/utils';
+import { Routes } from '@/routes';
+import { buttonVariants } from '@/components/ui/button';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,42 +11,42 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu'
-import { Skeleton } from '@/components/ui/skeleton'
-import Container from '@/components/layout/container'
-import { Logo } from '@/components/layout/logo'
-import { ModeSwitcher } from '@/components/layout/mode-switcher'
-import { NavbarIcon } from '@/components/layout/navbar-icons'
-import { NavbarMobile } from '@/components/layout/navbar-mobile'
-import { UserButton } from '@/components/layout/user-button'
-import { Link, useLocation } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+} from '@/components/ui/navigation-menu';
+import { Skeleton } from '@/components/ui/skeleton';
+import Container from '@/components/layout/container';
+import { Logo } from '@/components/layout/logo';
+import { ModeSwitcher } from '@/components/layout/mode-switcher';
+import { NavbarIcon } from '@/components/layout/navbar-icons';
+import { NavbarMobile } from '@/components/layout/navbar-mobile';
+import { UserButton } from '@/components/layout/user-button';
+import { Link, useLocation } from '@tanstack/react-router';
+import { useEffect, useState } from 'react';
 
 const navTriggerStyle = cn(
   'relative bg-transparent text-muted-foreground cursor-pointer',
   'hover:bg-accent hover:text-accent-foreground',
   'data-active:font-semibold data-active:bg-transparent data-active:text-accent-foreground',
   'rounded-lg px-2.5 py-1.5 text-sm font-medium'
-)
+);
 
 interface NavbarProps {
-  scroll?: boolean
+  scroll?: boolean;
 }
 
-const APP_NAME = 'MkFast'
+const APP_NAME = 'MkFast';
 
 export function Navbar({ scroll = true }: NavbarProps) {
-  const scrolled = useScroll(50)
-  const menuLinks = getNavbarLinks()
-  const location = useLocation()
-  const pathname = location.pathname
-  const [mounted, setMounted] = useState(false)
-  const { data: session, isPending } = authClient.useSession()
-  const currentUser = session?.user
+  const scrolled = useScroll(50);
+  const menuLinks = getNavbarLinks();
+  const location = useLocation();
+  const pathname = location.pathname;
+  const [mounted, setMounted] = useState(false);
+  const { data: session, isPending } = authClient.useSession();
+  const currentUser = session?.user;
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   return (
     <section
@@ -97,14 +97,16 @@ export function Navbar({ scroll = true }: NavbarProps) {
                               subItem.href &&
                               (subItem.href === '/'
                                 ? pathname === '/'
-                                : pathname.startsWith(subItem.href))
+                                : pathname.startsWith(subItem.href));
                             return (
                               <li key={subIndex}>
                                 <NavigationMenuLink
                                   render={
                                     <Link
                                       to={subItem.href ?? '#'}
-                                      target={subItem.external ? '_blank' : undefined}
+                                      target={
+                                        subItem.external ? '_blank' : undefined
+                                      }
                                       rel={
                                         subItem.external
                                           ? 'noopener noreferrer'
@@ -113,17 +115,14 @@ export function Navbar({ scroll = true }: NavbarProps) {
                                       className={cn(
                                         'group flex select-none flex-row items-center gap-4 rounded-md p-2 leading-none no-underline outline-hidden transition-colors',
                                         'hover:bg-accent hover:text-accent-foreground',
-                                        isActive && 'bg-accent text-accent-foreground'
+                                        isActive &&
+                                          'bg-accent text-accent-foreground'
                                       )}
                                     >
                                       <div className="flex size-8 shrink-0 items-center justify-center">
-                                        {subItem.icon
-                                          ? (
-                                              <subItem.icon
-                                                className="size-4 text-muted-foreground group-hover:text-accent-foreground"
-                                              />
-                                            )
-                                          : null}
+                                        {subItem.icon ? (
+                                          <subItem.icon className="size-4 text-muted-foreground group-hover:text-accent-foreground" />
+                                        ) : null}
                                       </div>
                                       <div className="flex-1">
                                         <div className="text-sm font-medium">
@@ -145,7 +144,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
                                   }
                                 />
                               </li>
-                            )
+                            );
                           })}
                         </ul>
                       </NavigationMenuContent>
@@ -190,7 +189,9 @@ export function Navbar({ scroll = true }: NavbarProps) {
               <div className="flex items-center gap-x-4">
                 <Link
                   to={Routes.Login}
-                  className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+                  className={cn(
+                    buttonVariants({ variant: 'outline', size: 'sm' })
+                  )}
                 >
                   Log in
                 </Link>
@@ -208,5 +209,5 @@ export function Navbar({ scroll = true }: NavbarProps) {
         <NavbarMobile className="lg:hidden" />
       </Container>
     </section>
-  )
+  );
 }

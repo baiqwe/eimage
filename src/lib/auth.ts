@@ -1,10 +1,10 @@
-import { env } from "cloudflare:workers";
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { tanstackStartCookies } from "better-auth/tanstack-start";
-import { getDb } from "@/db";
-import { sendEmail } from "@/mail";
-import { getBaseUrl } from "./urls";
+import { env } from 'cloudflare:workers';
+import { betterAuth } from 'better-auth';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { tanstackStartCookies } from 'better-auth/tanstack-start';
+import { getDb } from '@/db';
+import { sendEmail } from '@/mail';
+import { getBaseUrl } from './urls';
 
 /**
  * Better Auth Drizzle Adapter
@@ -14,7 +14,7 @@ import { getBaseUrl } from "./urls";
 export const auth = betterAuth({
   baseURL: getBaseUrl(),
   database: drizzleAdapter(getDb(env.DB), {
-    provider: "sqlite",
+    provider: 'sqlite',
   }),
   emailAndPassword: {
     enabled: true,
@@ -22,8 +22,8 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
-        template: "forgotPassword",
-        context: { url, name: user.name ?? "" },
+        template: 'forgotPassword',
+        context: { url, name: user.name ?? '' },
       });
     },
   },
@@ -31,8 +31,8 @@ export const auth = betterAuth({
     sendVerificationEmail: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
-        template: "verifyEmail",
-        context: { url, name: user.name ?? "" },
+        template: 'verifyEmail',
+        context: { url, name: user.name ?? '' },
       });
     },
   },

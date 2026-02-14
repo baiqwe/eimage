@@ -1,18 +1,18 @@
-import { Link, useRouter } from '@tanstack/react-router'
-import { ArrowLeftIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { Link, useRouter } from '@tanstack/react-router';
+import { ArrowLeftIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface BackButtonSmallProps {
-  href?: string
-  className?: string
+  href?: string;
+  className?: string;
 }
 
 export default function BackButtonSmall({
   href,
   className,
 }: BackButtonSmallProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   const button = (
     <Button
@@ -22,10 +22,10 @@ export default function BackButtonSmall({
     >
       <ArrowLeftIcon className="size-4" />
     </Button>
-  )
+  );
 
   if (href != null) {
-    return <Link to={href}>{button}</Link>
+    return <Link to={href}>{button}</Link>;
   }
   return (
     <Button
@@ -36,5 +36,5 @@ export default function BackButtonSmall({
     >
       <ArrowLeftIcon className="size-4" />
     </Button>
-  )
+  );
 }

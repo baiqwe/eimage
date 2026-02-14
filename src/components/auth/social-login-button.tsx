@@ -1,21 +1,21 @@
-import { useState } from 'react'
-import { DividerWithText } from '@/components/auth/divider-with-text'
-import { GoogleIcon } from '@/components/icons/google'
-import { Button } from '@/components/ui/button'
-import { websiteConfig } from '@/config/website'
-import { authClient } from '@/lib/auth-client'
-import { getBaseUrl } from '@/lib/urls'
-import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/routes'
-import { Loader2Icon } from 'lucide-react'
+import { useState } from 'react';
+import { DividerWithText } from '@/components/auth/divider-with-text';
+import { GoogleIcon } from '@/components/icons/google';
+import { Button } from '@/components/ui/button';
+import { websiteConfig } from '@/config/website';
+import { authClient } from '@/lib/auth-client';
+import { getBaseUrl } from '@/lib/urls';
+import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/routes';
+import { Loader2Icon } from 'lucide-react';
 
 const message = {
   or: 'Or continue with',
   signInWithGoogle: 'Sign In with Google',
-} as const
+} as const;
 
 interface SocialLoginButtonProps {
-  callbackUrl?: string
-  showDivider?: boolean
+  callbackUrl?: string;
+  showDivider?: boolean;
 }
 
 export function SocialLoginButton({
@@ -25,16 +25,19 @@ export function SocialLoginButton({
   const paramCallbackUrl =
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('callbackUrl')
-      : null
-  const defaultCallbackUrl = `${getBaseUrl()}${DEFAULT_LOGIN_REDIRECT}`
+      : null;
+  const defaultCallbackUrl = `${getBaseUrl()}${DEFAULT_LOGIN_REDIRECT}`;
   const callbackUrl =
-    propCallbackUrl ?? (paramCallbackUrl ? `${getBaseUrl()}${paramCallbackUrl}` : defaultCallbackUrl)
-  const errorCallbackUrl = `${getBaseUrl()}${Routes.AuthError}`
+    propCallbackUrl ??
+    (paramCallbackUrl
+      ? `${getBaseUrl()}${paramCallbackUrl}`
+      : defaultCallbackUrl);
+  const errorCallbackUrl = `${getBaseUrl()}${Routes.AuthError}`;
 
-  const [isLoading, setIsLoading] = useState<'google' | null>(null)
+  const [isLoading, setIsLoading] = useState<'google' | null>(null);
 
   if (!websiteConfig.auth.enableGoogleLogin) {
-    return null
+    return null;
   }
 
   const onClick = async (provider: 'google') => {
@@ -49,9 +52,9 @@ export function SocialLoginButton({
         onResponse: () => setIsLoading(null),
         onSuccess: () => setIsLoading(null),
         onError: () => setIsLoading(null),
-      },
-    )
-  }
+      }
+    );
+  };
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -73,5 +76,5 @@ export function SocialLoginButton({
         </Button>
       )}
     </div>
-  )
+  );
 }

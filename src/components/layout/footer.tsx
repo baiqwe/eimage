@@ -1,18 +1,16 @@
-import { getFooterLinks } from '@/config/footer-config'
-import { getSocialLinks } from '@/config/social-config'
-import { cn } from '@/lib/utils'
-import Container from '@/components/layout/container'
-import { Logo } from '@/components/layout/logo'
-import { SocialIcon } from '@/components/layout/social-icons'
-import { Link } from '@tanstack/react-router'
+import { getFooterLinks } from '@/config/footer-config';
+import { getSocialLinks } from '@/config/social-config';
+import { cn } from '@/lib/utils';
+import Container from '@/components/layout/container';
+import { Logo } from '@/components/layout/logo';
+import { SocialIcon } from '@/components/layout/social-icons';
+import { Link } from '@tanstack/react-router';
 
-const APP_NAME = 'MkFast'
+const APP_NAME = 'MkFast';
 
-export function Footer({
-  className,
-}: React.HTMLAttributes<HTMLElement>) {
-  const footerLinks = getFooterLinks()
-  const socialLinks = getSocialLinks()
+export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
+  const footerLinks = getFooterLinks();
+  const socialLinks = getSocialLinks();
 
   return (
     <footer className={cn('border-t', className)}>
@@ -79,5 +77,5 @@ export function Footer({
         </Container>
       </div>
     </footer>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import EmailLayout from '../components/email-layout'
-import { Heading, Text } from '@react-email/components'
+import EmailLayout from '../components/email-layout';
+import { Heading, Text } from '@react-email/components';
 
 export default function SubscribeNewsletter() {
   return (
@@ -10,5 +10,5 @@ export default function SubscribeNewsletter() {
         with the latest news and updates.
       </Text>
     </EmailLayout>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { marked } from 'marked'
-import { cn } from '@/lib/utils'
+import { marked } from 'marked';
+import { cn } from '@/lib/utils';
 
 /**
  * Renders markdown string as HTML using Tailwind Typography (prose).
@@ -9,10 +9,10 @@ export function MarkdownBody({
   content,
   className,
 }: {
-  content: string
-  className?: string
+  content: string;
+  className?: string;
 }) {
-  const html = marked.parse(content, { async: false }) as string
+  const html = marked.parse(content, { async: false }) as string;
   return (
     <div
       className={cn(
@@ -27,5 +27,5 @@ export function MarkdownBody({
       )}
       dangerouslySetInnerHTML={{ __html: html }}
     />
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import type { WebsiteConfig } from './types'
+import type { WebsiteConfig } from './types';
 
 /**
  * Website config
@@ -59,10 +59,8 @@ export const websiteConfig: WebsiteConfig = {
   },
   mail: {
     provider: 'resend',
-    fromEmail:
-      'MkFast <noreply@mksaas.link>',
-    supportEmail:
-      'MkFast <support@mksaas.link>',
+    fromEmail: 'MkFast <noreply@mksaas.link>',
+    supportEmail: 'MkFast <support@mksaas.link>',
   },
   newsletter: {
     enable: true,
@@ -94,16 +92,14 @@ export const websiteConfig: WebsiteConfig = {
         prices: [
           {
             type: 'subscription',
-            priceId:
-              '',
+            priceId: '',
             amount: 990,
             currency: 'USD',
             interval: 'month',
           },
           {
             type: 'subscription',
-            priceId:
-              '',
+            priceId: '',
             amount: 9900,
             currency: 'USD',
             interval: 'year',
@@ -123,8 +119,7 @@ export const websiteConfig: WebsiteConfig = {
         prices: [
           {
             type: 'one_time',
-            priceId:
-              '',
+            priceId: '',
             amount: 19900,
             currency: 'USD',
             allowPromotionCode: true,
@@ -155,8 +150,7 @@ export const websiteConfig: WebsiteConfig = {
         amount: 100,
         expireDays: 30,
         price: {
-          priceId:
-            '',
+          priceId: '',
           amount: 990,
           currency: 'USD',
           allowPromotionCode: true,
@@ -168,8 +162,7 @@ export const websiteConfig: WebsiteConfig = {
         amount: 200,
         expireDays: 30,
         price: {
-          priceId:
-            '',
+          priceId: '',
           amount: 1490,
           currency: 'USD',
           allowPromotionCode: true,
@@ -181,8 +174,7 @@ export const websiteConfig: WebsiteConfig = {
         amount: 500,
         expireDays: 30,
         price: {
-          priceId:
-            '',
+          priceId: '',
           amount: 3990,
           currency: 'USD',
           allowPromotionCode: true,
@@ -194,8 +186,7 @@ export const websiteConfig: WebsiteConfig = {
         amount: 1000,
         expireDays: 30,
         price: {
-          priceId:
-            '',
+          priceId: '',
           amount: 6990,
           currency: 'USD',
           allowPromotionCode: true,
@@ -203,4 +194,4 @@ export const websiteConfig: WebsiteConfig = {
       },
     },
   },
-}
+};

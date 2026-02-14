@@ -1,16 +1,16 @@
-import { Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router';
 
 export function BlogPagination({
   currentPage,
   totalPages,
 }: {
-  currentPage: number
-  totalPages: number
+  currentPage: number;
+  totalPages: number;
 }) {
-  if (totalPages <= 1) return null
+  if (totalPages <= 1) return null;
 
-  const prevPage = currentPage - 1
-  const nextPage = currentPage + 1
+  const prevPage = currentPage - 1;
+  const nextPage = currentPage + 1;
 
   return (
     <nav
@@ -47,5 +47,5 @@ export function BlogPagination({
         </span>
       )}
     </nav>
-  )
+  );
 }

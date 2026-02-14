@@ -1,8 +1,8 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 interface DividerWithTextProps {
-  text: string
-  className?: string
+  text: string;
+  className?: string;
 }
 
 export function DividerWithText({ text, className }: DividerWithTextProps) {
@@ -12,5 +12,5 @@ export function DividerWithText({ text, className }: DividerWithTextProps) {
       <span className="shrink mx-4 text-sm text-muted-foreground">{text}</span>
       <div className="grow border-t border-border" />
     </div>
-  )
+  );
 }

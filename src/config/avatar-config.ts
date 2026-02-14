@@ -2,9 +2,9 @@ import {
   IconCreditCard,
   IconLayoutDashboard,
   IconSettings2,
-} from '@tabler/icons-react'
-import { Routes } from '@/routes'
-import type { MenuItemConfig } from './types'
+} from '@tabler/icons-react';
+import { Routes } from '@/routes';
+import type { MenuItemConfig } from './types';
 
 /**
  * Avatar dropdown links (English). Shown when user clicks avatar in header.
@@ -26,5 +26,5 @@ export function getAvatarLinks(): MenuItemConfig[] {
       href: Routes.SettingsProfile,
       icon: IconSettings2,
     },
-  ]
+  ];
 }

@@ -1,11 +1,11 @@
-import { MarkdownBody } from '@/components/blog/markdown-body'
-import { Card, CardContent } from '@/components/ui/card'
+import { MarkdownBody } from '@/components/blog/markdown-body';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface PageData {
-  title: string
-  description: string
-  date?: string
-  content: string
+  title: string;
+  description: string;
+  date?: string;
+  content: string;
 }
 
 function formatDate(dateStr: string): string {
@@ -13,11 +13,11 @@ function formatDate(dateStr: string): string {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  })
+  });
 }
 
 export function PageMarkdown({ page }: { page: PageData }) {
-  const { title, description, date, content } = page
+  const { title, description, date, content } = page;
 
   return (
     <div className="mx-auto max-w-3xl space-y-8">
@@ -44,5 +44,5 @@ export function PageMarkdown({ page }: { page: PageData }) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

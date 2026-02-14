@@ -7,18 +7,18 @@ import {
   Section,
   Tailwind,
   Text,
-} from '@react-email/components'
-import { APP_NAME } from '../constants'
+} from '@react-email/components';
+import { APP_NAME } from '../constants';
 
 interface EmailLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 /**
  * Shared email layout (same structure as MkSaaS).
  */
 export default function EmailLayout({ children }: EmailLayoutProps) {
-  const year = new Date().getFullYear()
+  const year = new Date().getFullYear();
   return (
     <Html lang="en">
       <Head>
@@ -40,5 +40,5 @@ export default function EmailLayout({ children }: EmailLayoutProps) {
         </Section>
       </Tailwind>
     </Html>
-  )
+  );
 }

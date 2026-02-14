@@ -1,18 +1,17 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { LoginForm } from '@/components/auth/login-form'
-import { Routes } from '@/routes'
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { LoginForm } from '@/components/auth/login-form';
+import { Routes } from '@/routes';
 
 export const Route = createFileRoute('/auth/login')({
   component: LoginPage,
-})
+});
 
 const message = {
-  byClickingContinue:
-    'By clicking continue, you agree to our ',
+  byClickingContinue: 'By clicking continue, you agree to our ',
   termsOfService: 'Terms of Service',
   privacyPolicy: 'Privacy Policy',
   and: ' and ',
-} as const
+} as const;
 
 function LoginPage() {
   return (
@@ -35,5 +34,5 @@ function LoginPage() {
         </Link>
       </div>
     </div>
-  )
+  );
 }

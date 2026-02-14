@@ -1,9 +1,9 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
-import BackButtonSmall from '@/components/shared/back-button-small'
+import { createFileRoute, Outlet } from '@tanstack/react-router';
+import BackButtonSmall from '@/components/shared/back-button-small';
 
 export const Route = createFileRoute('/auth')({
   component: AuthLayout,
-})
+});
 
 function AuthLayout() {
   return (
@@ -13,5 +13,5 @@ function AuthLayout() {
         <Outlet />
       </div>
     </div>
-  )
+  );
 }

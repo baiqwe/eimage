@@ -1,10 +1,10 @@
-import EmailLayout from '../components/email-layout'
-import { Text } from '@react-email/components'
+import EmailLayout from '../components/email-layout';
+import { Text } from '@react-email/components';
 
 interface ContactMessageProps {
-  name: string
-  email: string
-  message: string
+  name: string;
+  email: string;
+  message: string;
 }
 
 export default function ContactMessage({
@@ -18,5 +18,5 @@ export default function ContactMessage({
       <Text>Email: {email}</Text>
       <Text>Message: {message}</Text>
     </EmailLayout>
-  )
+  );
 }

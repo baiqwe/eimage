@@ -1,16 +1,16 @@
-import { Logo } from '@/components/layout/logo'
-import { buttonVariants } from '@/components/ui/button'
-import { Link } from '@tanstack/react-router'
-import { cn } from '@/lib/utils'
+import { Logo } from '@/components/layout/logo';
+import { buttonVariants } from '@/components/ui/button';
+import { Link } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
 
 function IntegrationCard({
   children,
   className,
   borderClassName,
 }: {
-  children: React.ReactNode
-  className?: string
-  borderClassName?: string
+  children: React.ReactNode;
+  className?: string;
+  borderClassName?: string;
 }) {
   return (
     <div
@@ -27,7 +27,7 @@ function IntegrationCard({
         {children}
       </div>
     </div>
-  )
+  );
 }
 
 export default function Integration2Section() {
@@ -81,7 +81,9 @@ export default function Integration2Section() {
               </Link>
               <Link
                 to="/"
-                className={cn(buttonVariants({ size: 'lg', variant: 'outline' }))}
+                className={cn(
+                  buttonVariants({ size: 'lg', variant: 'outline' })
+                )}
               >
                 View docs
               </Link>
@@ -90,5 +92,5 @@ export default function Integration2Section() {
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,9 +1,9 @@
-import { HeaderSection } from '@/components/layout/header-section'
-import { buttonVariants } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Link } from '@tanstack/react-router'
-import { IconChevronRight } from '@tabler/icons-react'
-import { cn } from '@/lib/utils'
+import { HeaderSection } from '@/components/layout/header-section';
+import { buttonVariants } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Link } from '@tanstack/react-router';
+import { IconChevronRight } from '@tabler/icons-react';
+import { cn } from '@/lib/utils';
 
 const integrations = [
   {
@@ -30,14 +30,14 @@ const integrations = [
     title: 'Google PaLM',
     description: 'Google AI models.',
   },
-]
+];
 
 function IntegrationCard({
   title,
   description,
 }: {
-  title: string
-  description: string
+  title: string;
+  description: string;
 }) {
   return (
     <Card className="bg-transparent p-6 hover:bg-accent dark:hover:bg-card">
@@ -65,7 +65,7 @@ function IntegrationCard({
         </div>
       </div>
     </Card>
-  )
+  );
 }
 
 export default function IntegrationSection() {
@@ -91,5 +91,5 @@ export default function IntegrationSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

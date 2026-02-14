@@ -1,8 +1,8 @@
-import { Link } from '@tanstack/react-router'
-import { AuthCard } from '@/components/auth/auth-card'
-import { FormError } from '@/components/shared/form-error'
-import { FormSuccess } from '@/components/shared/form-success'
-import { Button } from '@/components/ui/button'
+import { Link } from '@tanstack/react-router';
+import { AuthCard } from '@/components/auth/auth-card';
+import { FormError } from '@/components/shared/form-error';
+import { FormSuccess } from '@/components/shared/form-success';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -10,19 +10,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { websiteConfig } from '@/config/website'
-import { authClient } from '@/lib/auth-client'
-import { getBaseUrl } from '@/lib/urls'
-import { cn } from '@/lib/utils'
-import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/routes'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import { SocialLoginButton } from './social-login-button'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { websiteConfig } from '@/config/website';
+import { authClient } from '@/lib/auth-client';
+import { getBaseUrl } from '@/lib/urls';
+import { cn } from '@/lib/utils';
+import { DEFAULT_LOGIN_REDIRECT, Routes } from '@/routes';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { SocialLoginButton } from './social-login-button';
 
 const message = {
   welcomeBack: 'Welcome back',
@@ -35,11 +35,11 @@ const message = {
   hidePassword: 'Hide password',
   emailRequired: 'Please enter your email',
   passwordRequired: 'Please enter your password',
-} as const
+} as const;
 
 export interface LoginFormProps {
-  className?: string
-  callbackUrl?: string
+  className?: string;
+  callbackUrl?: string;
 }
 
 export function LoginForm({
@@ -49,33 +49,35 @@ export function LoginForm({
   const paramCallbackUrl =
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('callbackUrl')
-      : null
-  const defaultCallbackUrl = `${getBaseUrl()}${DEFAULT_LOGIN_REDIRECT}`
+      : null;
+  const defaultCallbackUrl = `${getBaseUrl()}${DEFAULT_LOGIN_REDIRECT}`;
   const callbackUrl =
     propCallbackUrl ??
-    (paramCallbackUrl ? `${getBaseUrl()}${paramCallbackUrl}` : defaultCallbackUrl)
+    (paramCallbackUrl
+      ? `${getBaseUrl()}${paramCallbackUrl}`
+      : defaultCallbackUrl);
 
-  const [error, setError] = useState<string | undefined>('')
-  const [success, setSuccess] = useState<string | undefined>('')
-  const [isPending, setIsPending] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string | undefined>('');
+  const [success, setSuccess] = useState<string | undefined>('');
+  const [isPending, setIsPending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const credentialLoginEnabled = websiteConfig.auth.enableCredentialLogin
+  const credentialLoginEnabled = websiteConfig.auth.enableCredentialLogin;
 
   const LoginSchema = z.object({
     email: z.string().email({ message: message.emailRequired }),
     password: z.string().min(1, { message: message.passwordRequired }),
-  })
+  });
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: { email: '', password: '' },
-  })
+  });
 
   const urlError =
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('error')
-      : null
+      : null;
 
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
     await authClient.signIn.email(
@@ -86,22 +88,22 @@ export function LoginForm({
       },
       {
         onRequest: () => {
-          setIsPending(true)
-          setError('')
-          setSuccess('')
+          setIsPending(true);
+          setError('');
+          setSuccess('');
         },
         onResponse: () => setIsPending(false),
         onSuccess: () => {},
         onError: (ctx) => {
-          setError(`${ctx.error.status}: ${ctx.error.message}`)
+          setError(`${ctx.error.status}: ${ctx.error.message}`);
         },
-      },
-    )
-  }
+      }
+    );
+  };
 
   const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev)
-  }
+    setShowPassword((prev) => !prev);
+  };
 
   return (
     <AuthCard
@@ -204,5 +206,5 @@ export function LoginForm({
         />
       </div>
     </AuthCard>
-  )
+  );
 }

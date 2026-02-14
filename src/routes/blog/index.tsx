@@ -1,27 +1,28 @@
-import { createFileRoute } from '@tanstack/react-router'
-import Container from '@/components/layout/container'
-import { BlogGrid } from '@/components/blog/blog-grid'
-import { BlogPagination } from '@/components/blog/blog-pagination'
-import { getPaginatedPosts } from '@/lib/blog'
-import { websiteConfig } from '@/config/website'
+import { createFileRoute } from '@tanstack/react-router';
+import Container from '@/components/layout/container';
+import { BlogGrid } from '@/components/blog/blog-grid';
+import { BlogPagination } from '@/components/blog/blog-pagination';
+import { getPaginatedPosts } from '@/lib/blog';
+import { websiteConfig } from '@/config/website';
 
 export const Route = createFileRoute('/blog/')({
   validateSearch: (search: Record<string, unknown>) => ({
-    page: typeof search.page === 'number' ? search.page : Number(search.page) || 1,
+    page:
+      typeof search.page === 'number' ? search.page : Number(search.page) || 1,
   }),
   component: BlogListPage,
-})
+});
 
 function BlogListPage() {
-  const { page } = Route.useSearch()
-  const { posts, totalPages, currentPage } = getPaginatedPosts(page)
+  const { page } = Route.useSearch();
+  const { posts, totalPages, currentPage } = getPaginatedPosts(page);
 
   if (!websiteConfig.blog?.enable) {
     return (
       <Container className="py-16">
         <p className="text-center text-muted-foreground">Blog is disabled.</p>
       </Container>
-    )
+    );
   }
 
   return (
@@ -35,9 +36,11 @@ function BlogListPage() {
         </div>
       </div>
       <Container className="mt-8 px-4">
-        <BlogGrid posts={posts as (typeof posts[0] & { _meta: { path: string } })[]} />
+        <BlogGrid
+          posts={posts as ((typeof posts)[0] & { _meta: { path: string } })[]}
+        />
         <BlogPagination currentPage={currentPage} totalPages={totalPages} />
       </Container>
     </div>
-  )
+  );
 }

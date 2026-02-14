@@ -1,30 +1,30 @@
 export interface SubscribeNewsletterParams {
-  email: string
+  email: string;
 }
 
 export interface UnsubscribeNewsletterParams {
-  email: string
+  email: string;
 }
 
 export interface CheckSubscribeStatusParams {
-  email: string
+  email: string;
 }
 
 export type SubscribeNewsletterHandler = (
   params: SubscribeNewsletterParams
-) => Promise<boolean>
+) => Promise<boolean>;
 
 export type UnsubscribeNewsletterHandler = (
   params: UnsubscribeNewsletterParams
-) => Promise<boolean>
+) => Promise<boolean>;
 
 export type CheckSubscribeStatusHandler = (
   params: CheckSubscribeStatusParams
-) => Promise<boolean>
+) => Promise<boolean>;
 
 export interface NewsletterProvider {
-  subscribe: SubscribeNewsletterHandler
-  unsubscribe: UnsubscribeNewsletterHandler
-  checkSubscribeStatus: CheckSubscribeStatusHandler
-  getProviderName(): string
+  subscribe: SubscribeNewsletterHandler;
+  unsubscribe: UnsubscribeNewsletterHandler;
+  checkSubscribeStatus: CheckSubscribeStatusHandler;
+  getProviderName(): string;
 }

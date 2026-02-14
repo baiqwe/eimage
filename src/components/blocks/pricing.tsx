@@ -1,14 +1,14 @@
-import { HeaderSection } from '@/components/layout/header-section'
-import { getPricePlans } from '@/config/price-config'
-import { buttonVariants } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Link } from '@tanstack/react-router'
-import { IconCheck } from '@tabler/icons-react'
-import { cn } from '@/lib/utils'
+import { HeaderSection } from '@/components/layout/header-section';
+import { getPricePlans } from '@/config/price-config';
+import { buttonVariants } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Link } from '@tanstack/react-router';
+import { IconCheck } from '@tabler/icons-react';
+import { cn } from '@/lib/utils';
 
 export default function PricingSection() {
-  const plans = getPricePlans()
-  const planList = Object.entries(plans)
+  const plans = getPricePlans();
+  const planList = Object.entries(plans);
 
   return (
     <section id="pricing" className="px-4 py-16">
@@ -42,8 +42,7 @@ export default function PricingSection() {
                 ) : plan.prices[0] ? (
                   <div className="mt-4">
                     <span className="text-3xl font-bold">
-                      $
-                      {(plan.prices[0].amount / 100).toLocaleString()}
+                      ${(plan.prices[0].amount / 100).toLocaleString()}
                     </span>
                     <span className="text-muted-foreground">
                       /{plan.prices[0].interval === 'year' ? 'year' : 'month'}
@@ -77,5 +76,5 @@ export default function PricingSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

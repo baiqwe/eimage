@@ -1,26 +1,22 @@
-import { websiteConfig } from '@/config/website'
+import { websiteConfig } from '@/config/website';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  IconDeviceDesktop,
-  IconMoon,
-  IconSun,
-} from '@tabler/icons-react'
-import { useTheme } from '@/components/layout/theme-provider'
+} from '@/components/ui/dropdown-menu';
+import { IconDeviceDesktop, IconMoon, IconSun } from '@tabler/icons-react';
+import { useTheme } from '@/components/layout/theme-provider';
 
 /**
  * Theme mode switcher (light / dark / system), used in navbar.
  */
 export function ModeSwitcher() {
   if (!websiteConfig.ui?.mode?.enableSwitch) {
-    return null
+    return null;
   }
 
-  const { setTheme } = useTheme()
+  const { setTheme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -57,5 +53,5 @@ export function ModeSwitcher() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

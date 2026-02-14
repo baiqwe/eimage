@@ -12,7 +12,7 @@ import {
   IconMenu2,
   IconShieldCheck,
   IconX,
-} from '@tabler/icons-react'
+} from '@tabler/icons-react';
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Building: IconBuilding,
   Mail: IconMail,
@@ -27,17 +27,17 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   ChevronDown: IconChevronDown,
   ChevronRight: IconChevronRight,
   ArrowUpRight: IconArrowUpRight,
-}
+};
 
 export function NavbarIcon({
   name,
   className,
 }: {
-  name?: string
-  className?: string
+  name?: string;
+  className?: string;
 }) {
-  if (!name) return null
-  const Icon = iconMap[name]
-  if (!Icon) return null
-  return <Icon className={className} />
+  if (!name) return null;
+  const Icon = iconMap[name];
+  if (!Icon) return null;
+  return <Icon className={className} />;
 }

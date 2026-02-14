@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { useRouter } from '@tanstack/react-router'
-import { AuthCard } from '@/components/auth/auth-card'
-import { FormError } from '@/components/shared/form-error'
-import { FormSuccess } from '@/components/shared/form-success'
-import { Button } from '@/components/ui/button'
+import { useState } from 'react';
+import { useRouter } from '@tanstack/react-router';
+import { AuthCard } from '@/components/auth/auth-card';
+import { FormError } from '@/components/shared/form-error';
+import { FormSuccess } from '@/components/shared/form-success';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -11,14 +11,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { authClient } from '@/lib/auth-client'
-import { Routes } from '@/routes'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { authClient } from '@/lib/auth-client';
+import { Routes } from '@/routes';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
 
 const message = {
   title: 'Reset Password',
@@ -28,18 +28,18 @@ const message = {
   showPassword: 'Show password',
   hidePassword: 'Hide password',
   minLength: 'Password must be at least 8 characters',
-} as const
+} as const;
 
 export function ResetPasswordForm() {
-  const router = useRouter()
+  const router = useRouter();
   const token =
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('token')
-      : null
+      : null;
   const errorParam =
     typeof window !== 'undefined'
       ? new URLSearchParams(window.location.search).get('error')
-      : null
+      : null;
 
   if (!token || errorParam === 'invalid_token') {
     return (
@@ -52,26 +52,26 @@ export function ResetPasswordForm() {
           Invalid or expired reset link. Please request a new one.
         </p>
       </AuthCard>
-    )
+    );
   }
 
-  const [error, setError] = useState<string | undefined>('')
-  const [success, setSuccess] = useState<string | undefined>('')
-  const [isPending, setIsPending] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string | undefined>('');
+  const [success, setSuccess] = useState<string | undefined>('');
+  const [isPending, setIsPending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const ResetPasswordSchema = z.object({
     password: z.string().min(8, { message: message.minLength }),
-  })
+  });
 
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
     defaultValues: { password: '' },
-  })
+  });
 
   const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev)
-  }
+    setShowPassword((prev) => !prev);
+  };
 
   const onSubmit = async (values: z.infer<typeof ResetPasswordSchema>) => {
     await authClient.resetPassword(
@@ -81,20 +81,20 @@ export function ResetPasswordForm() {
       },
       {
         onRequest: () => {
-          setIsPending(true)
-          setError('')
-          setSuccess('')
+          setIsPending(true);
+          setError('');
+          setSuccess('');
         },
         onResponse: () => setIsPending(false),
         onSuccess: () => {
-          router.navigate({ to: Routes.Login })
+          router.navigate({ to: Routes.Login });
         },
         onError: (ctx) => {
-          setError(`${ctx.error.status}: ${ctx.error.message}`)
+          setError(`${ctx.error.status}: ${ctx.error.message}`);
         },
-      },
-    )
-  }
+      }
+    );
+  };
 
   return (
     <AuthCard
@@ -154,13 +154,11 @@ export function ResetPasswordForm() {
             type="submit"
             className="w-full cursor-pointer"
           >
-            {isPending && (
-              <Loader2Icon className="mr-2 size-4 animate-spin" />
-            )}
+            {isPending && <Loader2Icon className="mr-2 size-4 animate-spin" />}
             <span>{message.reset}</span>
           </Button>
         </form>
       </Form>
     </AuthCard>
-  )
+  );
 }

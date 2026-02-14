@@ -1,12 +1,12 @@
-import { AuthCard } from '@/components/auth/auth-card'
-import { Routes } from '@/routes'
-import { TriangleAlertIcon } from 'lucide-react'
+import { AuthCard } from '@/components/auth/auth-card';
+import { Routes } from '@/routes';
+import { TriangleAlertIcon } from 'lucide-react';
 
 const message = {
   title: 'Oops! Something went wrong!',
   tryAgain: 'Please try again.',
   backToLogin: 'Back to login',
-} as const
+} as const;
 
 export function ErrorCard() {
   return (
@@ -21,5 +21,5 @@ export function ErrorCard() {
         <p className="font-medium text-destructive">{message.tryAgain}</p>
       </div>
     </AuthCard>
-  )
+  );
 }

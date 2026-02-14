@@ -1,4 +1,4 @@
-import { websiteConfig } from './config/website'
+import { websiteConfig } from './config/website';
 
 export const Routes = {
   Root: '/',
@@ -29,7 +29,7 @@ export const Routes = {
   SettingsSecurity: '/dashboard/settings/security',
   SettingsNotifications: '/dashboard/settings/notifications',
   AdminUsers: '/dashboard/admin/users',
-} as const
+} as const;
 
 export const DEFAULT_LOGIN_REDIRECT =
-  websiteConfig.routes.defaultLoginRedirect ?? Routes.Dashboard
+  websiteConfig.routes.defaultLoginRedirect ?? Routes.Dashboard;

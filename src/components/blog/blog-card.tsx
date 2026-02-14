@@ -1,19 +1,19 @@
-import type { Blog } from 'content-collections'
-import { Link } from '@tanstack/react-router'
+import type { Blog } from 'content-collections';
+import { Link } from '@tanstack/react-router';
 
-type BlogWithMeta = Blog & { _meta: { path: string } }
+type BlogWithMeta = Blog & { _meta: { path: string } };
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  })
+  });
 }
 
 export function BlogCard({ post }: { post: BlogWithMeta }) {
-  const slug = post._meta.path
-  const dateFormatted = formatDate(post.date)
+  const slug = post._meta.path;
+  const dateFormatted = formatDate(post.date);
 
   return (
     <Link
@@ -37,10 +37,7 @@ export function BlogCard({ post }: { post: BlogWithMeta }) {
           <span className="rounded-full bg-muted px-2.5 py-0.5 text-muted-foreground text-xs font-medium capitalize">
             {post.category}
           </span>
-          <time
-            dateTime={post.date}
-            className="text-muted-foreground text-xs"
-          >
+          <time dateTime={post.date} className="text-muted-foreground text-xs">
             {dateFormatted}
           </time>
         </div>
@@ -72,5 +69,5 @@ export function BlogCard({ post }: { post: BlogWithMeta }) {
         </div>
       </div>
     </Link>
-  )
+  );
 }

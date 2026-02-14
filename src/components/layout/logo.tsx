@@ -1,11 +1,9 @@
-import { websiteConfig } from '@/config/website'
-import { cn } from '@/lib/utils'
+import { websiteConfig } from '@/config/website';
+import { cn } from '@/lib/utils';
 
 export function Logo({ className }: { className?: string }) {
-  const logoLight =
-    websiteConfig.metadata?.images?.logoLight ?? '/logo.png'
-  const logoDark =
-    websiteConfig.metadata?.images?.logoDark ?? logoLight
+  const logoLight = websiteConfig.metadata?.images?.logoLight ?? '/logo.png';
+  const logoDark = websiteConfig.metadata?.images?.logoDark ?? logoLight;
   return (
     <>
       <img
@@ -23,5 +21,5 @@ export function Logo({ className }: { className?: string }) {
         height={32}
       />
     </>
-  )
+  );
 }

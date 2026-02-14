@@ -1,29 +1,29 @@
-import { getAvatarLinks } from '@/config/avatar-config'
-import { authClient } from '@/lib/auth-client'
-import type { User } from 'better-auth'
-import { IconLogout } from '@tabler/icons-react'
-import { Link, useRouter } from '@tanstack/react-router'
+import { getAvatarLinks } from '@/config/avatar-config';
+import { authClient } from '@/lib/auth-client';
+import type { User } from 'better-auth';
+import { IconLogout } from '@tabler/icons-react';
+import { Link, useRouter } from '@tanstack/react-router';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { UserAvatar } from './user-avatar'
+} from '@/components/ui/dropdown-menu';
+import { UserAvatar } from './user-avatar';
 
 interface UserButtonProps {
-  user: User
+  user: User;
 }
 
 export function UserButton({ user }: UserButtonProps) {
-  const router = useRouter()
-  const avatarLinks = getAvatarLinks()
+  const router = useRouter();
+  const avatarLinks = getAvatarLinks();
 
   const handleSignOut = async () => {
-    await authClient.signOut()
-    router.navigate({ to: '/' })
-  }
+    await authClient.signOut();
+    router.navigate({ to: '/' });
+  };
 
   return (
     <DropdownMenu>
@@ -48,9 +48,7 @@ export function UserButton({ user }: UserButtonProps) {
           item.href ? (
             <DropdownMenuItem key={item.title}>
               <Link to={item.href} className="flex items-center">
-                {item.icon
-                  ? <item.icon className="mr-2 size-4" />
-                  : null}
+                {item.icon ? <item.icon className="mr-2 size-4" /> : null}
                 {item.title}
               </Link>
             </DropdownMenuItem>
@@ -63,5 +61,5 @@ export function UserButton({ user }: UserButtonProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

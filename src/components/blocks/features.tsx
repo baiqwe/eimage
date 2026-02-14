@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import { HeaderSection } from '@/components/layout/header-section'
+import { HeaderSection } from '@/components/layout/header-section';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion'
+} from '@/components/ui/accordion';
 import {
   IconChartBar,
   IconDatabase,
   IconFingerprint,
   IconId,
-} from '@tabler/icons-react'
-import { useState } from 'react'
+} from '@tabler/icons-react';
+import { useState } from 'react';
 
 const items = [
   {
@@ -44,10 +44,10 @@ const items = [
     description:
       'Track usage and conversions. Dashboards and reports out of the box.',
   },
-]
+];
 
 export default function FeaturesSection() {
-  const [activeItem, setActiveItem] = useState('item-1')
+  const [activeItem, setActiveItem] = useState('item-1');
 
   return (
     <section id="features" className="px-4 py-16">
@@ -72,7 +72,9 @@ export default function FeaturesSection() {
             </div>
             <Accordion
               value={[activeItem]}
-              onValueChange={(v) => setActiveItem((v?.[0] as string) ?? 'item-1')}
+              onValueChange={(v) =>
+                setActiveItem((v?.[0] as string) ?? 'item-1')
+              }
               className="w-full"
             >
               {items.map((item) => (
@@ -108,5 +110,5 @@ export default function FeaturesSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

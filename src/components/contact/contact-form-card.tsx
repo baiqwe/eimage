@@ -1,5 +1,5 @@
-import { FormError } from '@/components/shared/form-error'
-import { Button } from '@/components/ui/button'
+import { FormError } from '@/components/shared/form-error';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@/components/ui/card';
 import {
   Form,
   FormControl,
@@ -15,13 +15,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 const schema = z.object({
   name: z
@@ -33,38 +33,38 @@ const schema = z.object({
     .string()
     .min(10, 'Message must be at least 10 characters')
     .max(500, 'Message must not exceed 500 characters'),
-})
+});
 
-type FormValues = z.infer<typeof schema>
+type FormValues = z.infer<typeof schema>;
 
 export function ContactFormCard() {
-  const [error, setError] = useState<string | undefined>()
+  const [error, setError] = useState<string | undefined>();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { name: '', email: '', message: '' },
-  })
+  });
 
-  const isPending = form.formState.isSubmitting
+  const isPending = form.formState.isSubmitting;
 
   async function onSubmit(values: FormValues) {
-    setError(undefined)
+    setError(undefined);
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
-      })
-      const json = (await res.json()) as { success?: boolean; error?: string }
+      });
+      const json = (await res.json()) as { success?: boolean; error?: string };
       if (json.success) {
-        form.reset()
-        return
+        form.reset();
+        return;
       }
-      const msg = json.error ?? 'Failed to send the message'
-      setError(msg)
+      const msg = json.error ?? 'Failed to send the message';
+      setError(msg);
     } catch (err) {
-      console.error('Contact form error:', err)
-      setError('Failed to send the message')
+      console.error('Contact form error:', err);
+      setError('Failed to send the message');
     }
   }
 
@@ -125,12 +125,16 @@ export function ContactFormCard() {
             <FormError message={error} />
           </CardContent>
           <CardFooter className="mt-6 flex items-center justify-between rounded-none border-t bg-muted px-6 py-4">
-            <Button type="submit" disabled={isPending} className="cursor-pointer">
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="cursor-pointer"
+            >
               {isPending ? 'Sending…' : 'Send'}
             </Button>
           </CardFooter>
         </form>
       </Form>
     </Card>
-  )
+  );
 }

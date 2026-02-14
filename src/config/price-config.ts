@@ -1,21 +1,21 @@
-import type { PlanConfig } from './types'
-import { websiteConfig } from './website'
+import type { PlanConfig } from './types';
+import { websiteConfig } from './website';
 
 /** Plan with display copy (English) for pricing table */
 export interface PricePlanDisplay extends PlanConfig {
-  name: string
-  description: string
-  features: string[]
-  limits: string[]
+  name: string;
+  description: string;
+  features: string[];
+  limits: string[];
 }
 
 /**
  * Price plans with English display copy. Use in pricing table / billing UI.
  */
 export function getPricePlans(): Record<string, PricePlanDisplay> {
-  const plans: Record<string, PricePlanDisplay> = {}
-  const config = websiteConfig.price?.plans
-  if (!config) return plans
+  const plans: Record<string, PricePlanDisplay> = {};
+  const config = websiteConfig.price?.plans;
+  if (!config) return plans;
 
   if (config.free) {
     plans.free = {
@@ -29,7 +29,7 @@ export function getPricePlans(): Record<string, PricePlanDisplay> {
         'Standard limits',
       ],
       limits: ['Limit 1', 'Limit 2', 'Limit 3'],
-    }
+    };
   }
   if (config.pro) {
     plans.pro = {
@@ -44,7 +44,7 @@ export function getPricePlans(): Record<string, PricePlanDisplay> {
         'API access',
       ],
       limits: ['Limit 1', 'Limit 2'],
-    }
+    };
   }
   if (config.lifetime) {
     plans.lifetime = {
@@ -61,7 +61,7 @@ export function getPricePlans(): Record<string, PricePlanDisplay> {
         'Unlimited usage',
       ],
       limits: [],
-    }
+    };
   }
-  return plans
+  return plans;
 }

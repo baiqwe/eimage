@@ -3,8 +3,8 @@ import type {
   NewsletterProvider,
   SubscribeNewsletterParams,
   UnsubscribeNewsletterParams,
-} from '@/newsletter/types'
-import { Resend } from 'resend'
+} from '@/newsletter/types';
+import { Resend } from 'resend';
 
 /**
  * Resend newsletter provider.
@@ -12,17 +12,17 @@ import { Resend } from 'resend'
  * https://resend.com/docs/dashboard/audiences/contacts
  */
 export class ResendNewsletterProvider implements NewsletterProvider {
-  private resend: Resend
+  private resend: Resend;
 
   constructor(apiKey: string) {
     if (!apiKey) {
-      throw new Error('RESEND_API_KEY is required.')
+      throw new Error('RESEND_API_KEY is required.');
     }
-    this.resend = new Resend(apiKey)
+    this.resend = new Resend(apiKey);
   }
 
   getProviderName(): string {
-    return 'Resend'
+    return 'Resend';
   }
 
   /**
@@ -35,22 +35,22 @@ export class ResendNewsletterProvider implements NewsletterProvider {
       const createResult = await this.resend.contacts.create({
         email,
         unsubscribed: false,
-      })
-      if (!createResult.error) return true
+      });
+      if (!createResult.error) return true;
 
       // Create failed (e.g. contact already exists) -> update to subscribed
       const updateResult = await this.resend.contacts.update({
         email,
         unsubscribed: false,
-      })
+      });
       if (updateResult.error) {
-        console.error('Error updating contact', updateResult.error)
-        return false
+        console.error('Error updating contact', updateResult.error);
+        return false;
       }
-      return true
+      return true;
     } catch (error) {
-      console.error('Error subscribing newsletter', error)
-      return false
+      console.error('Error subscribing newsletter', error);
+      return false;
     }
   }
 
@@ -59,15 +59,15 @@ export class ResendNewsletterProvider implements NewsletterProvider {
       const result = await this.resend.contacts.update({
         email,
         unsubscribed: true,
-      })
+      });
       if (result.error) {
-        console.error('Error unsubscribing newsletter', result.error)
-        return false
+        console.error('Error unsubscribing newsletter', result.error);
+        return false;
       }
-      return true
+      return true;
     } catch (error) {
-      console.error('Error unsubscribing newsletter', error)
-      return false
+      console.error('Error unsubscribing newsletter', error);
+      return false;
     }
   }
 
@@ -75,12 +75,12 @@ export class ResendNewsletterProvider implements NewsletterProvider {
     email,
   }: CheckSubscribeStatusParams): Promise<boolean> {
     try {
-      const result = await this.resend.contacts.get({ email })
-      if (result.error) return false
-      return !result.data?.unsubscribed
+      const result = await this.resend.contacts.get({ email });
+      if (result.error) return false;
+      return !result.data?.unsubscribed;
     } catch (error) {
-      console.error('Error checking subscribe status', error)
-      return false
+      console.error('Error checking subscribe status', error);
+      return false;
     }
   }
 }

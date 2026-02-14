@@ -1,7 +1,7 @@
-import { buttonVariants } from '@/components/ui/button'
-import { Link } from '@tanstack/react-router'
-import { IconArrowRight } from '@tabler/icons-react'
-import { cn } from '@/lib/utils'
+import { buttonVariants } from '@/components/ui/button';
+import { Link } from '@tanstack/react-router';
+import { IconArrowRight } from '@tabler/icons-react';
+import { cn } from '@/lib/utils';
 
 export default function HeroSection() {
   return (
@@ -75,5 +75,5 @@ export default function HeroSection() {
         </div>
       </section>
     </main>
-  )
+  );
 }

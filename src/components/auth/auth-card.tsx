@@ -1,21 +1,21 @@
-import { BottomLink } from '@/components/auth/bottom-link'
-import { Logo } from '@/components/layout/logo'
+import { BottomLink } from '@/components/auth/bottom-link';
+import { Logo } from '@/components/layout/logo';
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-} from '@/components/ui/card'
-import { Link } from '@tanstack/react-router'
-import { cn } from '@/lib/utils'
+} from '@/components/ui/card';
+import { Link } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
 
 interface AuthCardProps {
-  children: React.ReactNode
-  headerLabel: string
-  bottomButtonLabel: string
-  bottomButtonHref: string
-  className?: string
+  children: React.ReactNode;
+  headerLabel: string;
+  bottomButtonLabel: string;
+  bottomButtonHref: string;
+  className?: string;
 }
 
 export function AuthCard({
@@ -41,5 +41,5 @@ export function AuthCard({
         <BottomLink label={bottomButtonLabel} href={bottomButtonHref} />
       </CardFooter>
     </Card>
-  )
+  );
 }

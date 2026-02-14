@@ -1,7 +1,7 @@
-import { websiteConfig } from '@/config/website'
-import { HeaderSection } from '@/components/layout/header-section'
-import { FormError } from '@/components/shared/form-error'
-import { Button } from '@/components/ui/button'
+import { websiteConfig } from '@/config/website';
+import { HeaderSection } from '@/components/layout/header-section';
+import { FormError } from '@/components/shared/form-error';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -9,56 +9,56 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2Icon, Send } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2Icon, Send } from 'lucide-react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email address'),
-})
+});
 
-type FormData = z.infer<typeof schema>
+type FormData = z.infer<typeof schema>;
 
 export function NewsletterCard() {
-  const enabled = websiteConfig.newsletter?.enable ?? false
-  const [error, setError] = useState<string | undefined>()
-  const [success, setSuccess] = useState(false)
+  const enabled = websiteConfig.newsletter?.enable ?? false;
+  const [error, setError] = useState<string | undefined>();
+  const [success, setSuccess] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { email: '' },
-  })
+  });
 
-  const isPending = form.formState.isSubmitting
+  const isPending = form.formState.isSubmitting;
 
   async function onSubmit(data: FormData) {
-    setError(undefined)
-    setSuccess(false)
+    setError(undefined);
+    setSuccess(false);
     try {
       const res = await fetch('/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: data.email }),
-      })
-      const json = (await res.json()) as { success?: boolean; error?: string }
+      });
+      const json = (await res.json()) as { success?: boolean; error?: string };
       if (json.success) {
-        setSuccess(true)
-        form.reset()
+        setSuccess(true);
+        form.reset();
       } else {
-        const msg = json.error ?? 'Failed to subscribe to the newsletter'
-        setError(msg)
+        const msg = json.error ?? 'Failed to subscribe to the newsletter';
+        setError(msg);
       }
     } catch (err) {
-      console.error('Newsletter subscription error:', err)
-      setError('Failed to subscribe to the newsletter')
+      console.error('Newsletter subscription error:', err);
+      setError('Failed to subscribe to the newsletter');
     }
   }
 
-  if (!enabled) return null
+  if (!enabled) return null;
 
   return (
     <div className="w-full rounded-lg bg-muted/50 p-16">
@@ -122,5 +122,5 @@ export function NewsletterCard() {
         </Form>
       </div>
     </div>
-  )
+  );
 }

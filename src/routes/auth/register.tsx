@@ -1,17 +1,17 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { RegisterForm } from '@/components/auth/register-form'
-import { Routes } from '@/routes'
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { RegisterForm } from '@/components/auth/register-form';
+import { Routes } from '@/routes';
 
 export const Route = createFileRoute('/auth/register')({
   component: RegisterPage,
-})
+});
 
 const message = {
   byClickingContinue: 'By clicking continue, you agree to our ',
   termsOfService: 'Terms of Service',
   privacyPolicy: 'Privacy Policy',
   and: ' and ',
-} as const
+} as const;
 
 function RegisterPage() {
   return (
@@ -34,5 +34,5 @@ function RegisterPage() {
         </Link>
       </div>
     </div>
-  )
+  );
 }

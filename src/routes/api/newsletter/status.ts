@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { isSubscribed } from '@/newsletter'
-import { websiteConfig } from '@/config/website'
+import { createFileRoute } from '@tanstack/react-router';
+import { isSubscribed } from '@/newsletter';
+import { websiteConfig } from '@/config/website';
 
 export const Route = createFileRoute('/api/newsletter/status')({
   server: {
@@ -8,23 +8,31 @@ export const Route = createFileRoute('/api/newsletter/status')({
       GET: async ({ request }) => {
         if (!websiteConfig.newsletter?.enable) {
           return Response.json(
-            { success: false, subscribed: false, error: 'Newsletter is not enabled' },
+            {
+              success: false,
+              subscribed: false,
+              error: 'Newsletter is not enabled',
+            },
             { status: 400 }
-          )
+          );
         }
-        const url = new URL(request.url)
-        const email = url.searchParams.get('email')?.trim() ?? ''
+        const url = new URL(request.url);
+        const email = url.searchParams.get('email')?.trim() ?? '';
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
           return Response.json(
-            { success: false, subscribed: false, error: 'Valid email required' },
+            {
+              success: false,
+              subscribed: false,
+              error: 'Valid email required',
+            },
             { status: 400 }
-          )
+          );
         }
         try {
-          const subscribed = await isSubscribed(email)
-          return Response.json({ success: true, subscribed })
+          const subscribed = await isSubscribed(email);
+          return Response.json({ success: true, subscribed });
         } catch (error) {
-          console.error('Check newsletter status error:', error)
+          console.error('Check newsletter status error:', error);
           return Response.json(
             {
               success: false,
@@ -33,9 +41,9 @@ export const Route = createFileRoute('/api/newsletter/status')({
                 error instanceof Error ? error.message : 'Something went wrong',
             },
             { status: 500 }
-          )
+          );
         }
       },
     },
   },
-})
+});
