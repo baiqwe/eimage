@@ -67,10 +67,7 @@ export function AdminUsersContent() {
   useEffect(() => {
     if (prevFiltersRef.current === filtersSignature) return;
     prevFiltersRef.current = filtersSignature;
-    void setQueryStates(
-      { page: 0 },
-      { history: 'replace', shallow: true }
-    );
+    void setQueryStates({ page: 0 }, { history: 'replace', shallow: true });
   }, [filtersSignature, setQueryStates]);
 
   const { data, isLoading } = useUsers(

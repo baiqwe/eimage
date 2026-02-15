@@ -7,6 +7,8 @@ import { sendEmail } from '@/mail';
 import { getBaseUrl } from '../lib/urls';
 import { messages } from '@/config/messages';
 import { websiteConfig } from '@/config/website';
+import { emailHarmony } from 'better-auth-harmony';
+import { admin, apiKey } from 'better-auth/plugins';
 
 /**
  * Better Auth Drizzle Adapter
@@ -65,7 +67,30 @@ export const auth = betterAuth({
       enabled: true,
     },
   },
-  plugins: [tanstackStartCookies()],
+  plugins: [
+    // https://www.better-auth.com/docs/integrations/tanstack
+    tanstackStartCookies(),
+    // https://www.better-auth.com/docs/plugins/admin
+    // support user management, ban/unban user, manage user roles, etc.
+    admin({
+      // https://www.better-auth.com/docs/plugins/admin#default-ban-reason
+      // defaultBanReason: 'Spamming',
+      defaultBanExpiresIn: undefined,
+      bannedUserMessage:
+        'You have been banned from this application. Please contact support if you believe this is an error.',
+    }),
+    // https://www.better-auth.com/docs/plugins/api-key
+    // support API key management for user authentication
+    apiKey(),
+    // https://github.com/gekorm/better-auth-harmony
+    // Email normalization and validation to prevent duplicate registrations
+    emailHarmony({
+      // Don't allow login with any version of the unnormalized email address
+      // e.g., user signed up with johndoe@googlemail.com can't login with john.doe@gmail.com
+      // e.g., user signed up with johndoe@googlemail.com can't login with johndoe+abc@gmail.com
+      allowNormalizedSignin: false,
+    }),
+  ],
   onAPIError: {
     // https://www.better-auth.com/docs/reference/options#onapierror
     errorURL: '/auth/error',
