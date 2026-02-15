@@ -60,6 +60,20 @@ export const auth = betterAuth({
       });
     },
   },
+  socialProviders: {
+    // https://www.better-auth.com/docs/authentication/google
+    ...(websiteConfig.auth?.enableGoogleLogin ? { google: {
+        clientId: process.env.GOOGLE_CLIENT_ID!,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      } } : {}),
+  },
+  account: {
+    // https://www.better-auth.com/docs/concepts/users-accounts#account-linking
+    accountLinking: {
+      enabled: websiteConfig.auth?.enableGoogleLogin,
+      trustedProviders: websiteConfig.auth?.enableGoogleLogin ? ['google'] : [],
+    },
+  },
   user: {
     // https://www.better-auth.com/docs/concepts/users-accounts#delete-user
     deleteUser: {
