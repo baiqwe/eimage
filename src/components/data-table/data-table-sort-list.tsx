@@ -1,10 +1,7 @@
-"use client";
-
-import type { ColumnSort, SortDirection, Table } from "@tanstack/react-table";
+import type { ColumnSort, Table } from "@tanstack/react-table";
 import {
-  IconArrowDownUp,
+  IconArrowsDownUp,
   IconSelector,
-  IconGripVertical,
   IconTrash,
 } from "@tabler/icons-react";
 import * as React from "react";
@@ -31,15 +28,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sortable,
-  SortableContent,
-  SortableItem,
-  SortableItemHandle,
-  SortableOverlay,
-} from "@/components/ui/sortable";
 import { dataTableConfig } from "@/components/data-table/config/data-table";
 import { cn } from "@/lib/utils";
+import { messages } from "@/config/messages";
+
+const t = messages.common.table;
 
 const SORT_SHORTCUT_KEY = "s";
 const REMOVE_SORT_SHORTCUTS = ["backspace", "delete"];
@@ -159,21 +152,18 @@ export function DataTableSortList<TData>({
   );
 
   return (
-    <Sortable
-      value={sorting}
-      onValueChange={onSortingChange}
-      getItemValue={(item) => item.id}
-    >
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
+        render={(triggerProps) => (
           <Button
+            {...triggerProps}
             variant="outline"
             size="sm"
             className="font-normal"
             onKeyDown={onTriggerKeyDown}
           >
-            <IconArrowDownUp className="text-muted-foreground" />
-            Sort
+            <IconArrowsDownUp className="text-muted-foreground" />
+            {t.sort}
             {sorting.length > 0 && (
               <Badge
                 variant="secondary"
@@ -183,78 +173,68 @@ export function DataTableSortList<TData>({
               </Badge>
             )}
           </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          aria-labelledby={labelId}
-          aria-describedby={descriptionId}
-          className="flex w-full max-w-(--radix-popover-content-available-width) flex-col gap-3.5 p-4 sm:min-w-[380px]"
-          {...props}
-        >
-          <div className="flex flex-col gap-1">
-            <h4 id={labelId} className="font-medium leading-none">
-              {sorting.length > 0 ? "Sort by" : "No sorting applied"}
-            </h4>
-            <p
-              id={descriptionId}
-              className={cn(
-                "text-muted-foreground text-sm",
-                sorting.length > 0 && "sr-only",
-              )}
-            >
-              {sorting.length > 0
-                ? "Modify sorting to organize your rows."
-                : "Add sorting to organize your rows."}
-            </p>
-          </div>
+        )}
+      />
+      <PopoverContent
+        aria-labelledby={labelId}
+        aria-describedby={descriptionId}
+        className="flex w-full flex-col gap-3.5 p-4 sm:min-w-[380px]"
+        {...props}
+      >
+        <div className="flex flex-col gap-1">
+          <h4 id={labelId} className="font-medium leading-none">
+            {sorting.length > 0 ? t.sortBy : t.noSortingApplied}
+          </h4>
+          <p
+            id={descriptionId}
+            className={cn(
+              "text-muted-foreground text-sm",
+              sorting.length > 0 && "sr-only",
+            )}
+          >
+            {sorting.length > 0
+              ? t.modifySortingHint
+              : t.addSortingHint}
+          </p>
+        </div>
+        {sorting.length > 0 && (
+          <ul className="flex max-h-[300px] flex-col gap-2 overflow-y-auto p-1">
+            {sorting.map((sort) => (
+              <DataTableSortItem
+                key={sort.id}
+                sort={sort}
+                sortItemId={`${id}-sort-${sort.id}`}
+                columns={columns}
+                columnLabels={columnLabels}
+                onSortUpdate={onSortUpdate}
+                onSortRemove={onSortRemove}
+              />
+            ))}
+          </ul>
+        )}
+        <div className="flex w-full items-center gap-2">
+          <Button
+            size="sm"
+            className="rounded"
+            ref={addButtonRef}
+            onClick={onSortAdd}
+            disabled={columns.length === 0}
+          >
+            {t.addSort}
+          </Button>
           {sorting.length > 0 && (
-            <SortableContent asChild>
-              <ul className="flex max-h-[300px] flex-col gap-2 overflow-y-auto p-1">
-                {sorting.map((sort) => (
-                  <DataTableSortItem
-                    key={sort.id}
-                    sort={sort}
-                    sortItemId={`${id}-sort-${sort.id}`}
-                    columns={columns}
-                    columnLabels={columnLabels}
-                    onSortUpdate={onSortUpdate}
-                    onSortRemove={onSortRemove}
-                  />
-                ))}
-              </ul>
-            </SortableContent>
-          )}
-          <div className="flex w-full items-center gap-2">
             <Button
+              variant="outline"
               size="sm"
               className="rounded"
-              ref={addButtonRef}
-              onClick={onSortAdd}
-              disabled={columns.length === 0}
+              onClick={onSortingReset}
             >
-              Add sort
+              {t.resetSorting}
             </Button>
-            {sorting.length > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded"
-                onClick={onSortingReset}
-              >
-                Reset sorting
-              </Button>
-            )}
-          </div>
-        </PopoverContent>
-      </Popover>
-      <SortableOverlay>
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-[180px] rounded-sm bg-primary/10" />
-          <div className="h-8 w-24 rounded-sm bg-primary/10" />
-          <div className="size-8 shrink-0 rounded-sm bg-primary/10" />
-          <div className="size-8 shrink-0 rounded-sm bg-primary/10" />
+          )}
         </div>
-      </SortableOverlay>
-    </Sortable>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -305,16 +285,17 @@ function DataTableSortItem({
   );
 
   return (
-    <SortableItem value={sort.id} asChild>
-      <li
-        id={sortItemId}
-        tabIndex={-1}
-        className="flex items-center gap-2"
-        onKeyDown={onItemKeyDown}
-      >
-        <Popover open={showFieldSelector} onOpenChange={setShowFieldSelector}>
-          <PopoverTrigger asChild>
+    <li
+      id={sortItemId}
+      tabIndex={-1}
+      className="flex items-center gap-2"
+      onKeyDown={onItemKeyDown}
+    >
+      <Popover open={showFieldSelector} onOpenChange={setShowFieldSelector}>
+        <PopoverTrigger
+          render={(triggerProps) => (
             <Button
+              {...triggerProps}
               id={fieldTriggerId}
               aria-controls={fieldListboxId}
               variant="outline"
@@ -324,74 +305,64 @@ function DataTableSortItem({
               <span className="truncate">{columnLabels.get(sort.id)}</span>
               <IconSelector className="opacity-50" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            id={fieldListboxId}
-            className="w-(--radix-popover-trigger-width) p-0"
-          >
-            <Command>
-              <CommandInput placeholder="Search fields..." />
-              <CommandList>
-                <CommandEmpty>No fields found.</CommandEmpty>
-                <CommandGroup>
-                  {columns.map((column) => (
-                    <CommandItem
-                      key={column.id}
-                      value={column.id}
-                      onSelect={(value) => onSortUpdate(sort.id, { id: value })}
-                    >
-                      <span className="truncate">{column.label}</span>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-        <Select
-          open={showDirectionSelector}
-          onOpenChange={setShowDirectionSelector}
-          value={sort.desc ? "desc" : "asc"}
-          onValueChange={(value: SortDirection) =>
-            onSortUpdate(sort.id, { desc: value === "desc" })
+          )}
+        />
+        <PopoverContent
+          id={fieldListboxId}
+          className="w-48 p-0"
+        >
+          <Command>
+            <CommandInput placeholder={t.searchFields} />
+            <CommandList>
+              <CommandEmpty>{t.noFieldsFound}</CommandEmpty>
+              <CommandGroup>
+                {columns.map((column) => (
+                  <CommandItem
+                    key={column.id}
+                    value={column.id}
+                    onSelect={(value) => onSortUpdate(sort.id, { id: value })}
+                  >
+                    <span className="truncate">{column.label}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      <Select
+        open={showDirectionSelector}
+        onOpenChange={setShowDirectionSelector}
+        value={sort.desc ? "desc" : "asc"}
+        onValueChange={(value: string | null) => {
+          if (value === "asc" || value === "desc") {
+            onSortUpdate(sort.id, { desc: value === "desc" });
           }
+        }}
+      >
+        <SelectTrigger
+          aria-controls={directionListboxId}
+          className="h-8 w-24 rounded data-size:h-8"
         >
-          <SelectTrigger
-            aria-controls={directionListboxId}
-            className="h-8 w-24 rounded data-size:h-8"
-          >
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent
-            id={directionListboxId}
-            className="min-w-(--radix-select-trigger-width)"
-          >
-            {dataTableConfig.sortOrders.map((order) => (
-              <SelectItem key={order.value} value={order.value}>
-                {order.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button
-          aria-controls={sortItemId}
-          variant="outline"
-          size="icon"
-          className="size-8 shrink-0 rounded"
-          onClick={() => onSortRemove(sort.id)}
-        >
-          <IconTrash />
-        </Button>
-        <SortableItemHandle asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-8 shrink-0 rounded"
-          >
-            <IconGripVertical />
-          </Button>
-        </SortableItemHandle>
-      </li>
-    </SortableItem>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent id={directionListboxId}>
+          {dataTableConfig.sortOrders.map((order) => (
+            <SelectItem key={order.value} value={order.value}>
+              {order.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Button
+        aria-controls={sortItemId}
+        variant="outline"
+        size="icon"
+        className="size-8 shrink-0 rounded"
+        onClick={() => onSortRemove(sort.id)}
+      >
+        <IconTrash />
+      </Button>
+    </li>
   );
 }

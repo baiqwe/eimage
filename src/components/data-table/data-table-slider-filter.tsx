@@ -1,5 +1,3 @@
-"use client";
-
 import type { Column } from "@tanstack/react-table";
 import { IconCirclePlus, IconCircleX } from "@tabler/icons-react";
 import * as React from "react";
@@ -13,7 +11,10 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
+import { messages } from "@/config/messages";
 import { cn } from "@/lib/utils";
+
+const t = messages.common.table;
 
 interface Range {
   min: number;
@@ -122,9 +123,9 @@ export function DataTableSliderFilter<TData>({
   );
 
   const onSliderValueChange = React.useCallback(
-    (value: RangeValue) => {
+    (value: number | readonly number[]) => {
       if (Array.isArray(value) && value.length === 2) {
-        column.setFilterValue(value);
+        column.setFilterValue(value as RangeValue);
       }
     },
     [column],
@@ -142,39 +143,42 @@ export function DataTableSliderFilter<TData>({
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-dashed font-normal"
-        >
-          {columnFilterValue ? (
-            <div
-              role="button"
-              aria-label={`Clear ${title} filter`}
-              tabIndex={0}
-              className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              onClick={onReset}
-            >
-              <IconCircleX />
-            </div>
-          ) : (
-            <IconCirclePlus />
-          )}
-          <span>{title}</span>
-          {columnFilterValue ? (
-            <>
-              <Separator
-                orientation="vertical"
-                className="mx-0.5 data-[orientation=vertical]:h-4"
-              />
-              {formatValue(columnFilterValue[0])} -{" "}
-              {formatValue(columnFilterValue[1])}
-              {unit ? ` ${unit}` : ""}
-            </>
-          ) : null}
-        </Button>
-      </PopoverTrigger>
+      <PopoverTrigger
+        render={(props) => (
+          <Button
+            {...props}
+            variant="outline"
+            size="sm"
+            className="border-dashed font-normal"
+          >
+            {columnFilterValue ? (
+              <div
+                role="button"
+                aria-label={`${t.clear} ${title} ${t.filter}`}
+                tabIndex={0}
+                className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                onClick={onReset}
+              >
+                <IconCircleX />
+              </div>
+            ) : (
+              <IconCirclePlus />
+            )}
+            <span>{title}</span>
+            {columnFilterValue ? (
+              <>
+                <Separator
+                  orientation="vertical"
+                  className="mx-0.5 data-[orientation=vertical]:h-4"
+                />
+                {formatValue(columnFilterValue[0])} -{" "}
+                {formatValue(columnFilterValue[1])}
+                {unit ? ` ${unit}` : ""}
+              </>
+            ) : null}
+          </Button>
+        )}
+      />
       <PopoverContent align="start" className="flex w-auto flex-col gap-4">
         <div className="flex flex-col gap-3">
           <p className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -182,7 +186,7 @@ export function DataTableSliderFilter<TData>({
           </p>
           <div className="flex items-center gap-4">
             <Label htmlFor={`${id}-from`} className="sr-only">
-              From
+              {t.from}
             </Label>
             <div className="relative">
               <Input
@@ -206,7 +210,7 @@ export function DataTableSliderFilter<TData>({
               )}
             </div>
             <Label htmlFor={`${id}-to`} className="sr-only">
-              to
+              {t.to}
             </Label>
             <div className="relative">
               <Input
@@ -231,7 +235,7 @@ export function DataTableSliderFilter<TData>({
             </div>
           </div>
           <Label htmlFor={`${id}-slider`} className="sr-only">
-            {title} slider
+            {title} {t.slider}
           </Label>
           <Slider
             id={`${id}-slider`}
@@ -243,12 +247,12 @@ export function DataTableSliderFilter<TData>({
           />
         </div>
         <Button
-          aria-label={`Clear ${title} filter`}
+          aria-label={`${t.clear} ${title} ${t.filter}`}
           variant="outline"
           size="sm"
           onClick={onReset}
         >
-          Clear
+          {t.clear}
         </Button>
       </PopoverContent>
     </Popover>

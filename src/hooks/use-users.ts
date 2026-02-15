@@ -12,6 +12,10 @@ export interface AdminUser {
   image: string | null;
   createdAt: Date;
   updatedAt: Date;
+  role: string | null;
+  banned: boolean;
+  banReason: string | null;
+  banExpires: Date | null;
 }
 
 interface SimpleFilter {
@@ -60,6 +64,10 @@ export function useUsers(
         sortId,
         sortDesc: String(sortDesc),
       });
+      const roleFilter = filters.find((f) => f.id === 'role');
+      const statusFilter = filters.find((f) => f.id === 'status');
+      if (roleFilter?.value) params.set('role', roleFilter.value);
+      if (statusFilter?.value) params.set('status', statusFilter.value);
       const res = await fetch(`/api/admin/users?${params.toString()}`, {
         credentials: 'include',
       });

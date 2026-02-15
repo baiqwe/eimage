@@ -2,7 +2,7 @@ import { getAvatarLinks } from '@/config/avatar-config';
 import { authClient } from '@/auth/auth-client';
 import type { User } from 'better-auth';
 import { IconLogout } from '@tabler/icons-react';
-import { Link, useRouter } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,18 +11,25 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { UserAvatar } from './user-avatar';
+import { messages } from '@/config/messages';
+
+const m = messages.dashboard.avatar;
 
 interface UserButtonProps {
   user: User;
 }
 
 export function UserButton({ user }: UserButtonProps) {
-  const router = useRouter();
   const avatarLinks = getAvatarLinks();
 
   const handleSignOut = async () => {
-    await authClient.signOut();
-    router.navigate({ to: '/' });
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.href = '/';
+        },
+      },
+    });
   };
 
   return (
@@ -34,11 +41,11 @@ export function UserButton({ user }: UserButtonProps) {
           className="size-8 border cursor-pointer"
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-64">
         <div className="flex items-center gap-2 p-2">
           <div className="flex flex-col space-y-1 leading-none">
             <p className="font-medium">{user.name}</p>
-            <p className="w-[240px] truncate text-sm text-muted-foreground">
+            <p className="truncate text-sm text-muted-foreground">
               {user.email}
             </p>
           </div>
@@ -46,18 +53,18 @@ export function UserButton({ user }: UserButtonProps) {
         <DropdownMenuSeparator />
         {avatarLinks.map((item) =>
           item.href ? (
-            <DropdownMenuItem key={item.title}>
-              <Link to={item.href} className="flex items-center">
+            <Link key={item.title} to={item.href} className="block">
+              <DropdownMenuItem className="cursor-pointer">
                 {item.icon ? <item.icon className="mr-2 size-4" /> : null}
                 {item.title}
-              </Link>
-            </DropdownMenuItem>
+              </DropdownMenuItem>
+            </Link>
           ) : null
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer" onSelect={handleSignOut}>
           <IconLogout className="mr-2 size-4" />
-          Sign out
+          {m.logOut}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

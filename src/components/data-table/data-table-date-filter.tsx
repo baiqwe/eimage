@@ -1,5 +1,3 @@
-"use client";
-
 import type { Column } from "@tanstack/react-table";
 import { IconCalendar, IconCircleX } from "@tabler/icons-react";
 import * as React from "react";
@@ -13,7 +11,10 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { messages } from "@/config/messages";
 import { formatDate } from "@/components/data-table/lib/format";
+
+const t = messages.common.table;
 
 type DateSelection = Date[] | DateRange;
 
@@ -131,7 +132,7 @@ export function DataTableDateFilter<TData>({
       const hasSelectedDates = selectedDates.from || selectedDates.to;
       const dateText = hasSelectedDates
         ? formatDateRange(selectedDates)
-        : "Select date range";
+        : t.selectDateRange;
 
       return (
         <span className="flex items-center gap-2">
@@ -154,7 +155,7 @@ export function DataTableDateFilter<TData>({
     const hasSelectedDate = selectedDates.length > 0;
     const dateText = hasSelectedDate
       ? formatDate(selectedDates[0])
-      : "Select date";
+      : t.selectDate;
 
     return (
       <span className="flex items-center gap-2">
@@ -174,28 +175,31 @@ export function DataTableDateFilter<TData>({
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-dashed font-normal"
-        >
-          {hasValue ? (
-            <div
-              role="button"
-              aria-label={`Clear ${title} filter`}
-              tabIndex={0}
-              onClick={onReset}
-              className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <IconCircleX />
-            </div>
-          ) : (
-            <IconCalendar />
-          )}
-          {label}
-        </Button>
-      </PopoverTrigger>
+      <PopoverTrigger
+        render={(props) => (
+          <Button
+            {...props}
+            variant="outline"
+            size="sm"
+            className="border-dashed font-normal"
+          >
+            {hasValue ? (
+              <div
+                role="button"
+                aria-label={`${t.clear} ${title} ${t.filter}`}
+                tabIndex={0}
+                onClick={onReset}
+                className="rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              >
+                <IconCircleX />
+              </div>
+            ) : (
+              <IconCalendar />
+            )}
+            {label}
+          </Button>
+        )}
+      />
       <PopoverContent className="w-auto p-0" align="start">
         {multiple ? (
           <Calendar

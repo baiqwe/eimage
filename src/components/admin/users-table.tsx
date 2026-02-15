@@ -1,5 +1,6 @@
 import { DataTableAdvancedToolbar } from '@/components/data-table/data-table-advanced-toolbar';
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header';
+import { DataTableFacetedFilter } from '@/components/data-table/data-table-faceted-filter';
 import { DataTablePagination } from '@/components/data-table/data-table-pagination';
 import { Input } from '@/components/ui/input';
 import {
@@ -22,8 +23,9 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { IconX } from '@tabler/icons-react';
+import { IconUserCheck, IconUserX, IconX } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -50,6 +52,13 @@ function TableRowSkeleton({ columns }: { columns: number }) {
           return (
             <TableCell key={i} className="py-3">
               <Skeleton className="h-6 w-32" />
+            </TableCell>
+          );
+        }
+        if (i === 2 || i === 4) {
+          return (
+            <TableCell key={i} className="py-3">
+              <Skeleton className="h-6 w-16" />
             </TableCell>
           );
         }
@@ -141,6 +150,7 @@ export function UsersTable({
                 className="text-sm px-1.5 cursor-pointer hover:bg-accent"
                 onClick={() => {
                   navigator.clipboard.writeText(u.email);
+                  toast.success(m.emailCopied);
                 }}
               >
                 {u.emailVerified ? (
@@ -158,6 +168,29 @@ export function UsersTable({
         size: 220,
       },
       {
+        id: 'role',
+        accessorKey: 'role',
+        enableHiding: true,
+        enableSorting: true,
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} label={m.columns.role} />
+        ),
+        cell: ({ row }) => {
+          const r = row.original.role ?? 'user';
+          return (
+            <Badge
+              variant={r === 'admin' ? 'default' : 'outline'}
+              className="px-1.5"
+            >
+              {r === 'admin' ? m.admin : m.user}
+            </Badge>
+          );
+        },
+        meta: { label: m.columns.role },
+        minSize: 100,
+        size: 120,
+      },
+      {
         id: 'createdAt',
         accessorKey: 'createdAt',
         enableHiding: true,
@@ -170,6 +203,51 @@ export function UsersTable({
         minSize: 140,
         size: 160,
       },
+      {
+        id: 'status',
+        accessorFn: (row) => (row.banned ? 'inactive' : 'active'),
+        enableHiding: true,
+        enableSorting: true,
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} label={m.columns.status} />
+        ),
+        cell: ({ row }) => {
+          const banned = row.original.banned;
+          return (
+            <Badge variant="outline" className="px-1.5">
+              {banned ? (
+                <>
+                  <IconUserX className="stroke-red-500 dark:stroke-red-400" />
+                  {m.inactive}
+                </>
+              ) : (
+                <>
+                  <IconUserCheck className="stroke-green-500 dark:stroke-green-400" />
+                  {m.active}
+                </>
+              )}
+            </Badge>
+          );
+        },
+        meta: { label: m.columns.status },
+        minSize: 100,
+        size: 120,
+      },
+    ],
+    []
+  );
+
+  const roleFilterOptions = useMemo(
+    () => [
+      { label: m.admin, value: 'admin' },
+      { label: m.user, value: 'user' },
+    ],
+    []
+  );
+  const statusFilterOptions = useMemo(
+    () => [
+      { label: m.active, value: 'active' },
+      { label: m.inactive, value: 'inactive' },
     ],
     []
   );
@@ -242,6 +320,16 @@ export function UsersTable({
               </button>
             ) : null}
           </div>
+          <DataTableFacetedFilter
+            column={table.getColumn('role')}
+            title={m.columns.role}
+            options={roleFilterOptions}
+          />
+          <DataTableFacetedFilter
+            column={table.getColumn('status')}
+            title={m.columns.status}
+            options={statusFilterOptions}
+          />
         </div>
       </DataTableAdvancedToolbar>
       <div className="relative flex flex-col gap-4 overflow-auto">

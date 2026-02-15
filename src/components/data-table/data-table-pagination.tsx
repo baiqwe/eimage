@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -50,8 +48,8 @@ export function DataTablePagination<TData>({
           </p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => {
-              table.setPageSize(Number(value));
+            onValueChange={(value: string | null) => {
+              if (value) table.setPageSize(Number(value));
             }}
           >
             <SelectTrigger className="h-8 w-18 data-size:h-8">

@@ -2,25 +2,46 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getDb } from '@/db';
 import { user } from '@/db/auth.schema';
 import { requireSession, unauthorizedResponse } from '@/lib/session';
-import { and, asc, count as countFn, desc, or, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count as countFn,
+  desc,
+  eq,
+  isNull,
+  or,
+  sql,
+} from 'drizzle-orm';
 
 const SORT_FIELD_MAP: Record<
   string,
-  typeof user.name | typeof user.email | typeof user.createdAt
+  | typeof user.name
+  | typeof user.email
+  | typeof user.createdAt
+  | typeof user.role
+  | typeof user.banned
 > = {
   name: user.name,
   email: user.email,
   createdAt: user.createdAt,
   created_at: user.createdAt,
   createdat: user.createdAt,
+  role: user.role,
+  status: user.banned,
+  banned: user.banned,
 };
 
-function normalizeSortId(raw: string): 'name' | 'email' | 'createdAt' {
+function normalizeSortId(
+  raw: string
+): 'name' | 'email' | 'createdAt' | 'role' | 'status' {
   const s = (raw ?? 'createdAt').trim();
   if (s === 'created_at' || s === 'createdat' || s === 'createdAt')
     return 'createdAt';
   if (s.toLowerCase() === 'name') return 'name';
   if (s.toLowerCase() === 'email') return 'email';
+  if (s.toLowerCase() === 'role') return 'role';
+  if (s.toLowerCase() === 'status' || s.toLowerCase() === 'banned')
+    return 'status';
   return 'createdAt';
 }
 
@@ -32,10 +53,12 @@ async function listUsers(
     search: string;
     sortId: string;
     sortDesc: boolean;
+    role?: string;
+    status?: string;
   }
 ): Promise<{ items: Array<Record<string, unknown>>; total: number }> {
   const db = getDb(d1);
-  const { pageIndex, pageSize, search, sortDesc } = params;
+  const { pageIndex, pageSize, search, sortDesc, role, status } = params;
   const offset = pageIndex * pageSize;
   const sortId = normalizeSortId(params.sortId);
 
@@ -52,6 +75,14 @@ async function listUsers(
         sql`lower(${user.email}) like lower(${pattern})`
       )!
     );
+  }
+  if (role?.trim()) {
+    conditions.push(eq(user.role, role.trim()));
+  }
+  if (status === 'active') {
+    conditions.push(or(eq(user.banned, false), isNull(user.banned))!);
+  } else if (status === 'inactive') {
+    conditions.push(eq(user.banned, true));
   }
   const where = conditions.length > 0 ? and(...conditions) : undefined;
   const sortField = SORT_FIELD_MAP[sortId] ?? user.createdAt;
@@ -77,6 +108,10 @@ async function listUsers(
       image: row.image,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
+      role: row.role,
+      banned: row.banned,
+      banReason: row.banReason,
+      banExpires: row.banExpires,
     })),
     total: Number(count),
   };
@@ -106,6 +141,8 @@ export const Route = createFileRoute('/api/admin/users')({
         const search = (url.searchParams.get('search') ?? '').trim();
         const sortId = url.searchParams.get('sortId') ?? 'createdAt';
         const sortDesc = url.searchParams.get('sortDesc') !== 'false';
+        const role = (url.searchParams.get('role') ?? '').trim();
+        const status = url.searchParams.get('status') ?? '';
 
         try {
           const { env } = await import('cloudflare:workers');
@@ -115,6 +152,8 @@ export const Route = createFileRoute('/api/admin/users')({
             search,
             sortId,
             sortDesc,
+            role: role || undefined,
+            status: status === 'active' || status === 'inactive' ? status : undefined,
           });
           return Response.json({ success: true, data: result });
         } catch (error) {

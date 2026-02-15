@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getCommonPinningStyles } from "@/components/data-table/lib/data-table";
+import { messages } from "@/config/messages";
 import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData> extends React.ComponentProps<"div"> {
@@ -83,7 +84,7 @@ export function DataTable<TData>({
                   colSpan={table.getAllColumns().length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  {messages.common.table.noResults}
                 </TableCell>
               </TableRow>
             )}

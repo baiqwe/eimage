@@ -1,11 +1,8 @@
-"use client";
-
 import type { Column, ColumnMeta, Table } from "@tanstack/react-table";
 import {
   IconCalendar,
   IconCheck,
   IconSelector,
-  IconGripVertical,
   IconFilter,
   IconTrash,
 } from "@tabler/icons-react";
@@ -24,17 +21,6 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Faceted,
-  FacetedBadgeList,
-  FacetedContent,
-  FacetedEmpty,
-  FacetedGroup,
-  FacetedInput,
-  FacetedItem,
-  FacetedList,
-  FacetedTrigger,
-} from "@/components/ui/faceted";
 import { Input } from "@/components/ui/input";
 import {
   Popover,
@@ -48,13 +34,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sortable,
-  SortableContent,
-  SortableItem,
-  SortableItemHandle,
-  SortableOverlay,
-} from "@/components/ui/sortable";
 import { dataTableConfig } from "@/components/data-table/config/data-table";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { getDefaultFilterOperator, getFilterOperators } from "@/components/data-table/lib/data-table";
@@ -67,6 +46,9 @@ import type {
   FilterOperator,
   JoinOperator,
 } from "@/components/data-table/types/data-table";
+import { messages } from "@/config/messages";
+
+const t = messages.common.table;
 
 const DEBOUNCE_MS = 300;
 const THROTTLE_MS = 50;
@@ -214,21 +196,18 @@ export function DataTableFilterList<TData>({
   );
 
   return (
-    <Sortable
-      value={filters}
-      onValueChange={setFilters}
-      getItemValue={(item) => item.filterId}
-    >
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
+        render={(triggerProps) => (
           <Button
+            {...triggerProps}
             variant="outline"
             size="sm"
             className="font-normal"
             onKeyDown={onTriggerKeyDown}
           >
             <IconFilter className="text-muted-foreground" />
-            Filter
+            {t.filter}
             {filters.length > 0 && (
               <Badge
                 variant="secondary"
@@ -238,81 +217,69 @@ export function DataTableFilterList<TData>({
               </Badge>
             )}
           </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          aria-describedby={descriptionId}
-          aria-labelledby={labelId}
-          className="flex w-full max-w-(--radix-popover-content-available-width) flex-col gap-3.5 p-4 sm:min-w-[380px]"
-          {...props}
-        >
-          <div className="flex flex-col gap-1">
-            <h4 id={labelId} className="font-medium leading-none">
-              {filters.length > 0 ? "Filters" : "No filters applied"}
-            </h4>
-            <p
-              id={descriptionId}
-              className={cn(
-                "text-muted-foreground text-sm",
-                filters.length > 0 && "sr-only",
-              )}
-            >
-              {filters.length > 0
-                ? "Modify filters to refine your rows."
-                : "Add filters to refine your rows."}
-            </p>
-          </div>
+        )}
+      />
+      <PopoverContent
+        aria-describedby={descriptionId}
+        aria-labelledby={labelId}
+        className="flex w-full flex-col gap-3.5 p-4 sm:min-w-[380px]"
+        {...props}
+      >
+        <div className="flex flex-col gap-1">
+          <h4 id={labelId} className="font-medium leading-none">
+            {filters.length > 0 ? t.filters : t.noFiltersApplied}
+          </h4>
+          <p
+            id={descriptionId}
+            className={cn(
+              "text-muted-foreground text-sm",
+              filters.length > 0 && "sr-only",
+            )}
+          >
+            {filters.length > 0
+              ? t.modifyFiltersHint
+              : t.addFiltersHint}
+          </p>
+        </div>
+        {filters.length > 0 ? (
+          <ul className="flex max-h-[300px] flex-col gap-2 overflow-y-auto p-1">
+            {filters.map((filter, index) => (
+              <DataTableFilterItem<TData>
+                key={filter.filterId}
+                filter={filter}
+                index={index}
+                filterItemId={`${id}-filter-${filter.filterId}`}
+                joinOperator={joinOperator}
+                setJoinOperator={setJoinOperator}
+                columns={columns}
+                onFilterUpdate={onFilterUpdate}
+                onFilterRemove={onFilterRemove}
+              />
+            ))}
+          </ul>
+        ) : null}
+        <div className="flex w-full items-center gap-2">
+          <Button
+            size="sm"
+            className="rounded"
+            ref={addButtonRef}
+            onClick={onFilterAdd}
+          >
+            {t.addFilter}
+          </Button>
           {filters.length > 0 ? (
-            <SortableContent asChild>
-              <ul className="flex max-h-[300px] flex-col gap-2 overflow-y-auto p-1">
-                {filters.map((filter, index) => (
-                  <DataTableFilterItem<TData>
-                    key={filter.filterId}
-                    filter={filter}
-                    index={index}
-                    filterItemId={`${id}-filter-${filter.filterId}`}
-                    joinOperator={joinOperator}
-                    setJoinOperator={setJoinOperator}
-                    columns={columns}
-                    onFilterUpdate={onFilterUpdate}
-                    onFilterRemove={onFilterRemove}
-                  />
-                ))}
-              </ul>
-            </SortableContent>
-          ) : null}
-          <div className="flex w-full items-center gap-2">
             <Button
+              variant="outline"
               size="sm"
               className="rounded"
-              ref={addButtonRef}
-              onClick={onFilterAdd}
+              onClick={onFiltersReset}
             >
-              Add filter
+              {t.resetFilters}
             </Button>
-            {filters.length > 0 ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded"
-                onClick={onFiltersReset}
-              >
-                Reset filters
-              </Button>
-            ) : null}
-          </div>
-        </PopoverContent>
-      </Popover>
-      <SortableOverlay>
-        <div className="flex items-center gap-2">
-          <div className="h-8 min-w-[72px] rounded-sm bg-primary/10" />
-          <div className="h-8 w-32 rounded-sm bg-primary/10" />
-          <div className="h-8 w-32 rounded-sm bg-primary/10" />
-          <div className="h-8 min-w-36 flex-1 rounded-sm bg-primary/10" />
-          <div className="size-8 shrink-0 rounded-sm bg-primary/10" />
-          <div className="size-8 shrink-0 rounded-sm bg-primary/10" />
+          ) : null}
         </div>
-      </SortableOverlay>
-    </Sortable>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -384,165 +351,166 @@ function DataTableFilterItem<TData>({
   if (!column) return null;
 
   return (
-    <SortableItem value={filter.filterId} asChild>
-      <li
-        id={filterItemId}
-        tabIndex={-1}
-        className="flex items-center gap-2"
-        onKeyDown={onItemKeyDown}
-      >
-        <div className="min-w-[72px] text-center">
-          {index === 0 ? (
-            <span className="text-muted-foreground text-sm">Where</span>
-          ) : index === 1 ? (
-            <Select
-              value={joinOperator}
-              onValueChange={(value: JoinOperator) => setJoinOperator(value)}
+    <li
+      id={filterItemId}
+      tabIndex={-1}
+      className="flex items-center gap-2"
+      onKeyDown={onItemKeyDown}
+    >
+      <div className="min-w-[72px] text-center">
+        {index === 0 ? (
+          <span className="text-muted-foreground text-sm">{t.where}</span>
+        ) : index === 1 ? (
+          <Select
+            value={joinOperator}
+            onValueChange={(value: string | null) => {
+              if (value === "and" || value === "or") {
+                setJoinOperator(value);
+              }
+            }}
+          >
+            <SelectTrigger
+              aria-label={t.selectJoinOperator}
+              aria-controls={joinOperatorListboxId}
+              className="h-8 rounded lowercase data-size:h-8"
             >
-              <SelectTrigger
-                aria-label="Select join operator"
-                aria-controls={joinOperatorListboxId}
-                className="h-8 rounded lowercase data-size:h-8"
-              >
-                <SelectValue placeholder={joinOperator} />
-              </SelectTrigger>
-              <SelectContent
-                id={joinOperatorListboxId}
-                position="popper"
-                className="min-w-(--radix-select-trigger-width) lowercase"
-              >
-                {dataTableConfig.joinOperators.map((joinOperator) => (
-                  <SelectItem key={joinOperator} value={joinOperator}>
-                    {joinOperator}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : (
-            <span className="text-muted-foreground text-sm">
-              {joinOperator}
-            </span>
-          )}
-        </div>
-        <Popover open={showFieldSelector} onOpenChange={setShowFieldSelector}>
-          <PopoverTrigger asChild>
+              <SelectValue placeholder={joinOperator} />
+            </SelectTrigger>
+            <SelectContent
+              id={joinOperatorListboxId}
+              className="lowercase"
+            >
+              {dataTableConfig.joinOperators.map((jo) => (
+                <SelectItem key={jo} value={jo}>
+                  {jo}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <span className="text-muted-foreground text-sm">
+            {joinOperator}
+          </span>
+        )}
+      </div>
+      <Popover open={showFieldSelector} onOpenChange={setShowFieldSelector}>
+        <PopoverTrigger
+          render={(triggerProps) => (
             <Button
+              {...triggerProps}
               aria-controls={fieldListboxId}
               variant="outline"
               size="sm"
               className="w-32 justify-between rounded font-normal"
             >
               <span className="truncate">
-                {columns.find((column) => column.id === filter.id)?.columnDef
-                  .meta?.label ?? "Select field"}
+                {columns.find((c) => c.id === filter.id)?.columnDef
+                  .meta?.label ?? t.selectField}
               </span>
               <IconSelector className="opacity-50" />
             </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            id={fieldListboxId}
-            align="start"
-            className="w-40 p-0"
-          >
-            <Command>
-              <CommandInput placeholder="Search fields..." />
-              <CommandList>
-                <CommandEmpty>No fields found.</CommandEmpty>
-                <CommandGroup>
-                  {columns.map((column) => (
-                    <CommandItem
-                      key={column.id}
-                      value={column.id}
-                      onSelect={(value) => {
-                        onFilterUpdate(filter.filterId, {
-                          id: value as Extract<keyof TData, string>,
-                          variant: column.columnDef.meta?.variant ?? "text",
-                          operator: getDefaultFilterOperator(
-                            column.columnDef.meta?.variant ?? "text",
-                          ),
-                          value: "",
-                        });
+          )}
+        />
+        <PopoverContent
+          id={fieldListboxId}
+          align="start"
+          className="w-40 p-0"
+        >
+          <Command>
+            <CommandInput placeholder={t.searchFields} />
+            <CommandList>
+              <CommandEmpty>{t.noFieldsFound}</CommandEmpty>
+              <CommandGroup>
+                {columns.map((col) => (
+                  <CommandItem
+                    key={col.id}
+                    value={col.id}
+                    onSelect={(value) => {
+                      onFilterUpdate(filter.filterId, {
+                        id: value as Extract<keyof TData, string>,
+                        variant: col.columnDef.meta?.variant ?? "text",
+                        operator: getDefaultFilterOperator(
+                          col.columnDef.meta?.variant ?? "text",
+                        ),
+                        value: "",
+                      });
 
-                        setShowFieldSelector(false);
-                      }}
-                    >
-                      <span className="truncate">
-                        {column.columnDef.meta?.label}
-                      </span>
-                      <IconCheck
-                        className={cn(
-                          "ml-auto",
-                          column.id === filter.id ? "opacity-100" : "opacity-0",
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
-        <Select
-          open={showOperatorSelector}
-          onOpenChange={setShowOperatorSelector}
-          value={filter.operator}
-          onValueChange={(value: FilterOperator) =>
-            onFilterUpdate(filter.filterId, {
-              operator: value,
-              value:
-                value === "isEmpty" || value === "isNotEmpty"
-                  ? ""
-                  : filter.value,
-            })
-          }
+                      setShowFieldSelector(false);
+                    }}
+                  >
+                    <span className="truncate">
+                      {col.columnDef.meta?.label}
+                    </span>
+                    <IconCheck
+                      className={cn(
+                        "ml-auto",
+                        col.id === filter.id ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      <Select
+        open={showOperatorSelector}
+        onOpenChange={setShowOperatorSelector}
+        value={filter.operator}
+        onValueChange={(value: string | null) => {
+          if (!value) return;
+          const op = value as FilterOperator;
+          onFilterUpdate(filter.filterId, {
+            operator: op,
+            value:
+              op === "isEmpty" || op === "isNotEmpty"
+                ? ""
+                : filter.value,
+          });
+        }}
+      >
+        <SelectTrigger
+          aria-controls={operatorListboxId}
+          className="h-8 w-32 rounded lowercase data-size:h-8"
         >
-          <SelectTrigger
-            aria-controls={operatorListboxId}
-            className="h-8 w-32 rounded lowercase data-size:h-8"
-          >
-            <div className="truncate">
-              <SelectValue placeholder={filter.operator} />
-            </div>
-          </SelectTrigger>
-          <SelectContent id={operatorListboxId}>
-            {filterOperators.map((operator) => (
-              <SelectItem
-                key={operator.value}
-                value={operator.value}
-                className="lowercase"
-              >
-                {operator.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="min-w-36 flex-1">
-          {onFilterInputRender({
-            filter,
-            inputId,
-            column,
-            columnMeta,
-            onFilterUpdate,
-            showValueSelector,
-            setShowValueSelector,
-          })}
-        </div>
-        <Button
-          aria-controls={filterItemId}
-          variant="outline"
-          size="icon"
-          className="size-8 rounded"
-          onClick={() => onFilterRemove(filter.filterId)}
-        >
-          <IconTrash />
-        </Button>
-        <SortableItemHandle asChild>
-          <Button variant="outline" size="icon" className="size-8 rounded">
-            <IconGripVertical />
-          </Button>
-        </SortableItemHandle>
-      </li>
-    </SortableItem>
+          <div className="truncate">
+            <SelectValue placeholder={filter.operator} />
+          </div>
+        </SelectTrigger>
+        <SelectContent id={operatorListboxId}>
+          {filterOperators.map((operator) => (
+            <SelectItem
+              key={operator.value}
+              value={operator.value}
+              className="lowercase"
+            >
+              {operator.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <div className="min-w-36 flex-1">
+        {onFilterInputRender({
+          filter,
+          inputId,
+          column,
+          columnMeta,
+          onFilterUpdate,
+          showValueSelector,
+          setShowValueSelector,
+        })}
+      </div>
+      <Button
+        aria-controls={filterItemId}
+        variant="outline"
+        size="icon"
+        className="size-8 rounded"
+        onClick={() => onFilterRemove(filter.filterId)}
+      >
+        <IconTrash />
+      </Button>
+    </li>
   );
 }
 
@@ -608,7 +576,7 @@ function onFilterInputRender<TData>({
           aria-label={`${columnMeta?.label} filter value`}
           aria-describedby={`${inputId}-description`}
           inputMode={isNumber ? "numeric" : undefined}
-          placeholder={columnMeta?.placeholder ?? "Enter a value..."}
+          placeholder={columnMeta?.placeholder ?? t.enterValue}
           className="h-8 w-full rounded"
           defaultValue={
             typeof filter.value === "string" ? filter.value : undefined
@@ -631,12 +599,12 @@ function onFilterInputRender<TData>({
         <Select
           open={showValueSelector}
           onOpenChange={setShowValueSelector}
-          value={filter.value}
-          onValueChange={(value) =>
-            onFilterUpdate(filter.filterId, {
-              value,
-            })
-          }
+          value={typeof filter.value === "string" ? filter.value : "true"}
+          onValueChange={(value: string | null) => {
+            if (value) {
+              onFilterUpdate(filter.filterId, { value });
+            }
+          }}
         >
           <SelectTrigger
             id={inputId}
@@ -644,11 +612,11 @@ function onFilterInputRender<TData>({
             aria-label={`${columnMeta?.label} boolean filter`}
             className="h-8 w-full rounded data-size:h-8"
           >
-            <SelectValue placeholder={filter.value ? "True" : "False"} />
+            <SelectValue placeholder={filter.value ? t.boolTrue : t.boolFalse} />
           </SelectTrigger>
           <SelectContent id={inputListboxId}>
-            <SelectItem value="true">True</SelectItem>
-            <SelectItem value="false">False</SelectItem>
+            <SelectItem value="true">{t.boolTrue}</SelectItem>
+            <SelectItem value="false">{t.boolFalse}</SelectItem>
           </SelectContent>
         </Select>
       );
@@ -657,69 +625,93 @@ function onFilterInputRender<TData>({
     case "select":
     case "multiSelect": {
       const inputListboxId = `${inputId}-listbox`;
-
+      const options = columnMeta?.options ?? [];
       const multiple = filter.variant === "multiSelect";
       const selectedValues = multiple
         ? Array.isArray(filter.value)
           ? filter.value
           : []
         : typeof filter.value === "string"
-          ? filter.value
-          : undefined;
+          ? [filter.value]
+          : [];
+
+      const selectedOptions = options.filter((option) =>
+        selectedValues.includes(option.value),
+      );
 
       return (
-        <Faceted
-          open={showValueSelector}
-          onOpenChange={setShowValueSelector}
-          value={selectedValues}
-          onValueChange={(value) => {
-            onFilterUpdate(filter.filterId, {
-              value,
-            });
-          }}
-          multiple={multiple}
-        >
-          <FacetedTrigger asChild>
-            <Button
-              id={inputId}
-              aria-controls={inputListboxId}
-              aria-label={`${columnMeta?.label} filter value${multiple ? "s" : ""}`}
-              variant="outline"
-              size="sm"
-              className="w-full rounded font-normal"
-            >
-              <FacetedBadgeList
-                options={columnMeta?.options}
-                placeholder={
+        <Popover open={showValueSelector} onOpenChange={setShowValueSelector}>
+          <PopoverTrigger
+            render={(triggerProps) => (
+              <Button
+                {...triggerProps}
+                id={inputId}
+                aria-controls={inputListboxId}
+                aria-label={`${columnMeta?.label} filter value${multiple ? "s" : ""}`}
+                variant="outline"
+                size="sm"
+                className="w-full rounded font-normal"
+              >
+                {selectedOptions.length === 0 ? (
                   columnMeta?.placeholder ??
-                  `Select option${multiple ? "s" : ""}...`
-                }
+                  (multiple ? t.selectOptions : t.selectOption)
+                ) : (
+                  <span className="truncate">
+                    {selectedOptions.length > 1
+                      ? `${selectedOptions.length} ${t.selected}`
+                      : selectedOptions[0]?.label}
+                  </span>
+                )}
+              </Button>
+            )}
+          />
+          <PopoverContent id={inputListboxId} className="w-[200px] p-0">
+            <Command>
+              <CommandInput
+                aria-label={`Search ${columnMeta?.label} options`}
+                placeholder={columnMeta?.placeholder ?? t.searchOptions}
               />
-            </Button>
-          </FacetedTrigger>
-          <FacetedContent id={inputListboxId} className="w-[200px]">
-            <FacetedInput
-              aria-label={`Search ${columnMeta?.label} options`}
-              placeholder={columnMeta?.placeholder ?? "Search options..."}
-            />
-            <FacetedList>
-              <FacetedEmpty>No options found.</FacetedEmpty>
-              <FacetedGroup>
-                {columnMeta?.options?.map((option) => (
-                  <FacetedItem key={option.value} value={option.value}>
-                    {option.icon && <option.icon />}
-                    <span>{option.label}</span>
-                    {option.count && (
-                      <span className="ml-auto font-mono text-xs">
-                        {option.count}
-                      </span>
-                    )}
-                  </FacetedItem>
-                ))}
-              </FacetedGroup>
-            </FacetedList>
-          </FacetedContent>
-        </Faceted>
+              <CommandList>
+                <CommandEmpty>{t.noOptionsFound}</CommandEmpty>
+                <CommandGroup>
+                  {options.map((option) => {
+                    const isSelected = selectedValues.includes(option.value);
+                    return (
+                      <CommandItem
+                        key={option.value}
+                        value={option.value}
+                        onSelect={() => {
+                          const value = multiple
+                            ? isSelected
+                              ? selectedValues.filter((v) => v !== option.value)
+                              : [...selectedValues, option.value]
+                            : option.value;
+                          onFilterUpdate(filter.filterId, { value });
+                        }}
+                      >
+                        {option.icon && <option.icon />}
+                        <span>{option.label}</span>
+                        {multiple && (
+                          <IconCheck
+                            className={cn(
+                              "ml-auto",
+                              isSelected ? "opacity-100" : "opacity-0",
+                            )}
+                          />
+                        )}
+                        {option.count && (
+                          <span className="ml-auto font-mono text-xs">
+                            {option.count}
+                          </span>
+                        )}
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       );
     }
 
@@ -738,26 +730,29 @@ function onFilterInputRender<TData>({
             )}`
           : dateValue[0]
             ? formatDate(new Date(Number(dateValue[0])))
-            : "Pick a date";
+            : t.pickDate;
 
       return (
         <Popover open={showValueSelector} onOpenChange={setShowValueSelector}>
-          <PopoverTrigger asChild>
-            <Button
-              id={inputId}
-              aria-controls={inputListboxId}
-              aria-label={`${columnMeta?.label} date filter`}
-              variant="outline"
-              size="sm"
-              className={cn(
-                "w-full justify-start rounded text-left font-normal",
-                !filter.value && "text-muted-foreground",
-              )}
-            >
-              <IconCalendar />
-              <span className="truncate">{displayValue}</span>
-            </Button>
-          </PopoverTrigger>
+          <PopoverTrigger
+            render={(triggerProps) => (
+              <Button
+                {...triggerProps}
+                id={inputId}
+                aria-controls={inputListboxId}
+                aria-label={`${columnMeta?.label} date filter`}
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "w-full justify-start rounded text-left font-normal",
+                  !filter.value && "text-muted-foreground",
+                )}
+              >
+                <IconCalendar />
+                <span className="truncate">{displayValue}</span>
+              </Button>
+            )}
+          />
           <PopoverContent
             id={inputListboxId}
             align="start"

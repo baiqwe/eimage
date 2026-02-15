@@ -16,14 +16,18 @@ import {
 import { websiteConfig } from '@/config/website';
 import type { User } from 'better-auth';
 import {
+  IconDeviceDesktop,
   IconLogout,
   IconMoon,
   IconSelector,
   IconSun,
 } from '@tabler/icons-react';
 import { useTheme } from '@/components/layout/theme-provider';
-import { useRouter } from '@tanstack/react-router';
 import { UserAvatar } from '@/components/layout/user-avatar';
+import { authClient } from '@/auth/auth-client';
+import { messages } from '@/config/messages';
+
+const m = messages.common;
 
 interface SidebarUserProps {
   user: User;
@@ -32,15 +36,18 @@ interface SidebarUserProps {
 
 export function SidebarUser({ user }: SidebarUserProps) {
   const { setTheme } = useTheme();
-  const router = useRouter();
   const { isMobile } = useSidebar();
   const showModeSwitch = websiteConfig.ui?.mode?.enableSwitch ?? false;
 
   const handleSignOut = async () => {
     try {
-      const { authClient } = await import('@/auth/auth-client');
-      await authClient.signOut();
-      router.navigate({ to: '/' });
+      await authClient.signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            window.location.href = '/';
+          },
+        },
+      });
     } catch (error) {
       console.error('sign out error:', error);
     }
@@ -98,14 +105,21 @@ export function SidebarUser({ user }: SidebarUserProps) {
                     onClick={() => setTheme('light')}
                   >
                     <IconSun className="mr-2 size-4" />
-                    Light
+                    {m.mode.light}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
                     onClick={() => setTheme('dark')}
                   >
                     <IconMoon className="mr-2 size-4" />
-                    Dark
+                    {m.mode.dark}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => setTheme('system')}
+                  >
+                    <IconDeviceDesktop className="mr-2 size-4" />
+                    {m.mode.system}
                   </DropdownMenuItem>
                 </>
               )}
@@ -119,7 +133,7 @@ export function SidebarUser({ user }: SidebarUserProps) {
                 }}
               >
                 <IconLogout className="mr-2 size-4" />
-                Log out
+                {m.logout}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

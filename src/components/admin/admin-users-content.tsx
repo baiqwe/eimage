@@ -11,7 +11,7 @@ import {
 } from 'nuqs';
 import { useEffect, useMemo, useRef } from 'react';
 
-const SORTABLE_IDS = ['name', 'email', 'createdAt'] as const;
+const SORTABLE_IDS = ['name', 'email', 'role', 'createdAt', 'status'] as const;
 const defaultSorting: SortingState = [{ id: 'createdAt', desc: true }];
 const sortableColumnSet = new Set<string>(SORTABLE_IDS);
 

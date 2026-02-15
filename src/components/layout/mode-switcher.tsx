@@ -7,6 +7,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { IconDeviceDesktop, IconMoon, IconSun } from '@tabler/icons-react';
 import { useTheme } from '@/components/layout/theme-provider';
+import { messages } from '@/config/messages';
+
+const m = messages.common;
 
 /**
  * Theme mode switcher (light / dark / system), used in navbar.
@@ -35,21 +38,21 @@ export function ModeSwitcher() {
           className="cursor-pointer"
         >
           <IconSun className="mr-2 size-4" />
-          Light
+          {m.mode.light}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme('dark')}
           className="cursor-pointer"
         >
           <IconMoon className="mr-2 size-4" />
-          Dark
+          {m.mode.dark}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setTheme('system')}
           className="cursor-pointer"
         >
           <IconDeviceDesktop className="mr-2 size-4" />
-          System
+          {m.mode.system}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

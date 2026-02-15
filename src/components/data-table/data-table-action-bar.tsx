@@ -1,8 +1,5 @@
-"use client";
-
 import type { Table } from "@tanstack/react-table";
 import { IconLoader2, IconX } from "@tabler/icons-react";
-import { AnimatePresence, motion } from "motion/react";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Button } from "@/components/ui/button";
@@ -12,10 +9,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { messages } from "@/config/messages";
 import { cn } from "@/lib/utils";
 
+const t = messages.common.table;
+
 interface DataTableActionBarProps<TData>
-  extends React.ComponentProps<typeof motion.div> {
+  extends React.ComponentProps<"div"> {
   table: Table<TData>;
   visible?: boolean;
   portalContainer?: Element | DocumentFragment | null;
@@ -54,26 +54,20 @@ function DataTableActionBar<TData>({
   const visible =
     visibleProp ?? table.getFilteredSelectedRowModel().rows.length > 0;
 
+  if (!visible) return null;
+
   return ReactDOM.createPortal(
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          role="toolbar"
-          aria-orientation="horizontal"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
-          className={cn(
-            "fixed inset-x-0 bottom-6 z-50 mx-auto flex w-fit flex-wrap items-center justify-center gap-2 rounded-md border bg-background p-2 text-foreground shadow-sm",
-            className,
-          )}
-          {...props}
-        >
-          {children}
-        </motion.div>
+    <div
+      role="toolbar"
+      aria-orientation="horizontal"
+      className={cn(
+        "fixed inset-x-0 bottom-6 z-50 mx-auto flex w-fit flex-wrap items-center justify-center gap-2 rounded-md border bg-background p-2 text-foreground shadow-sm animate-in fade-in-0 slide-in-from-bottom-5",
+        className,
       )}
-    </AnimatePresence>,
+      {...props}
+    >
+      {children}
+    </div>,
     portalContainer,
   );
 }
@@ -113,7 +107,24 @@ function DataTableActionBarAction({
 
   return (
     <Tooltip>
-      <TooltipTrigger asChild>{trigger}</TooltipTrigger>
+      <TooltipTrigger
+        render={(triggerProps) => (
+          <Button
+            {...triggerProps}
+            variant="secondary"
+            size={size}
+            className={cn(
+              "gap-1.5 border border-secondary bg-secondary/50 hover:bg-secondary/70 [&>svg]:size-3.5",
+              size === "icon" ? "size-7" : "h-7",
+              className,
+            )}
+            disabled={disabled || isPending}
+            {...props}
+          >
+            {isPending ? <IconLoader2 className="size-3.5 animate-spin" /> : children}
+          </Button>
+        )}
+      />
       <TooltipContent
         sideOffset={6}
         className="border bg-accent font-semibold text-foreground dark:bg-zinc-900 [&>span]:hidden"
@@ -138,28 +149,31 @@ function DataTableActionBarSelection<TData>({
   return (
     <div className="flex h-7 items-center rounded-md border pr-1 pl-2.5">
       <span className="whitespace-nowrap text-xs">
-        {table.getFilteredSelectedRowModel().rows.length} selected
+        {table.getFilteredSelectedRowModel().rows.length} {t.selected}
       </span>
       <Separator
         orientation="vertical"
         className="mr-1 ml-2 data-[orientation=vertical]:h-4"
       />
       <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-5"
-            onClick={onClearSelection}
-          >
-            <IconX className="size-3.5" />
-          </Button>
-        </TooltipTrigger>
+        <TooltipTrigger
+          render={(triggerProps) => (
+            <Button
+              {...triggerProps}
+              variant="ghost"
+              size="icon"
+              className="size-5"
+              onClick={onClearSelection}
+            >
+              <IconX className="size-3.5" />
+            </Button>
+          )}
+        />
         <TooltipContent
           sideOffset={10}
           className="flex items-center gap-2 border bg-accent px-2 py-1 font-semibold text-foreground dark:bg-zinc-900 [&>span]:hidden"
         >
-          <p>Clear selection</p>
+          <p>{t.clearSelection}</p>
           <kbd className="select-none rounded border bg-background px-1.5 py-px font-mono font-normal text-[0.7rem] text-foreground shadow-xs">
             <abbr title="Escape" className="no-underline">
               Esc

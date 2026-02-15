@@ -1,11 +1,12 @@
-"use client";
-
 import type { Column } from "@tanstack/react-table";
 import * as React from "react";
 
 import { Input } from "@/components/ui/input";
+import { messages } from "@/config/messages";
 import { cn } from "@/lib/utils";
 import type { ExtendedColumnFilter } from "@/components/data-table/types/data-table";
+
+const t = messages.common.table;
 
 interface DataTableRangeFilterProps<TData> extends React.ComponentProps<"div"> {
   filter: ExtendedColumnFilter<TData>;
@@ -89,7 +90,7 @@ export function DataTableRangeFilter<TData>({
       <Input
         id={`${inputId}-min`}
         type="number"
-        aria-label={`${meta?.label} minimum value`}
+        aria-label={`${meta?.label} ${t.minimumValue}`}
         aria-valuemin={min}
         aria-valuemax={max}
         data-slot="range-min"
@@ -101,11 +102,11 @@ export function DataTableRangeFilter<TData>({
         defaultValue={value[0]}
         onChange={(event) => onRangeValueChange(event.target.value, true)}
       />
-      <span className="sr-only shrink-0 text-muted-foreground">to</span>
+      <span className="sr-only shrink-0 text-muted-foreground">{t.to}</span>
       <Input
         id={`${inputId}-max`}
         type="number"
-        aria-label={`${meta?.label} maximum value`}
+        aria-label={`${meta?.label} ${t.maximumValue}`}
         aria-valuemin={min}
         aria-valuemax={max}
         data-slot="range-max"

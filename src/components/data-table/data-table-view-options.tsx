@@ -1,5 +1,3 @@
-'use client';
-
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -40,9 +38,9 @@ export function DataTableViewOptions<TData>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={(triggerProps) => (
+        render={(props) => (
           <Button
-            {...triggerProps}
+            {...props}
             type="button"
             aria-label={t.viewOptions}
             variant="outline"
