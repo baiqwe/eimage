@@ -21,7 +21,9 @@ function BlogListPage() {
   if (!websiteConfig.blog?.enable) {
     return (
       <Container className="py-16">
-        <p className="text-center text-muted-foreground">{messages.blog.disabled}</p>
+        <p className="text-center text-muted-foreground">
+          {messages.blog.disabled}
+        </p>
       </Container>
     );
   }
@@ -30,7 +32,9 @@ function BlogListPage() {
     <div className="mb-16">
       <div className="mt-8 flex w-full flex-col items-center justify-center gap-8">
         <div className="space-y-4 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">{messages.blog.title}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {messages.blog.title}
+          </h1>
           <p className="text-muted-foreground text-lg">
             {messages.blog.description}
           </p>

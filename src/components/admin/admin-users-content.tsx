@@ -49,9 +49,7 @@ export function AdminUsersContent() {
       loading={isLoading}
       onSearch={(newSearch) => setQueryStates({ search: newSearch, page: 0 })}
       onPageChange={(newPage) => setQueryStates({ page: newPage })}
-      onPageSizeChange={(newSize) =>
-        setQueryStates({ size: newSize, page: 0 })
-      }
+      onPageSizeChange={(newSize) => setQueryStates({ size: newSize, page: 0 })}
       onSortingChange={(newSorting) => {
         const next = normalizeSorting(newSorting);
         setQueryStates({ sort: next as typeof sort, page: 0 });

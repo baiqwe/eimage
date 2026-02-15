@@ -27,9 +27,7 @@ function createProvider(): MailProvider {
       (env as MailEnv).RESEND_API_KEY ??
       (typeof process !== 'undefined' && process.env?.RESEND_API_KEY);
     if (!apiKey) {
-      throw new Error(
-        'RESEND_API_KEY is required.'
-      );
+      throw new Error('RESEND_API_KEY is required.');
     }
     if (!websiteConfig.mail?.fromEmail) {
       throw new Error('mail.fromEmail is required in websiteConfig.');

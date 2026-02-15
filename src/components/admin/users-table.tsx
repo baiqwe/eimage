@@ -150,8 +150,7 @@ export function UsersTable({
       onSortingChange(next);
     },
     onColumnFiltersChange: (updater) => {
-      const next =
-        typeof updater === 'function' ? updater(filters) : updater;
+      const next = typeof updater === 'function' ? updater(filters) : updater;
       onFiltersChange?.(next);
       onPageChange(0);
     },

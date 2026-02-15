@@ -255,9 +255,9 @@ export const messages = {
   about: {
     title: 'About',
     subtitle: 'We build tools that help you ship faster.',
-    description:
-      'Learn more about our mission and how we can help you.',
-    introduction: '👋 Hi there! This is MkFast, an AI SaaS template built with modern technologies, helping you build your SaaS faster and better. If you have any questions, welcome to contact me.',
+    description: 'Learn more about our mission and how we can help you.',
+    introduction:
+      '👋 Hi there! This is MkFast, an AI SaaS template built with modern technologies, helping you build your SaaS faster and better. If you have any questions, welcome to contact me.',
     followUs: 'Follow us',
     contactUs: 'Contact us',
   },

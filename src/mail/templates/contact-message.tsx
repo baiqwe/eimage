@@ -17,9 +17,15 @@ export default function ContactMessage({
 }: ContactMessageProps) {
   return (
     <EmailLayout>
-      <Text>{m.name} {name}</Text>
-      <Text>{m.email} {email}</Text>
-      <Text>{m.message} {message}</Text>
+      <Text>
+        {m.name} {name}
+      </Text>
+      <Text>
+        {m.email} {email}
+      </Text>
+      <Text>
+        {m.message} {message}
+      </Text>
     </EmailLayout>
   );
 }

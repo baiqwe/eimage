@@ -13,7 +13,9 @@ interface VerifyEmailProps {
 export default function VerifyEmail({ url, name }: VerifyEmailProps) {
   return (
     <EmailLayout>
-      <Text>{m.greeting} {name}.</Text>
+      <Text>
+        {m.greeting} {name}.
+      </Text>
       <Text>{m.body}</Text>
       <EmailButton href={url}>{m.button}</EmailButton>
     </EmailLayout>

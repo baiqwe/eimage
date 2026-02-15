@@ -41,7 +41,9 @@ function AboutPage() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h1 className="text-4xl text-foreground">{messages.site.name}</h1>
+                  <h1 className="text-4xl text-foreground">
+                    {messages.site.name}
+                  </h1>
                   <p className="mt-2 text-base text-muted-foreground">
                     {m.subtitle}
                   </p>

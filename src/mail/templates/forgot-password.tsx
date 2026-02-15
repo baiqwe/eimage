@@ -13,7 +13,9 @@ interface ForgotPasswordProps {
 export default function ForgotPassword({ url, name }: ForgotPasswordProps) {
   return (
     <EmailLayout>
-      <Text>{m.greeting} {name}.</Text>
+      <Text>
+        {m.greeting} {name}.
+      </Text>
       <Text>{m.body}</Text>
       <EmailButton href={url}>{m.button}</EmailButton>
     </EmailLayout>

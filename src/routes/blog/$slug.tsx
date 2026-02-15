@@ -25,7 +25,9 @@ function BlogPostPage() {
   if (!websiteConfig.blog?.enable) {
     return (
       <Container className="py-16">
-        <p className="text-center text-muted-foreground">{messages.blog.disabled}</p>
+        <p className="text-center text-muted-foreground">
+          {messages.blog.disabled}
+        </p>
       </Container>
     );
   }
