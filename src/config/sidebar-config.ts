@@ -5,7 +5,7 @@ import {
   IconSettings2,
   IconShieldCheck,
   IconUserCircle,
-  IconUsersGroup,
+  IconUsers,
 } from '@tabler/icons-react';
 import { Routes } from '@/routes';
 import type { MenuItemConfig } from '../types';
@@ -31,7 +31,7 @@ export function getSidebarLinks(): MenuItemConfig[] {
       items: [
         {
           title: adminM.users.title,
-          icon: IconUsersGroup,
+          icon: IconUsers,
           href: Routes.AdminUsers,
           external: false,
         },

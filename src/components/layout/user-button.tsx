@@ -38,7 +38,7 @@ export function UserButton({ user }: UserButtonProps) {
         <div className="flex items-center gap-2 p-2">
           <div className="flex flex-col space-y-1 leading-none">
             <p className="font-medium">{user.name}</p>
-            <p className="w-[200px] truncate text-sm text-muted-foreground">
+            <p className="w-[240px] truncate text-sm text-muted-foreground">
               {user.email}
             </p>
           </div>

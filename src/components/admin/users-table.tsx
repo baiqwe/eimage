@@ -26,6 +26,8 @@ import { IconX } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { IconMailCheck, IconMailQuestion } from '@tabler/icons-react';
 import { formatDateTime } from '@/lib/formatter';
 
 const m = messages.dashboard.admin.users;
@@ -33,11 +35,30 @@ const m = messages.dashboard.admin.users;
 function TableRowSkeleton({ columns }: { columns: number }) {
   return (
     <TableRow className="h-14">
-      {Array.from({ length: columns }).map((_, i) => (
-        <TableCell key={i} className="py-3">
-          <Skeleton className="h-4 w-24" />
-        </TableCell>
-      ))}
+      {Array.from({ length: columns }).map((_, i) => {
+        if (i === 0) {
+          return (
+            <TableCell key={i} className="py-3">
+              <div className="flex items-center gap-2">
+                <Skeleton className="size-8 rounded-full shrink-0" />
+                <Skeleton className="h-4 w-20" />
+              </div>
+            </TableCell>
+          );
+        }
+        if (i === 1) {
+          return (
+            <TableCell key={i} className="py-3">
+              <Skeleton className="h-6 w-32" />
+            </TableCell>
+          );
+        }
+        return (
+          <TableCell key={i} className="py-3">
+            <Skeleton className="h-4 w-24" />
+          </TableCell>
+        );
+      })}
     </TableRow>
   );
 }
@@ -111,9 +132,27 @@ export function UsersTable({
         header: ({ column }) => (
           <DataTableColumnHeader column={column} label={m.columns.email} />
         ),
-        cell: ({ row }) => (
-          <span className="text-muted-foreground">{row.original.email}</span>
-        ),
+        cell: ({ row }) => {
+          const u = row.original;
+          return (
+            <div className="flex items-center gap-2">
+              <Badge
+                variant="outline"
+                className="text-sm px-1.5 cursor-pointer hover:bg-accent"
+                onClick={() => {
+                  navigator.clipboard.writeText(u.email);
+                }}
+              >
+                {u.emailVerified ? (
+                  <IconMailCheck className="stroke-green-500 dark:stroke-green-400" />
+                ) : (
+                  <IconMailQuestion className="stroke-red-500 dark:stroke-red-400" />
+                )}
+                {u.email}
+              </Badge>
+            </div>
+          );
+        },
         meta: { label: m.columns.email },
         minSize: 180,
         size: 220,
@@ -178,26 +217,31 @@ export function UsersTable({
   return (
     <div className="w-full space-y-4">
       <DataTableAdvancedToolbar table={table}>
-        <div className="relative">
-          <Input
-            placeholder={m.search}
-            value={search}
-            onChange={(e) => onSearch(e.target.value)}
-            className="h-8 w-[260px] pr-8"
-          />
-          {search.length > 0 ? (
-            <button
-              type="button"
-              aria-label={m.clearSearch}
-              className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
-              onClick={() => {
-                onSearch('');
+        <div className="flex flex-1 flex-wrap items-center gap-2">
+          <div className="relative">
+            <Input
+              placeholder={m.search}
+              value={search}
+              onChange={(e) => {
+                onSearch(e.target.value);
                 onPageChange(0);
               }}
-            >
-              <IconX className="size-3.5" />
-            </button>
-          ) : null}
+              className="h-8 w-[260px] pr-8"
+            />
+            {search.length > 0 ? (
+              <button
+                type="button"
+                aria-label={m.clearSearch}
+                className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+                onClick={() => {
+                  onSearch('');
+                  onPageChange(0);
+                }}
+              >
+                <IconX className="size-3.5" />
+              </button>
+            ) : null}
+          </div>
         </div>
       </DataTableAdvancedToolbar>
       <div className="relative flex flex-col gap-4 overflow-auto">

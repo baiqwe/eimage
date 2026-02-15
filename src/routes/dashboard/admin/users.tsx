@@ -10,7 +10,10 @@ export const Route = createFileRoute('/dashboard/admin/users')({
 });
 
 function AdminUsersPage() {
-  const breadcrumbs = [{ label: m.title, isCurrentPage: true }];
+  const breadcrumbs = [
+    { label: messages.dashboard.admin.title, isCurrentPage: false },
+    { label: m.title, isCurrentPage: true },
+  ];
 
   return (
     <>
