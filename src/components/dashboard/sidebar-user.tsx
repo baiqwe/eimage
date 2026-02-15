@@ -22,6 +22,7 @@ import {
   IconSelector,
   IconSun,
 } from '@tabler/icons-react';
+import { useState } from 'react';
 import { useTheme } from '@/components/layout/theme-provider';
 import { UserAvatar } from '@/components/layout/user-avatar';
 import { authClient } from '@/auth/auth-client';
@@ -38,6 +39,7 @@ export function SidebarUser({ user }: SidebarUserProps) {
   const { setTheme } = useTheme();
   const { isMobile } = useSidebar();
   const showModeSwitch = websiteConfig.ui?.mode?.enableSwitch ?? false;
+  const [open, setOpen] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -56,7 +58,7 @@ export function SidebarUser({ user }: SidebarUserProps) {
   return (
     <SidebarMenu className="border-t pt-4">
       <SidebarMenuItem>
-        <DropdownMenu>
+        <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger
             render={
               <SidebarMenuButton
@@ -127,8 +129,9 @@ export function SidebarUser({ user }: SidebarUserProps) {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="cursor-pointer"
-                onSelect={(e) => {
-                  e.preventDefault();
+                onSelect={async (event) => {
+                  event.preventDefault();
+                  setOpen(false);
                   handleSignOut();
                 }}
               >

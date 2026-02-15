@@ -12,8 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { UserAvatar } from './user-avatar';
 import { messages } from '@/config/messages';
-
-const m = messages.dashboard.avatar;
+import { useState } from 'react';
 
 interface UserButtonProps {
   user: User;
@@ -21,6 +20,7 @@ interface UserButtonProps {
 
 export function UserButton({ user }: UserButtonProps) {
   const avatarLinks = getAvatarLinks();
+  const [open, setOpen] = useState(false);
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -33,7 +33,7 @@ export function UserButton({ user }: UserButtonProps) {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger>
         <UserAvatar
           name={user.name ?? null}
@@ -62,9 +62,16 @@ export function UserButton({ user }: UserButtonProps) {
           ) : null
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer" onSelect={handleSignOut}>
+        <DropdownMenuItem
+          className="cursor-pointer"
+          onSelect={async (event) => {
+            event.preventDefault();
+            setOpen(false);
+            handleSignOut();
+          }}
+        >
           <IconLogout className="mr-2 size-4" />
-          {m.logOut}
+          {messages.common.logout}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
