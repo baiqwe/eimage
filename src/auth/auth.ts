@@ -1,4 +1,3 @@
-import { env } from 'cloudflare:workers';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
@@ -18,7 +17,7 @@ import { admin, apiKey } from 'better-auth/plugins';
 export const auth = betterAuth({
   baseURL: getBaseUrl(),
   appName: messages.site.name,
-  database: drizzleAdapter(getDb(env.DB), {
+  database: drizzleAdapter(getDb(), {
     provider: 'sqlite',
   }),
   session: {

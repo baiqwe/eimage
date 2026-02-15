@@ -46,7 +46,6 @@ function normalizeSortId(
 }
 
 async function listUsers(
-  d1: D1Database,
   params: {
     pageIndex: number;
     pageSize: number;
@@ -57,7 +56,7 @@ async function listUsers(
     status?: string;
   }
 ): Promise<{ items: Array<Record<string, unknown>>; total: number }> {
-  const db = getDb(d1);
+  const db = getDb();
   const { pageIndex, pageSize, search, sortDesc, role, status } = params;
   const offset = pageIndex * pageSize;
   const sortId = normalizeSortId(params.sortId);
@@ -145,8 +144,7 @@ export const Route = createFileRoute('/api/admin/users')({
         const status = url.searchParams.get('status') ?? '';
 
         try {
-          const { env } = await import('cloudflare:workers');
-          const result = await listUsers(env.DB, {
+          const result = await listUsers({
             pageIndex,
             pageSize,
             search,
