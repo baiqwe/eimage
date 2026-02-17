@@ -6,6 +6,10 @@ import { cn } from '@/lib/utils';
 
 const m = messages.notFound;
 
+/**
+ * Not found component for TanStack Router
+ * https://github.com/TanStack/router/blob/main/examples/react/start-basic-cloudflare/src/components/NotFound.tsx
+ */
 export function NotFound() {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 px-4">

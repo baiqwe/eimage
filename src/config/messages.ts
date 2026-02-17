@@ -323,12 +323,6 @@ export const messages = {
     thanks: 'Thanks for subscribing!',
   },
 
-  notFound: {
-    title: 'Not Found',
-    description: 'The page you are looking for does not exist.',
-    backToHome: 'Back to Home',
-  },
-
   mail: {
     layout: {
       team: 'Team',
@@ -353,6 +347,18 @@ export const messages = {
       body: 'Please click the link below to verify your email address.',
       button: 'Confirm email',
     },
+  },
+
+  notFound: {
+    title: 'Not Found',
+    description: 'The page you are looking for does not exist.',
+    backToHome: 'Back to Home',
+  },
+
+  catchBoundary: {
+    tryAgain: 'Try again',
+    goBack: 'Go back',
+    backToHome: 'Back to Home',
   },
 
   common: {

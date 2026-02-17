@@ -75,7 +75,6 @@
 }
 
 @theme inline {
-  /* Use 1px for content borders (e.g. cards, panels) so borders are not too heavy. */
   --border-width: 1px;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);

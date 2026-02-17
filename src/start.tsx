@@ -1,5 +1,8 @@
 import { createStart } from '@tanstack/react-start';
 
+/**
+ * https://github.com/backpine/tanstack-start-on-cloudflare/blob/main/src/start.tsx
+ */
 declare module '@tanstack/react-start' {
   interface Register {
     server: {

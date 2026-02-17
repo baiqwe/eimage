@@ -1,5 +1,5 @@
 /**
- * Tailwind breakpoint indicator (dev only), fixed at bottom-left of root layout.
+ * Tailwind breakpoint indicator (dev only), fixed at bottom-right of root layout
  */
 export function TailwindIndicator() {
   if (import.meta.env.PROD) return null;

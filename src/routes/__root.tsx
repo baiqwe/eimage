@@ -3,6 +3,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import {
   createRootRouteWithContext,
   HeadContent,
+  Outlet,
   Scripts,
   useRouterState,
 } from '@tanstack/react-router';
@@ -18,37 +19,14 @@ import { messages } from '@/config/messages';
 import { websiteConfig } from '@/config/website';
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import appCss from '../styles.css?url';
+import { DefaultCatchBoundary } from '@/components/layout/default-catch-boundary';
 
 /**
- * Root layout: auth and dashboard use their own layouts (no marketing shell).
- * Only marketing pages get Navbar + main + Footer.
+ * https://github.com/backpine/tanstack-start-on-cloudflare/blob/main/src/routes/__root.tsx
  */
-function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname }) ?? '';
-  const isAuth = pathname.startsWith('/auth');
-  const isDashboard = pathname.startsWith('/dashboard');
-
-  if (isAuth || isDashboard) {
-    return <>{children}</>;
-  }
-
-  return (
-    <div className="flex min-h-screen flex-col">
-      <Navbar scroll />
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </div>
-  );
-}
-
-const DEFAULT_THEME = websiteConfig.ui?.mode?.defaultMode ?? 'system';
-
-interface MyRouterContext {
+export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
-}
-
-export const Route = createRootRouteWithContext<MyRouterContext>()({
-  notFoundComponent: NotFound,
+}>()({
   head: () => ({
     meta: [
       {
@@ -71,11 +49,69 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         rel: 'stylesheet',
         href: appCss,
       },
+      {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: '/apple-touch-icon.png',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '32x32',
+        href: '/favicon-32x32.png',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '16x16',
+        href: '/favicon-16x16.png',
+      },
+      { rel: 'manifest', href: '/site.webmanifest', color: '#fffff' },
+      { rel: 'icon', href: '/favicon.ico' },
     ],
   }),
+  // shellComponent automatically wraps root component, errorComponent, and notFoundComponent
   shellComponent: RootDocument,
+  component: RootComponent,
+  notFoundComponent: NotFound,
+  errorComponent: DefaultCatchBoundary,
 });
 
+const DEFAULT_THEME = websiteConfig.ui?.mode?.defaultMode ?? 'system';
+
+/**
+ * Root component (wrapped by shellComponent: RootDocument)
+ * Only marketing pages get Navbar + Footer; auth/dashboard pages don't.
+ */
+function RootComponent() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname }) ?? '';
+  const isAuth = pathname.startsWith('/auth');
+  const isDashboard = pathname.startsWith('/dashboard');
+
+  if (isAuth || isDashboard) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <main className="flex-1">
+          <Outlet />
+        </main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Navbar scroll />
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+/**
+ * Root document
+ */
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -89,23 +125,23 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ThemeProvider>
-          <RootLayout>{children}</RootLayout>
+          {children}
           <Toaster richColors position="top-right" offset={64} />
-          <TailwindIndicator />
-          <Analytics />
         </ThemeProvider>
+        <TailwindIndicator />
         <TanStackDevtools
-            config={{
-              position: 'bottom-right',
-            }}
-            plugins={[
-              {
-                name: 'Tanstack Router',
-                render: <TanStackRouterDevtoolsPanel />,
-              },
-              TanStackQueryDevtools,
-            ]}
-          />
+          config={{
+            position: 'bottom-right',
+          }}
+          plugins={[
+            {
+              name: 'Tanstack Router',
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+            TanStackQueryDevtools,
+          ]}
+        />
+        <Analytics />
         <Scripts />
       </body>
     </html>
