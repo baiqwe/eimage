@@ -1,5 +1,5 @@
+import { ClientScript } from '@/components/layout/client-script';
 import { clientEnv } from '@/env/client';
-import { ScriptInject } from './script-inject';
 
 /**
  * Google Analytics (GA4)
@@ -18,11 +18,11 @@ export function GoogleAnalytics() {
   `;
   return (
     <>
-      <ScriptInject
+      <ClientScript
         src={`https://www.googletagmanager.com/gtag/js?id=${id}`}
         async
       />
-      <ScriptInject id="google-analytics" inlineHtml={inlineHtml} />
+      <ClientScript id="google-analytics" inlineHtml={inlineHtml} />
     </>
   );
 }

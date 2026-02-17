@@ -1,5 +1,5 @@
+import { ClientScript } from '@/components/layout/client-script';
 import { clientEnv } from '@/env/client';
-import { ScriptInject } from './script-inject';
 
 /**
  * DataFast Analytics
@@ -12,7 +12,7 @@ export function DataFastAnalytics() {
   if (!domain || !websiteId) return null;
 
   return (
-    <ScriptInject
+    <ClientScript
       src="https://datafa.st/js/script.js"
       defer
       dataAttributes={{ websiteId, domain }}

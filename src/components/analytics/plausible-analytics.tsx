@@ -1,5 +1,5 @@
+import { ClientScript } from '@/components/layout/client-script';
 import { clientEnv } from '@/env/client';
-import { ScriptInject } from './script-inject';
 
 /**
  * Plausible Analytics
@@ -11,5 +11,5 @@ export function PlausibleAnalytics() {
   const script = clientEnv.VITE_PLAUSIBLE_SCRIPT;
   if (!domain || !script) return null;
 
-  return <ScriptInject src={script} defer dataAttributes={{ domain }} />;
+  return <ClientScript src={script} defer dataAttributes={{ domain }} />;
 }

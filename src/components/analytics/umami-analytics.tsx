@@ -1,5 +1,5 @@
+import { ClientScript } from '@/components/layout/client-script';
 import { clientEnv } from '@/env/client';
-import { ScriptInject } from './script-inject';
 
 /**
  * Umami Analytics
@@ -11,5 +11,5 @@ export function UmamiAnalytics() {
   const script = clientEnv.VITE_UMAMI_SCRIPT;
   if (!websiteId || !script) return null;
 
-  return <ScriptInject src={script} async dataAttributes={{ websiteId }} />;
+  return <ClientScript src={script} async dataAttributes={{ websiteId }} />;
 }

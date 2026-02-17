@@ -1,5 +1,5 @@
+import { ClientScript } from '@/components/layout/client-script';
 import { clientEnv } from '@/env/client';
-import { ScriptInject } from './script-inject';
 
 /**
  * Microsoft Clarity
@@ -16,5 +16,5 @@ export function ClarityAnalytics() {
     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
   })(window, document, "clarity", "script", "${projectId}");`;
 
-  return <ScriptInject id="microsoft-clarity-init" inlineHtml={inlineHtml} />;
+  return <ClientScript id="microsoft-clarity-init" inlineHtml={inlineHtml} />;
 }
