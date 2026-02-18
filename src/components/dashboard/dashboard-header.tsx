@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { ModeSwitcher } from '@/components/layout/mode-switcher';
+import { ModeSwitcher } from '@/components/theme/mode-switcher';
 import { websiteConfig } from '@/config/website';
 import type { ReactNode } from 'react';
 import React from 'react';

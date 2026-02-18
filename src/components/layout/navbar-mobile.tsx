@@ -14,7 +14,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Logo } from '@/components/layout/logo';
-import { ModeSwitcher } from '@/components/layout/mode-switcher';
+import { ModeSwitcher } from '@/components/theme/mode-switcher';
 import { UserButton } from '@/components/layout/user-button';
 import { cn } from '@/lib/utils';
 
