@@ -14,14 +14,12 @@ declare module '@tanstack/react-start' {
 }
 
 export const startInstance = createStart(() => {
-  console.log('create startInstance');
   return {
     defaultSsr: true,
   };
 });
 
 startInstance.createMiddleware().server(({ next }) => {
-  console.log('create middleware from startInstance');
   return next({
     context: {
       fromStartInstanceMw: true,

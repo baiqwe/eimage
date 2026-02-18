@@ -10,7 +10,6 @@ import { routeTree } from './routeTree.gen';
  * https://github.com/backpine/tanstack-start-on-cloudflare/blob/main/src/router.tsx
  */
 export const getRouter = () => {
-  console.log('get tanstack router');
   const queryContext = TanstackQuery.getContext();
 
   const router = createRouter({
