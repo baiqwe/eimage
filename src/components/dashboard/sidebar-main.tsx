@@ -10,14 +10,39 @@ import {
 import { getSidebarLinks } from '@/config/sidebar-config';
 import type { MenuItemConfig } from '@/types';
 import { Link, useRouterState } from '@tanstack/react-router';
+import { authClient } from '@/auth/auth-client';
+import { useMemo } from 'react';
 
 /**
- * Maps MenuItemConfig to sidebar items and renders icon from config
+ * Filters sidebar links based on user role (authorizeOnly)
  */
 function useFilteredSidebarLinks(): MenuItemConfig[] {
   const links = getSidebarLinks();
-  // TODO: filter by user role (authorizeOnly) when auth exposes role
-  return links;
+  const { data: session } = authClient.useSession();
+  const userRole = session?.user?.role;
+
+  return useMemo(() => {
+    const filterByRole = (items: MenuItemConfig[]): MenuItemConfig[] => {
+      return items
+        .filter((item) => {
+          if (!item.authorizeOnly) return true;
+          if (!userRole) return false;
+          return item.authorizeOnly.includes(userRole);
+        })
+        .map((item) => {
+          if (item.items && item.items.length > 0) {
+            const filteredItems = filterByRole(item.items);
+            return filteredItems.length > 0
+              ? { ...item, items: filteredItems }
+              : null;
+          }
+          return item;
+        })
+        .filter((item): item is MenuItemConfig => item !== null);
+    };
+
+    return filterByRole(links);
+  }, [links, userRole]);
 }
 
 export function SidebarMain() {
