@@ -1,6 +1,10 @@
+import { IconUser } from '@tabler/icons-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
+/**
+ * User avatar
+ */
 export function UserAvatar({
   name,
   image,
@@ -10,11 +14,13 @@ export function UserAvatar({
   image: string | null;
   className?: string;
 }) {
-  const initial = name?.charAt(0).toUpperCase() ?? 'U';
   return (
-    <Avatar className={cn('size-8 border cursor-pointer', className)}>
+    <Avatar className={cn('size-8 border', className)}>
       <AvatarImage alt={name ?? ''} src={image ?? undefined} />
-      <AvatarFallback>{initial}</AvatarFallback>
+      <AvatarFallback>
+        <span className="sr-only">{name ?? 'User'}</span>
+        <IconUser className="size-4" />
+      </AvatarFallback>
     </Avatar>
   );
 }
