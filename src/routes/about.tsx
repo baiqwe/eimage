@@ -4,12 +4,22 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { messages } from '@/config/messages';
+import { getCanonicalUrl } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import { IconBrandX, IconMail } from '@tabler/icons-react';
 
 const m = messages.about;
 
 export const Route = createFileRoute('/about')({
+  head: () => ({
+    meta: [
+      {
+        title: `${m.title} | ${websiteConfig.metadata?.name}`,
+      },
+      { name: 'description', content: m.description },
+    ],
+    links: [{ rel: 'canonical', href: getCanonicalUrl('/about') }],
+  }),
   component: AboutPage,
 });
 

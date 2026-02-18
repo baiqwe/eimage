@@ -8,6 +8,7 @@ import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
 export const Route = createFileRoute('/dashboard')({
+  ssr: false,
   component: DashboardLayout,
   server: {
     middleware: [authMiddleware],
@@ -22,7 +23,11 @@ function DashboardLayout() {
   );
 }
 
-/** Wraps children with sidebar and enforces auth (redirect to login if no session) */
+/** 
+ * Wraps children with sidebar and enforces auth (redirect to login if no session)
+ * @param children - The children to wrap
+ * @returns A sidebar provider with the children wrapped in a sidebar inset
+ */
 function DashboardLayoutWrapper({ children }: { children: React.ReactNode }) {
   const { data: session, isPending } = authClient.useSession();
   const navigate = useNavigate();

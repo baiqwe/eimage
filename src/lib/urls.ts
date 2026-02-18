@@ -8,6 +8,17 @@ export function getBaseUrl(): string {
   return clientEnv.VITE_BASE_URL;
 }
 
+/** 
+ * Build canonical URL for a path (e.g. /about -> https://example.com/about)
+ * @param path - The path to build the canonical URL for
+ * @returns The canonical URL
+ */
+export function getCanonicalUrl(path: string): string {
+  const base = getBaseUrl().replace(/\/$/, '');
+  const p = path.startsWith('/') ? path : `/${path}`;
+  return `${base}${p}`;
+}
+
 /**
  * Get the URL of the image, if the image is a relative path, it will be prefixed with the base URL
  * @param image - The image URL

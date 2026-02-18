@@ -1,9 +1,20 @@
 import { createFileRoute } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { WaitlistFormCard } from '@/components/waitlist/waitlist-form-card';
+import { websiteConfig } from '@/config/website';
 import { messages } from '@/config/messages';
+import { getCanonicalUrl } from '@/lib/urls';
+
+const m = messages.waitlist;
 
 export const Route = createFileRoute('/waitlist')({
+  head: () => ({
+    meta: [
+      { title: `${m.title} | ${websiteConfig.metadata?.name}` },
+      { name: 'description', content: m.description },
+    ],
+    links: [{ rel: 'canonical', href: getCanonicalUrl('/waitlist') }],
+  }),
   component: WaitlistPage,
 });
 
@@ -13,10 +24,10 @@ function WaitlistPage() {
       <div className="mx-auto max-w-4xl space-y-8 pb-16">
         <div className="space-y-4">
           <h1 className="text-center text-3xl font-bold tracking-tight">
-            {messages.waitlist.title}
+            {m.title}
           </h1>
           <p className="text-center text-lg text-muted-foreground">
-            {messages.waitlist.description}
+            {m.description}
           </p>
         </div>
         <WaitlistFormCard />

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
@@ -49,6 +50,11 @@ const WaitlistRoute = WaitlistRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -211,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/manifest.json': typeof ManifestDotjsonRoute
   '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
   '/api/contact': typeof ApiContactRoute
@@ -243,6 +250,7 @@ export interface FileRoutesByTo {
   '/manifest.json': typeof ManifestDotjsonRoute
   '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
   '/api/contact': typeof ApiContactRoute
@@ -277,6 +285,7 @@ export interface FileRoutesById {
   '/manifest.json': typeof ManifestDotjsonRoute
   '/privacy': typeof PrivacyRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
   '/api/contact': typeof ApiContactRoute
@@ -312,6 +321,7 @@ export interface FileRouteTypes {
     | '/manifest.json'
     | '/privacy'
     | '/robots.txt'
+    | '/sitemap.xml'
     | '/terms'
     | '/waitlist'
     | '/api/contact'
@@ -344,6 +354,7 @@ export interface FileRouteTypes {
     | '/manifest.json'
     | '/privacy'
     | '/robots.txt'
+    | '/sitemap.xml'
     | '/terms'
     | '/waitlist'
     | '/api/contact'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/manifest.json'
     | '/privacy'
     | '/robots.txt'
+    | '/sitemap.xml'
     | '/terms'
     | '/waitlist'
     | '/api/contact'
@@ -411,6 +423,7 @@ export interface RootRouteChildren {
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
   PrivacyRoute: typeof PrivacyRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   WaitlistRoute: typeof WaitlistRoute
   ApiContactRoute: typeof ApiContactRoute
@@ -439,6 +452,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -695,6 +715,7 @@ const rootRouteChildren: RootRouteChildren = {
   ManifestDotjsonRoute: ManifestDotjsonRoute,
   PrivacyRoute: PrivacyRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   WaitlistRoute: WaitlistRoute,
   ApiContactRoute: ApiContactRoute,

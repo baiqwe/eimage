@@ -5,11 +5,21 @@ import { BlogPagination } from '@/components/blog/blog-pagination';
 import { getPaginatedPosts } from '@/lib/blog';
 import { websiteConfig } from '@/config/website';
 import { messages } from '@/config/messages';
+import { getCanonicalUrl } from '@/lib/urls';
 
 export const Route = createFileRoute('/blog/')({
   validateSearch: (search: Record<string, unknown>) => ({
     page:
       typeof search.page === 'number' ? search.page : Number(search.page) || 1,
+  }),
+  head: () => ({
+    meta: [
+      {
+        title: `${messages.blog.title} | ${websiteConfig.metadata?.name}`,
+      },
+      { name: 'description', content: messages.blog.description },
+    ],
+    links: [{ rel: 'canonical', href: getCanonicalUrl('/blog') }],
   }),
   component: BlogListPage,
 });

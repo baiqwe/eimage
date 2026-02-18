@@ -4,24 +4,43 @@ import { MarkdownBody } from '@/components/page/markdown-body';
 import { getPostBySlug } from '@/lib/blog';
 import { websiteConfig } from '@/config/website';
 import { messages } from '@/config/messages';
+import { getCanonicalUrl, getImageUrl } from '@/lib/urls';
 import { IconArrowLeft } from '@tabler/icons-react';
+import { formatDate } from '@/lib/formatter';
 
 export const Route = createFileRoute('/blog/$slug')({
+  loader: ({ params }) => {
+    const post = getPostBySlug(params.slug);
+    if (!post) throw notFound();
+    return { post };
+  },
+  head: ({ loaderData, params }) => {
+    const post = loaderData?.post;
+    if (!post) return {};
+    const title = `${post.title} | ${websiteConfig.metadata?.name}`;
+    const description = post.description ?? websiteConfig.metadata?.description ?? '';
+    const url = getCanonicalUrl(`/blog/${params.slug}`);
+    const image = post.image ? getImageUrl(post.image) : undefined;
+    return {
+      meta: [
+        { title },
+        { name: 'description', content: description },
+        { property: 'og:title', content: title },
+        { property: 'og:description', content: description },
+        { property: 'og:type', content: 'article' as const },
+        ...(image ? [{ property: 'og:image', content: image }] : []),
+        { name: 'twitter:card', content: 'summary_large_image' as const },
+        { name: 'twitter:title', content: title },
+        { name: 'twitter:description', content: description },
+        ...(image ? [{ name: 'twitter:image', content: image }] : []),
+      ],
+      links: [{ rel: 'canonical', href: url }],
+    };
+  },
   component: BlogPostPage,
 });
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
-
 function BlogPostPage() {
-  const { slug } = Route.useParams();
-  const post = getPostBySlug(slug);
-
   if (!websiteConfig.blog?.enable) {
     return (
       <Container className="py-16">
@@ -32,14 +51,11 @@ function BlogPostPage() {
     );
   }
 
-  if (!post) {
-    throw notFound();
-  }
-
-  const dateFormatted = formatDate(post.date);
+  const { post } = Route.useLoaderData();
+  if (!post) throw notFound();
 
   return (
-    <div className="flex flex-col gap-8 pb-16">
+    <div className="flex flex-col gap-8 p-16">
       <Container className="px-4">
         <div className="mx-auto max-w-3xl">
           <Link
@@ -57,7 +73,7 @@ function BlogPostPage() {
               <span className="rounded-full bg-muted px-2.5 py-0.5 font-medium capitalize">
                 {post.category}
               </span>
-              <time dateTime={post.date}>{dateFormatted}</time>
+              <time dateTime={post.date}>{formatDate(new Date(post.date))}</time>
             </div>
 
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">

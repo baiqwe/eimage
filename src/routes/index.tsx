@@ -12,8 +12,20 @@ import FaqSection from '@/components/blocks/faqs';
 import CallToActionSection from '@/components/blocks/calltoaction';
 import TestimonialsSection from '@/components/blocks/testimonials';
 import { NewsletterCard } from '@/components/blocks/newsletter-card';
+import { websiteConfig } from '@/config/website';
+import { getCanonicalUrl } from '@/lib/urls';
 
 export const Route = createFileRoute('/')({
+  head: () => ({
+    meta: [
+      { title: websiteConfig.metadata?.title },
+      {
+        name: 'description',
+        content: websiteConfig.metadata?.description,
+      },
+    ],
+    links: [{ rel: 'canonical', href: getCanonicalUrl('/') }],
+  }),
   component: HomePage,
 });
 
