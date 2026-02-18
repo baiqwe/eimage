@@ -2,15 +2,15 @@ import { AppSidebarLayout } from '@/components/dashboard/app-sidebar-layout';
 import { authMiddleware } from '@/middleware/auth-middleware';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/dashboard')({
+export const Route = createFileRoute('/settings')({
   ssr: false,
-  component: DashboardPage,
+  component: SettingsLayoutPage,
   server: {
     middleware: [authMiddleware],
   },
 });
 
-function DashboardPage() {
+function SettingsLayoutPage() {
   return (
     <AppSidebarLayout>
       <Outlet />

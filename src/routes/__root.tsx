@@ -83,9 +83,9 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname }) ?? '';
   const isAuth = pathname.startsWith('/auth');
-  const isDashboard = pathname.startsWith('/dashboard');
+  const isApp = pathname.startsWith('/dashboard') || pathname.startsWith('/settings');
 
-  if (isAuth || isDashboard) {
+  if (isAuth || isApp) {
     return (
       <div className="flex min-h-screen flex-col">
         <main className="flex-1">

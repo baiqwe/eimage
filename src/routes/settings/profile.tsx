@@ -6,7 +6,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 const m = messages.dashboard.settings.profile;
 
-export const Route = createFileRoute('/dashboard/settings/profile')({
+export const Route = createFileRoute('/settings/profile')({
   component: ProfilePage,
 });
 

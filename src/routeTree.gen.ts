@@ -10,13 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
+import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
+import { Route as SettingsNotificationsRouteImport } from './routes/settings/notifications'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
@@ -30,9 +35,6 @@ import { Route as pagesAboutRouteImport } from './routes/(pages)/about'
 import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
-import { Route as DashboardSettingsSecurityRouteImport } from './routes/dashboard/settings/security'
-import { Route as DashboardSettingsProfileRouteImport } from './routes/dashboard/settings/profile'
-import { Route as DashboardSettingsNotificationsRouteImport } from './routes/dashboard/settings/notifications'
 import { Route as DashboardAdminUsersRouteImport } from './routes/dashboard/admin/users'
 import { Route as ApiStorageUploadRouteImport } from './routes/api/storage/upload'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
@@ -45,6 +47,11 @@ import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
@@ -72,6 +79,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -81,6 +93,21 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsSecurityRoute = SettingsSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsProfileRoute = SettingsProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => SettingsRoute,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
@@ -147,24 +174,6 @@ const legalsCookieRoute = legalsCookieRouteImport.update({
   path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardSettingsSecurityRoute =
-  DashboardSettingsSecurityRouteImport.update({
-    id: '/settings/security',
-    path: '/settings/security',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardSettingsProfileRoute =
-  DashboardSettingsProfileRouteImport.update({
-    id: '/settings/profile',
-    path: '/settings/profile',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardSettingsNotificationsRoute =
-  DashboardSettingsNotificationsRouteImport.update({
-    id: '/settings/notifications',
-    path: '/settings/notifications',
-    getParentRoute: () => DashboardRoute,
-  } as any)
 const DashboardAdminUsersRoute = DashboardAdminUsersRouteImport.update({
   id: '/admin/users',
   path: '/admin/users',
@@ -213,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
@@ -227,8 +237,12 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/security': typeof SettingsSecurityRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/newsletter/status': typeof ApiNewsletterStatusRoute
@@ -237,9 +251,6 @@ export interface FileRoutesByFullPath {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
-  '/dashboard/settings/notifications': typeof DashboardSettingsNotificationsRoute
-  '/dashboard/settings/profile': typeof DashboardSettingsProfileRoute
-  '/dashboard/settings/security': typeof DashboardSettingsSecurityRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -260,8 +271,12 @@ export interface FileRoutesByTo {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/security': typeof SettingsSecurityRoute
   '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/settings': typeof SettingsIndexRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/newsletter/status': typeof ApiNewsletterStatusRoute
@@ -270,9 +285,6 @@ export interface FileRoutesByTo {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
-  '/dashboard/settings/notifications': typeof DashboardSettingsNotificationsRoute
-  '/dashboard/settings/profile': typeof DashboardSettingsProfileRoute
-  '/dashboard/settings/security': typeof DashboardSettingsSecurityRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -281,6 +293,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
+  '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/(legals)/cookie': typeof legalsCookieRoute
   '/(legals)/privacy': typeof legalsPrivacyRoute
@@ -295,8 +308,12 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/profile': typeof SettingsProfileRoute
+  '/settings/security': typeof SettingsSecurityRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/newsletter/status': typeof ApiNewsletterStatusRoute
@@ -305,9 +322,6 @@ export interface FileRoutesById {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/storage/upload': typeof ApiStorageUploadRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
-  '/dashboard/settings/notifications': typeof DashboardSettingsNotificationsRoute
-  '/dashboard/settings/profile': typeof DashboardSettingsProfileRoute
-  '/dashboard/settings/security': typeof DashboardSettingsSecurityRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -317,6 +331,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/manifest.json'
     | '/robots.txt'
+    | '/settings'
     | '/sitemap.xml'
     | '/cookie'
     | '/privacy'
@@ -331,8 +346,12 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/blog/$slug'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/settings/security'
     | '/blog/'
     | '/dashboard/'
+    | '/settings/'
     | '/api/admin/users'
     | '/api/auth/$'
     | '/api/newsletter/status'
@@ -341,9 +360,6 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/storage/upload'
     | '/dashboard/admin/users'
-    | '/dashboard/settings/notifications'
-    | '/dashboard/settings/profile'
-    | '/dashboard/settings/security'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -364,8 +380,12 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/blog/$slug'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/settings/security'
     | '/blog'
     | '/dashboard'
+    | '/settings'
     | '/api/admin/users'
     | '/api/auth/$'
     | '/api/newsletter/status'
@@ -374,9 +394,6 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/storage/upload'
     | '/dashboard/admin/users'
-    | '/dashboard/settings/notifications'
-    | '/dashboard/settings/profile'
-    | '/dashboard/settings/security'
   id:
     | '__root__'
     | '/'
@@ -384,6 +401,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/manifest.json'
     | '/robots.txt'
+    | '/settings'
     | '/sitemap.xml'
     | '/(legals)/cookie'
     | '/(legals)/privacy'
@@ -398,8 +416,12 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/blog/$slug'
+    | '/settings/notifications'
+    | '/settings/profile'
+    | '/settings/security'
     | '/blog/'
     | '/dashboard/'
+    | '/settings/'
     | '/api/admin/users'
     | '/api/auth/$'
     | '/api/newsletter/status'
@@ -408,9 +430,6 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/storage/upload'
     | '/dashboard/admin/users'
-    | '/dashboard/settings/notifications'
-    | '/dashboard/settings/profile'
-    | '/dashboard/settings/security'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -419,6 +438,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRouteWithChildren
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SettingsRoute: typeof SettingsRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   legalsCookieRoute: typeof legalsCookieRoute
   legalsPrivacyRoute: typeof legalsPrivacyRoute
@@ -445,6 +465,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/robots.txt': {
@@ -482,6 +509,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
@@ -495,6 +529,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/settings/security': {
+      id: '/settings/security'
+      path: '/security'
+      fullPath: '/settings/security'
+      preLoaderRoute: typeof SettingsSecurityRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/profile': {
+      id: '/settings/profile'
+      path: '/profile'
+      fullPath: '/settings/profile'
+      preLoaderRoute: typeof SettingsProfileRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/notifications': {
+      id: '/settings/notifications'
+      path: '/notifications'
+      fullPath: '/settings/notifications'
+      preLoaderRoute: typeof SettingsNotificationsRouteImport
+      parentRoute: typeof SettingsRoute
     }
     '/blog/$slug': {
       id: '/blog/$slug'
@@ -587,27 +642,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof legalsCookieRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/settings/security': {
-      id: '/dashboard/settings/security'
-      path: '/settings/security'
-      fullPath: '/dashboard/settings/security'
-      preLoaderRoute: typeof DashboardSettingsSecurityRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/settings/profile': {
-      id: '/dashboard/settings/profile'
-      path: '/settings/profile'
-      fullPath: '/dashboard/settings/profile'
-      preLoaderRoute: typeof DashboardSettingsProfileRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/settings/notifications': {
-      id: '/dashboard/settings/notifications'
-      path: '/settings/notifications'
-      fullPath: '/dashboard/settings/notifications'
-      preLoaderRoute: typeof DashboardSettingsNotificationsRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/dashboard/admin/users': {
       id: '/dashboard/admin/users'
       path: '/admin/users'
@@ -688,21 +722,33 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 interface DashboardRouteChildren {
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardAdminUsersRoute: typeof DashboardAdminUsersRoute
-  DashboardSettingsNotificationsRoute: typeof DashboardSettingsNotificationsRoute
-  DashboardSettingsProfileRoute: typeof DashboardSettingsProfileRoute
-  DashboardSettingsSecurityRoute: typeof DashboardSettingsSecurityRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardAdminUsersRoute: DashboardAdminUsersRoute,
-  DashboardSettingsNotificationsRoute: DashboardSettingsNotificationsRoute,
-  DashboardSettingsProfileRoute: DashboardSettingsProfileRoute,
-  DashboardSettingsSecurityRoute: DashboardSettingsSecurityRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
+)
+
+interface SettingsRouteChildren {
+  SettingsNotificationsRoute: typeof SettingsNotificationsRoute
+  SettingsProfileRoute: typeof SettingsProfileRoute
+  SettingsSecurityRoute: typeof SettingsSecurityRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsNotificationsRoute: SettingsNotificationsRoute,
+  SettingsProfileRoute: SettingsProfileRoute,
+  SettingsSecurityRoute: SettingsSecurityRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
@@ -711,6 +757,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRouteWithChildren,
   ManifestDotjsonRoute: ManifestDotjsonRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
+  SettingsRoute: SettingsRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   legalsCookieRoute: legalsCookieRoute,
   legalsPrivacyRoute: legalsPrivacyRoute,

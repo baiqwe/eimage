@@ -1,0 +1,50 @@
+import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { Spinner } from '@/components/ui/spinner';
+import { authClient } from '@/auth/auth-client';
+import { Routes } from '@/routes';
+import { useNavigate } from '@tanstack/react-router';
+import { useEffect, type ReactNode } from 'react';
+
+/**
+ * Shared layout for /dashboard and /settings: sidebar + auth guard (redirect to login if no session).
+ * Use with Outlet as children.
+ */
+export function AppSidebarLayout({ children }: { children: ReactNode }) {
+  const { data: session, isPending } = authClient.useSession();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isPending) return;
+    if (!session?.user) {
+      navigate({ to: Routes.Login });
+    }
+  }, [session, isPending, navigate]);
+
+  if (isPending) {
+    return (
+      <div className="flex min-h-svh items-center justify-center">
+        <Spinner className="size-6" />
+      </div>
+    );
+  }
+
+  if (!session?.user) {
+    return null;
+  }
+
+  return (
+    <SidebarProvider
+      className="min-h-svh flex"
+      style={
+        {
+          '--sidebar-width': 'calc(var(--spacing) * 72)',
+          '--header-height': 'calc(var(--spacing) * 12)',
+        } as React.CSSProperties
+      }
+    >
+      <DashboardSidebar variant="inset" />
+      <SidebarInset>{children}</SidebarInset>
+    </SidebarProvider>
+  );
+}

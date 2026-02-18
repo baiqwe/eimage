@@ -7,7 +7,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 const m = messages.dashboard.settings.security;
 
-export const Route = createFileRoute('/dashboard/settings/security')({
+export const Route = createFileRoute('/settings/security')({
   component: SecurityPage,
 });
 

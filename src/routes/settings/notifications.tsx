@@ -5,7 +5,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 const m = messages.dashboard.settings.notification;
 
-export const Route = createFileRoute('/dashboard/settings/notifications')({
+export const Route = createFileRoute('/settings/notifications')({
   component: NotificationsPage,
 });
 

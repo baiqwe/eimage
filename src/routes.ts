@@ -24,13 +24,13 @@ export const Routes = {
   PrivacyPolicy: '/privacy',
   CookiePolicy: '/cookie',
 
-  // Settings routes
+  // App routes (same sidebar layout)
   Dashboard: '/dashboard',
-  SettingsProfile: '/dashboard/settings/profile',
-  SettingsBilling: '/dashboard/settings/billing',
-  SettingsCredits: '/dashboard/settings/credits',
-  SettingsSecurity: '/dashboard/settings/security',
-  SettingsNotifications: '/dashboard/settings/notifications',
+  SettingsProfile: '/settings/profile',
+  SettingsBilling: '/settings/billing',
+  SettingsCredits: '/settings/credits',
+  SettingsSecurity: '/settings/security',
+  SettingsNotifications: '/settings/notifications',
 
   // Admin routes
   AdminUsers: '/dashboard/admin/users',
