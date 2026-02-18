@@ -19,8 +19,9 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const m = messages.newsletter;
+
 const schema = z.object({
-  email: z.string().email(m.emailInvalid),
+  email: z.email(m.emailInvalid),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -67,7 +68,6 @@ export function NewsletterCard() {
       <div className="flex flex-col items-center justify-center gap-8">
         <HeaderSection
           title={m.title}
-          subtitle={m.subtitle}
           description={m.description}
         />
 

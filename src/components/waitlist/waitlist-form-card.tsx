@@ -66,8 +66,7 @@ export function WaitlistFormCard() {
   return (
     <Card className="mx-auto max-w-lg overflow-hidden pt-6 pb-0">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">{m.subtitle}</CardTitle>
-        {/* <CardDescription>{m.description}</CardDescription> */}
+        <CardTitle className="text-lg font-semibold">{m.formTitle}</CardTitle>
       </CardHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">

@@ -62,7 +62,7 @@ export const messages = {
     },
     error: {
       title: 'Oops! Something went wrong!',
-      tryAgain: 'Please try again.',
+      tryAgain: 'Please try again',
       backToLogin: 'Back to login',
     },
     social: {
@@ -71,7 +71,7 @@ export const messages = {
     },
     login: {
       title: 'Sign In',
-      description: 'Sign in to your account to continue.',
+      description: 'Sign in to your account to continue',
       welcomeBack: 'Welcome back',
       email: 'Email',
       password: 'Password',
@@ -87,7 +87,7 @@ export const messages = {
     },
     forgotPassword: {
       title: 'Forgot Password',
-      description: 'Request a password reset link to be sent to your email.',
+      description: 'Request a password reset link to be sent to your email',
       email: 'Email',
       send: 'Send reset link',
       backToLogin: 'Back to login',
@@ -97,7 +97,7 @@ export const messages = {
     },
     register: {
       title: 'Sign Up',
-      description: 'Create an account to get started.',
+      description: 'Create an account to get started',
       createAccount: 'Create an account',
       name: 'Name',
       email: 'Email',
@@ -116,14 +116,14 @@ export const messages = {
     },
     resetPassword: {
       title: 'Reset Password',
-      description: 'Set a new password for your account.',
+      description: 'Set a new password for your account',
       password: 'Password',
       reset: 'Reset password',
       backToLogin: 'Back to login',
       showPassword: 'Show password',
       hidePassword: 'Hide password',
       minLength: 'Password must be at least 8 characters',
-      invalidToken: 'Invalid or expired reset link. Please request a new one.',
+      invalidToken: 'Invalid or expired reset link, please request a new one',
       placeholderPassword: '******',
     },
   },
@@ -265,10 +265,22 @@ export const messages = {
     },
   },
 
+  blog: {
+    title: 'Blog',
+    description: 'Insights, updates and stories from our team',
+    disabled: 'Blog is disabled',
+    noPosts: 'No posts yet',
+    allPosts: 'All posts',
+    previous: 'Previous',
+    next: 'Next',
+    page: 'Page',
+    of: 'of',
+  },
+
   about: {
     title: 'About',
-    subtitle: 'We help you make SaaS faster',
     description: 'Learn more about our mission and how we can help you',
+    bio: 'We help you make SaaS faster',
     introduction:
       '👋 Hi there! This is MkFast, an AI SaaS template built with modern technologies, helping you build your SaaS faster and better. If you have any questions, please welcome to contact us for free.',
     followUs: 'Follow us on X',
@@ -277,8 +289,8 @@ export const messages = {
 
   contact: {
     title: 'Contact',
-    subtitle: 'Send message',
     description: 'Send us a message and we will get back to you',
+    formTitle: 'Send message',
     name: 'Name',
     email: 'Email',
     message: 'Message',
@@ -297,8 +309,8 @@ export const messages = {
 
   waitlist: {
     title: 'Waitlist',
-    subtitle: 'Join the waitlist',
     description: 'Join the waitlist for early access and updates',
+    formTitle: 'Join the waitlist',
     email: 'Email',
     placeholderEmail: 'you@example.com',
     subscribe: 'Subscribe',
@@ -307,22 +319,9 @@ export const messages = {
     error: 'Failed to subscribe',
   },
 
-  blog: {
-    title: 'Blog',
-    description: 'Insights, updates and stories from our team.',
-    disabled: 'Blog is disabled.',
-    noPosts: 'No posts yet.',
-    allPosts: 'All posts',
-    previous: 'Previous',
-    next: 'Next',
-    page: 'Page',
-    of: 'of',
-  },
-
   newsletter: {
     title: 'Newsletter',
-    subtitle: 'Stay in the loop',
-    description: 'Get product updates and tips in your inbox.',
+    description: 'Get product updates and tips in your inbox',
     email: 'Email',
     placeholderEmail: 'you@example.com',
     emailInvalid: 'Please enter a valid email address',
@@ -334,7 +333,7 @@ export const messages = {
   mail: {
     layout: {
       team: 'Team',
-      copyright: 'All Rights Reserved.',
+      copyright: 'All Rights Reserved',
     },
     contactMessage: {
       name: 'Name:',
@@ -359,7 +358,7 @@ export const messages = {
 
   notFound: {
     title: 'Not Found',
-    description: 'The page you are looking for does not exist.',
+    description: 'The page you are looking for does not exist',
     backToHome: 'Back to Home',
   },
 

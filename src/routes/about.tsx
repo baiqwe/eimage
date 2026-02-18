@@ -55,7 +55,7 @@ function AboutPage() {
                     {websiteConfig.metadata?.name}
                   </h1>
                   <p className="mt-2 text-base text-muted-foreground">
-                    {m.subtitle}
+                    {m.bio}
                   </p>
                 </div>
               </div>
