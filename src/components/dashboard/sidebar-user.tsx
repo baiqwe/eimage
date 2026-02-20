@@ -5,6 +5,9 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -39,10 +42,17 @@ interface SidebarUserProps {
 
 export function SidebarUser({ user }: SidebarUserProps) {
   const router = useRouter();
-  const { setTheme } = useTheme();
+  const { setTheme, theme } = useTheme();
   const { isMobile } = useSidebar();
   const showModeSwitch = websiteConfig.ui?.mode?.enableSwitch ?? false;
   const [open, setOpen] = useState(false);
+
+  const ThemeIcon =
+    theme === 'system'
+      ? IconDeviceDesktop
+      : theme === 'dark'
+        ? IconMoon
+        : IconSun;
 
   const handleSignOut = async () => {
     await authClient.signOut({
@@ -105,27 +115,35 @@ export function SidebarUser({ user }: SidebarUserProps) {
               {showModeSwitch && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => setTheme('light')}
-                  >
-                    <IconSun className="mr-2 size-4" />
-                    {m.mode.light}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => setTheme('dark')}
-                  >
-                    <IconMoon className="mr-2 size-4" />
-                    {m.mode.dark}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => setTheme('system')}
-                  >
-                    <IconDeviceDesktop className="mr-2 size-4" />
-                    {m.mode.system}
-                  </DropdownMenuItem>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="cursor-pointer">
+                      <ThemeIcon className="mr-2 size-4" />
+                      {m.mode.theme}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => setTheme('light')}
+                      >
+                        <IconSun className="mr-2 size-4" />
+                        {m.mode.light}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => setTheme('dark')}
+                      >
+                        <IconMoon className="mr-2 size-4" />
+                        {m.mode.dark}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => setTheme('system')}
+                      >
+                        <IconDeviceDesktop className="mr-2 size-4" />
+                        {m.mode.system}
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
                 </>
               )}
 
