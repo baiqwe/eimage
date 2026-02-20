@@ -13,7 +13,6 @@ export const serverEnv = createEnv({
     RESEND_API_KEY: z.string().optional(),
     BEEHIIV_API_KEY: z.string().optional(),
     BEEHIIV_PUBLICATION_ID: z.string().optional(),
-    STORAGE_PUBLIC_URL: z.string().optional(),
   },
   runtimeEnv: process.env,
 });

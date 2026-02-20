@@ -12,10 +12,9 @@ import {
 } from '@/components/ui/card';
 import { websiteConfig } from '@/config/website';
 import { authClient } from '@/auth/auth-client';
-import { MAX_FILE_SIZE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { uploadFileFromBrowser } from '@/storage/client';
-import { IconUserCircle } from '@tabler/icons-react';
+import { IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -65,7 +64,8 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
     let tempUrl = '';
 
     try {
-      if (file.size > MAX_FILE_SIZE) {
+      const maxSize = websiteConfig.storage?.maxFileSize ?? 4 * 1024 * 1024;
+      if (file.size > maxSize) {
         throw new Error('File size exceeds the server limit');
       }
 
@@ -116,7 +116,7 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
           <Avatar className="h-16 w-16 border">
             <AvatarImage src={avatarUrl ?? ''} alt={user.name ?? ''} />
             <AvatarFallback>
-              <IconUserCircle className="h-8 w-8 text-muted-foreground" />
+              <IconUser className="h-8 w-8 text-muted-foreground" />
             </AvatarFallback>
           </Avatar>
           <Button

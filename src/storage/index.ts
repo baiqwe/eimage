@@ -1,43 +1,103 @@
 import { websiteConfig } from '@/config/website';
-import { storageConfig } from './config/storage-config';
 import { R2Provider } from './provider/r2';
-import type { StorageConfig, StorageProvider, UploadFileResult } from './types';
+import type {
+  FileMetadata,
+  StorageConfig,
+  StorageProvider,
+  StorageProviderName,
+  UploadFileResult,
+} from './types';
+import {
+  DEFAULT_ALLOWED_TYPES,
+  DEFAULT_MAX_FILE_SIZE,
+  DEFAULT_USER_FILES_FOLDER,
+} from './types';
 
-export const defaultStorageConfig: StorageConfig = storageConfig;
+function buildStorageConfig(): StorageConfig {
+  const config = websiteConfig.storage;
+  return {
+    maxFileSize: config?.maxFileSize ?? DEFAULT_MAX_FILE_SIZE,
+    allowedTypes: config?.allowedTypes ?? DEFAULT_ALLOWED_TYPES,
+    userFilesFolder: config?.userFilesFolder ?? DEFAULT_USER_FILES_FOLDER,
+  };
+}
 
 let storageProvider: StorageProvider | null = null;
 
-export const getStorageProvider = (): StorageProvider => {
-  if (!storageProvider) {
-    return initializeStorageProvider();
-  }
-  return storageProvider;
+type ProviderFactory = () => StorageProvider;
+
+/**
+ * Registry of storage provider factories.
+ */
+const providerRegistry: Record<StorageProviderName, ProviderFactory> = {
+  r2: () => new R2Provider(buildStorageConfig()),
 };
 
-export const initializeStorageProvider = (): StorageProvider => {
-  if (!storageProvider) {
-    if (websiteConfig.storage?.provider === 'r2') {
-      storageProvider = new R2Provider();
-    } else {
-      throw new Error(
-        `Unsupported storage provider: ${websiteConfig.storage?.provider}`
-      );
-    }
+function createProvider(): StorageProvider {
+  const name = websiteConfig.storage?.provider;
+  if (!name) throw new Error('storage.provider is required in websiteConfig.');
+  const factory = providerRegistry[name as StorageProviderName];
+  if (!factory) {
+    throw new Error(`Unsupported storage provider: ${name}.`);
   }
+  return factory();
+}
+
+/**
+ * Get the storage provider (lazy-initialized on first use).
+ */
+export function getStorageProvider(): StorageProvider {
+  if (!storageProvider) storageProvider = createProvider();
   return storageProvider;
-};
+}
 
 export const uploadFile = async (
-  file: Buffer | Blob,
+  file: Buffer | Blob | File,
   filename: string,
   contentType: string,
-  folder?: string
+  options?: { folder?: string; userId?: string; requestOrigin?: string }
 ): Promise<UploadFileResult> => {
   const provider = getStorageProvider();
-  return provider.uploadFile({ file, filename, contentType, folder });
+  return provider.uploadFile({
+    file,
+    filename,
+    contentType,
+    folder: options?.folder,
+    userId: options?.userId,
+    requestOrigin: options?.requestOrigin,
+  });
 };
 
 export const deleteFile = async (key: string): Promise<void> => {
   const provider = getStorageProvider();
   return provider.deleteFile(key);
+};
+
+export const downloadFile = async (
+  keyOrMetadata: string | FileMetadata
+): Promise<ReadableStream | null> => {
+  const provider = getStorageProvider();
+  return provider.downloadFile(keyOrMetadata);
+};
+
+export const getFileInfo = async (
+  key: string
+): Promise<{ size?: number; contentType?: string } | null> => {
+  const provider = getStorageProvider();
+  return provider.getFileInfo(key);
+};
+
+export const getFile = async (
+  key: string
+): Promise<{ body: ReadableStream; contentType: string } | null> => {
+  const provider = getStorageProvider();
+  return provider.getFile(key);
+};
+
+export const listUserFiles = async (
+  userId: string,
+  options?: { limit?: number; cursor?: string }
+) => {
+  const provider = getStorageProvider();
+  return provider.listUserFiles(userId, options);
 };

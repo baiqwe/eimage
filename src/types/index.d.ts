@@ -105,8 +105,11 @@ export interface NewsletterConfig {
 
 /** Storage configuration */
 export interface StorageConfig {
-  enable: boolean;   // Whether to enable the storage
-  provider?: 'r2';   // The storage provider (e.g. R2)
+  enable: boolean;                   // Whether to enable the storage
+  provider?: 'r2';                   // The storage provider (e.g. R2)
+  maxFileSize?: number;              // Max file size in bytes (default 4MB)
+  allowedTypes?: string[];           // Allowed file extensions or MIME types. e.g. ['.jpg', '.png', 'image/webp']. Empty = all allowed.
+  userFilesFolder?: string;          // Parent folder for per-user files (default userfiles)
 }
 
 /** Payment configuration */

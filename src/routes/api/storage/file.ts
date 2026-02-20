@@ -1,10 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getR2Bucket } from '@/storage/get-bucket';
+import { getFile } from '@/storage';
 import { ConfigurationError } from '@/storage/types';
 
 /**
- * Serves a file from R2 by key. Used when STORAGE_PUBLIC_URL is not set (same-origin proxy).
- * Keys are unguessable (e.g. avatars/<uuid>.jpg); no auth required for read.
+ * Serves a file by key via the storage provider (same-origin proxy URL).
  */
 export const Route = createFileRoute('/api/storage/file')({
   server: {
@@ -17,17 +16,13 @@ export const Route = createFileRoute('/api/storage/file')({
         }
 
         try {
-          const bucket = getR2Bucket();
-          const object = await bucket.get(key);
-          if (!object?.body) {
+          const file = await getFile(key);
+          if (!file) {
             return new Response('Not Found', { status: 404 });
           }
-
-          const contentType =
-            object.httpMetadata?.contentType ?? 'application/octet-stream';
-          return new Response(object.body, {
+          return new Response(file.body, {
             headers: {
-              'Content-Type': contentType,
+              'Content-Type': file.contentType,
               'Cache-Control': 'public, max-age=31536000, immutable',
             },
           });

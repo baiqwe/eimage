@@ -2,18 +2,51 @@
 
 The storage module provides file upload (and optional delete) using **Cloudflare R2** via the Worker bucket binding. No S3 SDK or third-party storage library is used—only the [Cloudflare R2 Workers API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/). It is used for avatar uploads (Settings → Profile) when enabled.
 
+## Enabling storage (3 steps)
+
+1. **Create the R2 bucket** (once per environment):
+
+   ```bash
+   npx wrangler r2 bucket create <BUCKET_NAME>
+   ```
+
+   Use the same name as `bucket_name` in `wrangler.jsonc` (e.g. `mkfast-template`).
+
+2. **Configure the bucket in `wrangler.jsonc`**:
+
+   ```jsonc
+   "r2_buckets": [
+     {
+       "bucket_name": "mkfast-template",
+       "binding": "FILES"
+     }
+   ]
+   ```
+
+   The Worker receives the bucket as `env.FILES`. No extra env vars are required for upload/serve.
+
+3. **Enable storage in website config** (`src/config/website.ts`):
+
+   ```ts
+   storage: {
+     enable: true,
+     provider: 'r2',
+     maxFileSize: 4 * 1024 * 1024,  // optional, default 4MB
+     allowedTypes: ['.jpg', '.jpeg', '.png', '.webp'],  // optional
+   },
+   ```
+
+   After this, the upload API and avatar card are active. Returned file URLs use the same-origin proxy `/api/storage/file?key=...`.
+
 ## Directory structure
 
 ```
 src/storage/
-├── index.ts           # getStorageProvider, uploadFile, deleteFile
-├── types.ts           # StorageConfig, StorageProvider, UploadFileResult, errors
+├── index.ts           # getR2Bucket, getStorageProvider, uploadFile, deleteFile, …
+├── types.ts           # StorageConfig (provider options), R2BucketInterface, UploadFileResult, errors
 ├── client.ts          # uploadFileFromBrowser (for client components)
-├── get-bucket.ts      # getR2Bucket() from env.FILES
-├── config/
-│   └── storage-config.ts  # publicUrl from env
 └── provider/
-    └── r2.ts          # R2Provider (put, delete)
+    └── r2.ts          # getR2Bucket(), R2Provider (upload, delete, download, list, …)
 ```
 
 ## Configuration
@@ -23,10 +56,9 @@ src/storage/
   - `provider`: `'r2'`.
 
 - **wrangler.jsonc**
-  - `r2_buckets`: Bind the R2 bucket with `binding: "FILES"` (and `bucket_name`). The Worker accesses it as `env.FILES`.
+  - `r2_buckets`: Bind the R2 bucket with `binding: "FILES"` (and `bucket_name`). `getR2Bucket()` in `provider/r2.ts` reads `env.FILES` and is exported from `@/storage`.
 
-- **Environment** (optional)
-  - `STORAGE_PUBLIC_URL`: If set (e.g. custom domain for the bucket), returned file URLs use this base. If unset, files are served via the same-origin route `/api/storage/file?key=...`.
+No storage-specific environment variables are required. Files are always served via the same-origin route `/api/storage/file?key=...`.
 
 ## Core API
 
@@ -42,18 +74,18 @@ src/storage/
 ## API routes
 
 - **POST /api/storage/upload**
-  - Requires session. Validates file size (max 4MB) and type (jpeg, png, webp). Uploads to R2 and returns `{ url, key }`. If `STORAGE_PUBLIC_URL` is not set, `url` is rewritten to the same-origin proxy URL.
+  - Requires session. Validates file size (max 4MB) and type (jpeg, png, webp). Uploads to R2 and returns `{ url, key }`. `url` is the same-origin proxy URL (`/api/storage/file?key=...` or full origin + path).
 
 - **GET /api/storage/file?key=...**
-  - Streams the object from R2. Used when no custom domain is configured. Keys are unguessable (e.g. `avatars/<uuid>.<ext>`).
+  - Streams the object from R2. Keys are unguessable (e.g. `avatars/<uuid>.<ext>`).
 
 ## Consumers
 
 - **Settings → Profile** (`UpdateAvatarCard`): When `websiteConfig.storage.enable` and `websiteConfig.features.enableUpdateAvatar` are true, the user can upload an avatar; the client calls `uploadFileFromBrowser(file, 'avatars')` then updates `user.image` with the returned URL.
 
-## Constants
+## Configuration (continued)
 
-- **MAX_FILE_SIZE** (`src/lib/constants.ts`): 4MB limit for uploads.
+- **maxFileSize**: Configured in `websiteConfig.storage.maxFileSize` (e.g. 4MB). Used by upload validation and the avatar card client-side check.
 
 ## Notes
 

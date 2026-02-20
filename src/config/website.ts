@@ -64,8 +64,11 @@ export const websiteConfig: WebsiteConfig = {
     autoSubscribeAfterSignUp: false,
   },
   storage: {
-    enable: false,
+    enable: true,
     provider: 'r2',
+    maxFileSize: 10 * 1024 * 1024, // 10MB
+    allowedTypes: ['.jpg', '.jpeg', '.png', '.webp'],
+    userFilesFolder: 'userfiles',
   },
   payment: {
     provider: 'stripe',

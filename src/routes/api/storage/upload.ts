@@ -1,11 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 import { authApiMiddleware } from '@/middleware/auth-middleware';
+import { auth } from '@/auth/auth';
 import { websiteConfig } from '@/config/website';
-import { MAX_FILE_SIZE } from '@/lib/constants';
 import { uploadFile } from '@/storage';
-import { StorageError } from '@/storage/types';
-
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+import { StorageError, UploadError } from '@/storage/types';
 
 export const Route = createFileRoute('/api/storage/upload')({
   server: {
@@ -20,6 +19,10 @@ export const Route = createFileRoute('/api/storage/upload')({
         }
 
         try {
+          const headers = getRequestHeaders();
+          const session = await auth.api.getSession({ headers });
+          const userId = session?.user?.id;
+
           const formData = await request.formData();
           const file = formData.get('file') as File | null;
           const folder = (formData.get('folder') as string | null) ?? undefined;
@@ -31,38 +34,18 @@ export const Route = createFileRoute('/api/storage/upload')({
             );
           }
 
-          if (file.size > MAX_FILE_SIZE) {
-            return Response.json(
-              { error: 'File size exceeds the server limit' },
-              { status: 400 }
-            );
-          }
-
-          if (!ALLOWED_TYPES.includes(file.type)) {
-            return Response.json(
-              { error: 'File type not supported' },
-              { status: 400 }
-            );
-          }
-
           const buffer = Buffer.from(await file.arrayBuffer());
-          const result = await uploadFile(
-            buffer,
-            file.name,
-            file.type,
-            folder || undefined
-          );
+          const origin = new URL(request.url).origin;
+          const result = await uploadFile(buffer, file.name, file.type, {
+            folder: folder || undefined,
+            userId,
+            requestOrigin: origin,
+          });
 
-          // When no STORAGE_PUBLIC_URL, serve via same-origin proxy
-          const url =
-            result.url.startsWith('http') || result.url.startsWith('/')
-              ? result.url
-              : `${new URL(request.url).origin}/api/storage/file?key=${encodeURIComponent(result.key)}`;
-
-          return Response.json({ ...result, url });
+          return Response.json({ ...result, url: result.url });
         } catch (error) {
-          if (error instanceof StorageError) {
-            return Response.json({ error: error.message }, { status: 500 });
+          if (error instanceof UploadError || error instanceof StorageError) {
+            return Response.json({ error: error.message }, { status: 400 });
           }
           return Response.json(
             { error: 'Something went wrong while uploading the file' },
