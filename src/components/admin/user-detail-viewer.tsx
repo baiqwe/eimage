@@ -193,7 +193,9 @@ export function UserDetailViewer({ user }: UserDetailViewerProps) {
             </div>
           </div>
           <Separator />
-          {error && <div className="text-sm text-destructive">{error}</div>}
+          {error && (
+            <div className="text-sm text-destructive">{error}</div>
+          )}
           {user.banned ? (
             <div className="grid gap-4">
               {user.banReason && (

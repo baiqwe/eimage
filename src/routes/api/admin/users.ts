@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getDb } from '@/db';
 import { user } from '@/db/auth.schema';
-import { requireSession, unauthorizedResponse } from '@/lib/session';
+import { adminApiMiddleware } from '@/middleware/admin-middleware';
 import {
   and,
   asc,
@@ -142,12 +142,9 @@ async function listUsers(
  */
 export const Route = createFileRoute('/api/admin/users')({
   server: {
+    middleware: [adminApiMiddleware],
     handlers: {
       GET: async ({ request }) => {
-        const session = await requireSession(request);
-        if (!session?.user) {
-          return unauthorizedResponse();
-        }
         const params = parseListUsersParams(new URL(request.url));
         try {
           const result = await listUsers(params);

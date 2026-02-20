@@ -28,6 +28,7 @@ export function getSidebarLinks(): MenuItemConfig[] {
     {
       title: am.title,
       icon: IconShieldCheck,
+      authorizeOnly: ['admin'],
       items: [
         {
           title: am.users.title,

@@ -6,6 +6,20 @@ import { Routes } from '@/lib/routes';
 
 const ADMIN_ROLE = 'admin';
 
+function forbiddenResponse() {
+  return Response.json(
+    { success: false, error: 'Forbidden' },
+    { status: 403, headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
+function unauthorizedResponse() {
+  return Response.json(
+    { success: false, error: 'Unauthorized' },
+    { status: 401, headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
 /**
  * Admin middleware: requires authenticated user with role === 'admin'.
  * Use after auth or alone (redirects to login if not signed in, then to dashboard if not admin).
@@ -21,6 +35,24 @@ export const adminMiddleware = createMiddleware().server(async ({ next }) => {
   const role = session.user.role;
   if (role !== ADMIN_ROLE) {
     throw redirect({ to: Routes.Dashboard });
+  }
+
+  return await next();
+});
+
+/**
+ * Admin API middleware: same check as adminMiddleware but returns 401/403 Response for API routes.
+ * Use with createFileRoute server: { middleware: [adminApiMiddleware], handlers: { ... } }.
+ */
+export const adminApiMiddleware = createMiddleware().server(async ({ next }) => {
+  const headers = getRequestHeaders();
+  const session = await auth.api.getSession({ headers });
+
+  if (!session?.user) {
+    return unauthorizedResponse();
+  }
+  if (session.user.role !== ADMIN_ROLE) {
+    return forbiddenResponse();
   }
 
   return await next();
