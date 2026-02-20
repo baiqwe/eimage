@@ -15,7 +15,7 @@ const m = messages.dashboard.sidebar;
 const am = messages.admin;
 
 /**
- * Dashboard sidebar links
+ * Sidebar links
  */
 export function getSidebarLinks(): MenuItemConfig[] {
   return [

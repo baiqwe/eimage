@@ -2,8 +2,7 @@ import { createEnv } from '@t3-oss/env-core';
 import * as z from 'zod';
 
 /**
- * Server-side env (runtime process.env; Worker vars/secrets populate it).
- * Use only in server code (auth, mail, storage, etc.).
+ * Server-side env (runtime process.env; Worker vars/secrets populate it)
  */
 export const serverEnv = createEnv({
   server: {
