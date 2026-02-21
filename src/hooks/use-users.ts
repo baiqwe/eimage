@@ -1,11 +1,6 @@
 import { authClient } from '@/auth/auth-client';
-import type { User } from '@/auth/auth-types';
-import {
-  keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { listUsers } from '@/api/users';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ColumnSort } from '@tanstack/react-table';
 
 /** Sorting state for users list */
@@ -46,35 +41,29 @@ export function useUsers(
       sorting,
       filters,
     }),
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const first = sorting[0];
       const sortId = first?.id ?? 'createdAt';
       const sortDesc = first?.desc ?? true;
-      const params = new URLSearchParams({
-        pageIndex: String(pageIndex),
-        pageSize: String(pageSize),
-        search,
-        sortId,
-        sortDesc: String(sortDesc),
-      });
       const roleFilter = filters.find((f) => f.id === 'role');
       const statusFilter = filters.find((f) => f.id === 'status');
-      if (roleFilter?.value) params.set('role', roleFilter.value);
-      if (statusFilter?.value) params.set('status', statusFilter.value);
-      const res = await fetch(`/api/admin/users?${params.toString()}`, {
-        credentials: 'include',
+      const status =
+        statusFilter?.value === 'active' || statusFilter?.value === 'inactive'
+          ? statusFilter.value
+          : undefined;
+      return listUsers({
+        data: {
+          pageIndex,
+          pageSize,
+          search,
+          sortId,
+          sortDesc,
+          role: roleFilter?.value,
+          status,
+        },
+        signal,
       });
-      const json = (await res.json()) as {
-        success?: boolean;
-        error?: string;
-        data?: { items: User[]; total: number };
-      };
-      if (!res.ok || !json.success) {
-        throw new Error(json.error ?? 'Failed to fetch users');
-      }
-      return json.data as { items: User[]; total: number };
     },
-    // placeholderData: keepPreviousData,
   });
 }
 

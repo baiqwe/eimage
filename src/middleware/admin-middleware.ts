@@ -42,7 +42,6 @@ export const adminMiddleware = createMiddleware().server(async ({ next }) => {
 
 /**
  * Admin API middleware: same check as adminMiddleware but returns 401/403 Response for API routes.
- * Use with createFileRoute server: { middleware: [adminApiMiddleware], handlers: { ... } }.
  */
 export const adminApiMiddleware = createMiddleware().server(
   async ({ next }) => {
