@@ -262,7 +262,7 @@ Session/types: `src/auth/client.ts` (authClient), `src/auth/types.ts` (Session, 
 ## Mail and contact
 
 - **Mail** – Resend in `src/mail/` (templates: contact, newsletter welcome, forgot password, verify email).
-- **Contact form** – POST `/api/contact` (body: name, email, message). Sends to `websiteConfig.mail.supportEmail` using the contact template.
+- **Contact form** – `sendContactMessage` server function in `src/api/contact.ts`. Sends to `websiteConfig.mail.supportEmail` using the contact template.
 
 ---
 

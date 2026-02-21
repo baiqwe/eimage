@@ -1,3 +1,4 @@
+import { sendContactMessage } from '@/api/contact';
 import { FormError } from '@/components/shared/form-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,7 +28,7 @@ const m = messages.contact;
 
 const schema = z.object({
   name: z.string().min(3, m.nameMin).max(30, m.nameMax),
-  email: z.string().email(m.emailInvalid),
+  email: z.email(m.emailInvalid),
   message: z.string().min(10, m.messageMin).max(500, m.messageMax),
 });
 
@@ -46,21 +47,11 @@ export function ContactFormCard() {
   async function onSubmit(values: FormValues) {
     setError(undefined);
     try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
-      const json = (await res.json()) as { success?: boolean; error?: string };
-      if (json.success) {
-        form.reset();
-        return;
-      }
-      const errMsg = json.error ?? m.error;
-      setError(errMsg);
+      await sendContactMessage({ data: values });
+      form.reset();
     } catch (err) {
-      console.error('Contact form error:', err);
-      setError(m.error);
+      const msg = err instanceof Error ? err.message : m.error;
+      setError(msg);
     }
   }
 

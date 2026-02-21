@@ -33,7 +33,6 @@ import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AuthErrorRouteImport } from './routes/auth/error'
 import { Route as ApiUserFilesRouteImport } from './routes/api/user-files'
-import { Route as ApiContactRouteImport } from './routes/api/contact'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as testsTestErrorRouteImport } from './routes/(tests)/test-error'
 import { Route as testsTest404RouteImport } from './routes/(tests)/test-404'
@@ -170,11 +169,6 @@ const ApiUserFilesRoute = ApiUserFilesRouteImport.update({
   path: '/api/user-files',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiContactRoute = ApiContactRouteImport.update({
-  id: '/api/contact',
-  path: '/api/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -271,7 +265,6 @@ export interface FileRoutesByFullPath {
   '/test-404': typeof testsTest404Route
   '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
-  '/api/contact': typeof ApiContactRoute
   '/api/user-files': typeof ApiUserFilesRouteWithChildren
   '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -310,7 +303,6 @@ export interface FileRoutesByTo {
   '/test-404': typeof testsTest404Route
   '/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
-  '/api/contact': typeof ApiContactRoute
   '/api/user-files': typeof ApiUserFilesRouteWithChildren
   '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -353,7 +345,6 @@ export interface FileRoutesById {
   '/(tests)/test-404': typeof testsTest404Route
   '/(tests)/test-error': typeof testsTestErrorRoute
   '/admin/users': typeof AdminUsersRoute
-  '/api/contact': typeof ApiContactRoute
   '/api/user-files': typeof ApiUserFilesRouteWithChildren
   '/auth/error': typeof AuthErrorRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -397,7 +388,6 @@ export interface FileRouteTypes {
     | '/test-404'
     | '/test-error'
     | '/admin/users'
-    | '/api/contact'
     | '/api/user-files'
     | '/auth/error'
     | '/auth/forgot-password'
@@ -436,7 +426,6 @@ export interface FileRouteTypes {
     | '/test-404'
     | '/test-error'
     | '/admin/users'
-    | '/api/contact'
     | '/api/user-files'
     | '/auth/error'
     | '/auth/forgot-password'
@@ -478,7 +467,6 @@ export interface FileRouteTypes {
     | '/(tests)/test-404'
     | '/(tests)/test-error'
     | '/admin/users'
-    | '/api/contact'
     | '/api/user-files'
     | '/auth/error'
     | '/auth/forgot-password'
@@ -520,7 +508,6 @@ export interface RootRouteChildren {
   pagesWaitlistRoute: typeof pagesWaitlistRoute
   testsTest404Route: typeof testsTest404Route
   testsTestErrorRoute: typeof testsTestErrorRoute
-  ApiContactRoute: typeof ApiContactRoute
   ApiUserFilesRoute: typeof ApiUserFilesRouteWithChildren
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -697,13 +684,6 @@ declare module '@tanstack/react-router' {
       path: '/api/user-files'
       fullPath: '/api/user-files'
       preLoaderRoute: typeof ApiUserFilesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/contact': {
-      id: '/api/contact'
-      path: '/api/contact'
-      fullPath: '/api/contact'
-      preLoaderRoute: typeof ApiContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/users': {
@@ -909,7 +889,6 @@ const rootRouteChildren: RootRouteChildren = {
   pagesWaitlistRoute: pagesWaitlistRoute,
   testsTest404Route: testsTest404Route,
   testsTestErrorRoute: testsTestErrorRoute,
-  ApiContactRoute: ApiContactRoute,
   ApiUserFilesRoute: ApiUserFilesRouteWithChildren,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,

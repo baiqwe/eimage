@@ -24,7 +24,7 @@ export const usersKeys = {
 };
 
 /**
- * Fetch users with pagination, search, sort. Uses TanStack Query; filters are in key for cache but API only supports search/sort.
+ * Fetch users with pagination, search, sort, filters
  */
 export function useUsers(
   pageIndex: number,
@@ -68,7 +68,7 @@ export function useUsers(
 }
 
 /**
- * Ban user via Better Auth admin plugin; invalidates users list on success.
+ * Ban user via Better Auth admin plugin
  */
 export function useBanUser() {
   const queryClient = useQueryClient();
@@ -90,7 +90,7 @@ export function useBanUser() {
 }
 
 /**
- * Unban user via Better Auth admin plugin; invalidates users list on success.
+ * Unban user via Better Auth admin plugin
  */
 export function useUnbanUser() {
   const queryClient = useQueryClient();

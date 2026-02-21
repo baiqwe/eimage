@@ -2,7 +2,7 @@
 
 Transactional email (verification, password reset, contact form, subscription welcome). Runs in Cloudflare Worker; **Resend** is the built-in provider. Design allows adding other providers (e.g. Cloudflare Emails) via a provider registry without changing callers.
 
-**Consumers:** Auth (`sendVerificationEmail`, `sendResetPassword`), `/api/contact`, `/api/newsletter/subscribe` — all use `sendEmail(...)` only.
+**Consumers:** Auth (`sendVerificationEmail`, `sendResetPassword`), contact form (`sendContactMessage` in `src/api/contact.ts`), newsletter subscribe — all use `sendEmail(...)` only.
 
 ---
 
