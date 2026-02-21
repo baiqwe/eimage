@@ -142,6 +142,26 @@ export function FilesTable({
         enableSorting: false,
       },
       {
+        id: 'isPublic',
+        accessorKey: 'isPublic',
+        header: t.columns.isPublic,
+        cell: ({ row }) => (
+          <span
+            className={cn(
+              'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+              row.original.isPublic
+                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                : 'bg-muted text-muted-foreground'
+            )}
+          >
+            {row.original.isPublic ? 'Public' : 'Private'}
+          </span>
+        ),
+        minSize: 80,
+        size: 90,
+        enableSorting: false,
+      },
+      {
         id: 'createdAt',
         accessorKey: 'createdAt',
         header: t.columns.createdAt,

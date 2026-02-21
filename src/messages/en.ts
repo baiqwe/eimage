@@ -329,6 +329,7 @@ export const messages = {
         contentType: 'Type',
         size: 'Size',
         createdAt: 'Uploaded',
+        isPublic: 'Access',
         accessLink: 'Link',
         actions: 'Actions',
       },
