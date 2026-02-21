@@ -1,4 +1,3 @@
-import { websiteConfig } from '@/config/website';
 import { getDb } from '@/db';
 import { userFiles } from '@/db/app.schema';
 import { getBaseUrl } from '@/lib/urls';
@@ -73,9 +72,13 @@ const uploadSchema = z
     const folderRaw = fd.get('folder');
     const folder = typeof folderRaw === 'string' ? folderRaw : undefined;
     const isPublicRaw = fd.get('isPublic');
-    const isPublic = typeof isPublicRaw === 'string' ? isPublicRaw === 'true' : undefined;
+    const isPublic =
+      typeof isPublicRaw === 'string' ? isPublicRaw === 'true' : undefined;
     const descriptionRaw = fd.get('description');
-    const description = typeof descriptionRaw === 'string' && descriptionRaw !== '' ? descriptionRaw : undefined;
+    const description =
+      typeof descriptionRaw === 'string' && descriptionRaw !== ''
+        ? descriptionRaw
+        : undefined;
     return {
       file,
       folder,

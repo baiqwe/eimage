@@ -14,14 +14,12 @@ import {
 } from '../types';
 
 /**
- * Get R2 bucket binding (env.FILES). Used by R2Provider internally.
+ * Get R2 bucket binding (env.BUCKET)
  */
 function getFilesBucket(): R2BucketInterface {
-  const bucket = env.FILES;
+  const bucket = env.BUCKET;
   if (!bucket) {
-    throw new ConfigurationError(
-      'R2 bucket binding "FILES" is not configured.'
-    );
+    throw new ConfigurationError('R2 bucket binding BUCKET is not configured.');
   }
   return bucket;
 }
