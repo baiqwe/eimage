@@ -1,7 +1,7 @@
 import { authClient } from '@/auth/auth-client';
 import { getAvatarLinks } from '@/config/avatar-config';
 import { messages } from '@/messages';
-import type { User } from '@/auth/auth-types';
+import type { SessionUser } from '@/auth/auth-types';
 import { IconLogout } from '@tabler/icons-react';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -16,7 +16,7 @@ import {
 import { UserAvatar } from '@/components/shared/user-avatar';
 
 interface UserButtonMobileProps {
-  user: User;
+  user: SessionUser;
 }
 
 /**

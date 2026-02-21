@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { User } from '@/auth/auth-types';
+import type { User } from '@/db/types';
 import { messages } from '@/messages';
 import {
   type ColumnDef,

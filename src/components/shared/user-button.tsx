@@ -13,10 +13,10 @@ import { UserAvatar } from './user-avatar';
 import { messages } from '@/messages';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import type { User } from '@/auth/auth-types';
+import type { SessionUser } from '@/auth/auth-types';
 
 interface UserButtonProps {
-  user: User;
+  user: SessionUser;
 }
 
 export function UserButton({ user }: UserButtonProps) {

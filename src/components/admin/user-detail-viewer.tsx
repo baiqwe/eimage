@@ -1,4 +1,4 @@
-import type { User } from '@/auth/auth-types';
+import type { User } from '@/db/types';
 import { UserAvatar } from '@/components/shared/user-avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

@@ -17,7 +17,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { websiteConfig } from '@/config/website';
-import type { User } from '@/auth/auth-types';
+import type { SessionUser } from '@/auth/auth-types';
 import {
   IconDeviceDesktop,
   IconLogout,
@@ -36,7 +36,7 @@ import { toast } from 'sonner';
 const m = messages.common;
 
 interface SidebarUserProps {
-  user: User;
+  user: SessionUser;
   className?: string;
 }
 
