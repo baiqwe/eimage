@@ -19,6 +19,7 @@ import { websiteConfig } from '@/config/website';
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import appCss from '../styles.css?url';
 import { DefaultCatchBoundary } from '@/components/layout/default-catch-boundary';
+import { Routes } from '@/lib/routes';
 
 /**
  * https://github.com/backpine/tanstack-start-on-cloudflare/blob/main/src/routes/__root.tsx
@@ -83,13 +84,13 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname }) ?? '';
   const matches = useRouterState({ select: (s) => s.matches }) ?? [];
-  const isAuthPages = pathname.startsWith('/auth');
+  const isAuthPages = pathname.startsWith(Routes.Auth);
   const isProtectedPages =
-    pathname.startsWith('/admin') ||
-    pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/settings');
+    pathname.startsWith(Routes.Admin) ||
+    pathname.startsWith(Routes.Dashboard) ||
+    pathname.startsWith(Routes.Settings);
   // When no child route matches (e.g. /hello), only root is in matches; use minimal layout
-  const isNotFound = pathname !== '/' && pathname !== '' && matches.length <= 1;
+  const isNotFound = pathname !== Routes.Root && pathname !== '' && matches.length <= 1;
 
   if (isAuthPages || isProtectedPages || isNotFound) {
     return (

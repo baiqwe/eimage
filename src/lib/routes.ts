@@ -14,6 +14,7 @@ export const Routes = {
   Waitlist: '/waitlist',
 
   // Auth routes
+  Auth: '/auth',
   Login: '/auth/login',
   Register: '/auth/register',
   AuthError: '/auth/error',
@@ -29,6 +30,7 @@ export const Routes = {
   Dashboard: '/dashboard',
 
   // Settings routes
+  Settings: '/settings',
   SettingsProfile: '/settings/profile',
   SettingsBilling: '/settings/billing',
   SettingsCredits: '/settings/credits',
@@ -38,6 +40,7 @@ export const Routes = {
   SettingsNotifications: '/settings/notifications',
 
   // Admin routes
+  Admin: '/admin',
   AdminUsers: '/admin/users',
 } as const;
 
