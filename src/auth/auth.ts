@@ -81,6 +81,13 @@ export const auth = betterAuth({
     },
   },
   user: {
+    // https://www.better-auth.com/docs/concepts/database#extending-core-schema
+    additionalFields: {
+      customerId: {
+        type: 'string',
+        required: false,
+      },
+    },
     // https://www.better-auth.com/docs/concepts/users-accounts#delete-user
     deleteUser: {
       enabled: websiteConfig.auth?.enableDeleteUser ?? false,

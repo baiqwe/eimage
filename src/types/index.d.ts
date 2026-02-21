@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import type { PricePlan } from '@/payment/types';
 
 /** Website config */
 export interface WebsiteConfig {
@@ -117,29 +118,9 @@ export interface PaymentConfig {
   provider?: 'stripe';  // The payment provider, only stripe is supported for now
 }
 
-/** Price configuration - plans indexed by ID */
+/** Price configuration */
 export interface PriceConfig {
-  enable: boolean;   // Whether to enable the price
-  plans: Record<string, PlanConfig>;
-}
-
-/** Plan config in websiteConfig.price.plans */
-export interface PlanConfig {
-  id: string;
-  prices: PriceItemConfig[];
-  isFree: boolean;
-  isLifetime: boolean;
-  popular?: boolean;
-}
-
-/** Price item for a plan (subscription or one-time) */
-export interface PriceItemConfig {
-  type: 'subscription' | 'one_time';
-  priceId: string;
-  amount: number;
-  currency: string;
-  interval?: 'month' | 'year';
-  allowPromotionCode?: boolean;
+  plans: Record<string, PricePlan>;
 }
 
 /** Menu item for navbar links, sidebar links, footer links. */

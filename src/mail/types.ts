@@ -1,6 +1,5 @@
 /**
  * Supported mail provider names
- * extend when adding new providers (e.g. 'cloudflare')
  **/
 export type MailProviderName = 'resend';
 
@@ -32,6 +31,9 @@ export interface SendRawEmailParams {
   text?: string;
 }
 
+/**
+ * Mail provider interface
+ */
 export interface MailProvider {
   sendTemplate(params: SendTemplateParams): Promise<SendEmailResult>;
   sendRawEmail(params: SendRawEmailParams): Promise<SendEmailResult>;

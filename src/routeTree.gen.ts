@@ -23,8 +23,10 @@ import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
 import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
+import { Route as SettingsPaymentRouteImport } from './routes/settings/payment'
 import { Route as SettingsNotificationsRouteImport } from './routes/settings/notifications'
 import { Route as SettingsFilesRouteImport } from './routes/settings/files'
+import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
 import { Route as SettingsApikeysRouteImport } from './routes/settings/apikeys'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
@@ -37,12 +39,14 @@ import { Route as testsTestErrorRouteImport } from './routes/(tests)/test-error'
 import { Route as testsTest404RouteImport } from './routes/(tests)/test-404'
 import { Route as pagesWaitlistRouteImport } from './routes/(pages)/waitlist'
 import { Route as pagesRoadmapRouteImport } from './routes/(pages)/roadmap'
+import { Route as pagesPricingRouteImport } from './routes/(pages)/pricing'
 import { Route as pagesContactRouteImport } from './routes/(pages)/contact'
 import { Route as pagesChangelogRouteImport } from './routes/(pages)/changelog'
 import { Route as pagesAboutRouteImport } from './routes/(pages)/about'
 import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
+import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -116,6 +120,11 @@ const SettingsProfileRoute = SettingsProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => SettingsRoute,
 } as any)
+const SettingsPaymentRoute = SettingsPaymentRouteImport.update({
+  id: '/payment',
+  path: '/payment',
+  getParentRoute: () => SettingsRoute,
+} as any)
 const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
   id: '/notifications',
   path: '/notifications',
@@ -124,6 +133,11 @@ const SettingsNotificationsRoute = SettingsNotificationsRouteImport.update({
 const SettingsFilesRoute = SettingsFilesRouteImport.update({
   id: '/files',
   path: '/files',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsBillingRoute = SettingsBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => SettingsRoute,
 } as any)
 const SettingsApikeysRoute = SettingsApikeysRouteImport.update({
@@ -186,6 +200,11 @@ const pagesRoadmapRoute = pagesRoadmapRouteImport.update({
   path: '/roadmap',
   getParentRoute: () => rootRouteImport,
 } as any)
+const pagesPricingRoute = pagesPricingRouteImport.update({
+  id: '/(pages)/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const pagesContactRoute = pagesContactRouteImport.update({
   id: '/(pages)/contact',
   path: '/contact',
@@ -216,6 +235,11 @@ const legalsCookieRoute = legalsCookieRouteImport.update({
   path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhooksStripeRoute = ApiWebhooksStripeRouteImport.update({
+  id: '/api/webhooks/stripe',
+  path: '/api/webhooks/stripe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStorageFileRoute = ApiStorageFileRouteImport.update({
   id: '/api/storage/file',
   path: '/api/storage/file',
@@ -242,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof pagesAboutRoute
   '/changelog': typeof pagesChangelogRoute
   '/contact': typeof pagesContactRoute
+  '/pricing': typeof pagesPricingRoute
   '/roadmap': typeof pagesRoadmapRoute
   '/waitlist': typeof pagesWaitlistRoute
   '/test-404': typeof testsTest404Route
@@ -254,8 +279,10 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
+  '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/admin/': typeof AdminIndexRoute
@@ -264,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
+  '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -277,6 +305,7 @@ export interface FileRoutesByTo {
   '/about': typeof pagesAboutRoute
   '/changelog': typeof pagesChangelogRoute
   '/contact': typeof pagesContactRoute
+  '/pricing': typeof pagesPricingRoute
   '/roadmap': typeof pagesRoadmapRoute
   '/waitlist': typeof pagesWaitlistRoute
   '/test-404': typeof testsTest404Route
@@ -289,8 +318,10 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
+  '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/admin': typeof AdminIndexRoute
@@ -299,6 +330,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
+  '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -316,6 +348,7 @@ export interface FileRoutesById {
   '/(pages)/about': typeof pagesAboutRoute
   '/(pages)/changelog': typeof pagesChangelogRoute
   '/(pages)/contact': typeof pagesContactRoute
+  '/(pages)/pricing': typeof pagesPricingRoute
   '/(pages)/roadmap': typeof pagesRoadmapRoute
   '/(pages)/waitlist': typeof pagesWaitlistRoute
   '/(tests)/test-404': typeof testsTest404Route
@@ -328,8 +361,10 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
+  '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
   '/settings/notifications': typeof SettingsNotificationsRoute
+  '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/admin/': typeof AdminIndexRoute
@@ -338,6 +373,7 @@ export interface FileRoutesById {
   '/settings/': typeof SettingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
+  '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -356,6 +392,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/changelog'
     | '/contact'
+    | '/pricing'
     | '/roadmap'
     | '/waitlist'
     | '/test-404'
@@ -368,8 +405,10 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/blog/$slug'
     | '/settings/apikeys'
+    | '/settings/billing'
     | '/settings/files'
     | '/settings/notifications'
+    | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
     | '/admin/'
@@ -378,6 +417,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/api/auth/$'
     | '/api/storage/file'
+    | '/api/webhooks/stripe'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -391,6 +431,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/changelog'
     | '/contact'
+    | '/pricing'
     | '/roadmap'
     | '/waitlist'
     | '/test-404'
@@ -403,8 +444,10 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/blog/$slug'
     | '/settings/apikeys'
+    | '/settings/billing'
     | '/settings/files'
     | '/settings/notifications'
+    | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
     | '/admin'
@@ -413,6 +456,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/api/auth/$'
     | '/api/storage/file'
+    | '/api/webhooks/stripe'
   id:
     | '__root__'
     | '/'
@@ -429,6 +473,7 @@ export interface FileRouteTypes {
     | '/(pages)/about'
     | '/(pages)/changelog'
     | '/(pages)/contact'
+    | '/(pages)/pricing'
     | '/(pages)/roadmap'
     | '/(pages)/waitlist'
     | '/(tests)/test-404'
@@ -441,8 +486,10 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/blog/$slug'
     | '/settings/apikeys'
+    | '/settings/billing'
     | '/settings/files'
     | '/settings/notifications'
+    | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
     | '/admin/'
@@ -451,6 +498,7 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/api/auth/$'
     | '/api/storage/file'
+    | '/api/webhooks/stripe'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -468,6 +516,7 @@ export interface RootRouteChildren {
   pagesAboutRoute: typeof pagesAboutRoute
   pagesChangelogRoute: typeof pagesChangelogRoute
   pagesContactRoute: typeof pagesContactRoute
+  pagesPricingRoute: typeof pagesPricingRoute
   pagesRoadmapRoute: typeof pagesRoadmapRoute
   pagesWaitlistRoute: typeof pagesWaitlistRoute
   testsTest404Route: typeof testsTest404Route
@@ -476,6 +525,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
+  ApiWebhooksStripeRoute: typeof ApiWebhooksStripeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -578,6 +628,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsProfileRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/settings/payment': {
+      id: '/settings/payment'
+      path: '/payment'
+      fullPath: '/settings/payment'
+      preLoaderRoute: typeof SettingsPaymentRouteImport
+      parentRoute: typeof SettingsRoute
+    }
     '/settings/notifications': {
       id: '/settings/notifications'
       path: '/notifications'
@@ -590,6 +647,13 @@ declare module '@tanstack/react-router' {
       path: '/files'
       fullPath: '/settings/files'
       preLoaderRoute: typeof SettingsFilesRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/billing': {
+      id: '/settings/billing'
+      path: '/billing'
+      fullPath: '/settings/billing'
+      preLoaderRoute: typeof SettingsBillingRouteImport
       parentRoute: typeof SettingsRoute
     }
     '/settings/apikeys': {
@@ -676,6 +740,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof pagesRoadmapRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(pages)/pricing': {
+      id: '/(pages)/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof pagesPricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(pages)/contact': {
       id: '/(pages)/contact'
       path: '/contact'
@@ -716,6 +787,13 @@ declare module '@tanstack/react-router' {
       path: '/cookie'
       fullPath: '/cookie'
       preLoaderRoute: typeof legalsCookieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/webhooks/stripe': {
+      id: '/api/webhooks/stripe'
+      path: '/api/webhooks/stripe'
+      fullPath: '/api/webhooks/stripe'
+      preLoaderRoute: typeof ApiWebhooksStripeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/storage/file': {
@@ -779,8 +857,10 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 interface SettingsRouteChildren {
   SettingsApikeysRoute: typeof SettingsApikeysRoute
+  SettingsBillingRoute: typeof SettingsBillingRoute
   SettingsFilesRoute: typeof SettingsFilesRoute
   SettingsNotificationsRoute: typeof SettingsNotificationsRoute
+  SettingsPaymentRoute: typeof SettingsPaymentRoute
   SettingsProfileRoute: typeof SettingsProfileRoute
   SettingsSecurityRoute: typeof SettingsSecurityRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
@@ -788,8 +868,10 @@ interface SettingsRouteChildren {
 
 const SettingsRouteChildren: SettingsRouteChildren = {
   SettingsApikeysRoute: SettingsApikeysRoute,
+  SettingsBillingRoute: SettingsBillingRoute,
   SettingsFilesRoute: SettingsFilesRoute,
   SettingsNotificationsRoute: SettingsNotificationsRoute,
+  SettingsPaymentRoute: SettingsPaymentRoute,
   SettingsProfileRoute: SettingsProfileRoute,
   SettingsSecurityRoute: SettingsSecurityRoute,
   SettingsIndexRoute: SettingsIndexRoute,
@@ -814,6 +896,7 @@ const rootRouteChildren: RootRouteChildren = {
   pagesAboutRoute: pagesAboutRoute,
   pagesChangelogRoute: pagesChangelogRoute,
   pagesContactRoute: pagesContactRoute,
+  pagesPricingRoute: pagesPricingRoute,
   pagesRoadmapRoute: pagesRoadmapRoute,
   pagesWaitlistRoute: pagesWaitlistRoute,
   testsTest404Route: testsTest404Route,
@@ -822,6 +905,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,
+  ApiWebhooksStripeRoute: ApiWebhooksStripeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

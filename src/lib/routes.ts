@@ -26,6 +26,9 @@ export const Routes = {
   PrivacyPolicy: '/privacy',
   CookiePolicy: '/cookie',
 
+  // Payment routes
+  Payment: '/payment',
+
   // Dashboard routes
   Dashboard: '/dashboard',
 

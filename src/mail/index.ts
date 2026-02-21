@@ -36,7 +36,7 @@ function createProvider(): MailProvider {
 }
 
 /**
- * Get the mail provider (lazy-initialized on first use).
+ * Get the mail provider (lazy-initialized on first use)
  */
 export function getMailProvider(): MailProvider {
   if (!mailProvider) mailProvider = createProvider();
@@ -44,7 +44,7 @@ export function getMailProvider(): MailProvider {
 }
 
 /**
- * Send email using the configured mail provider.
+ * Send email using the configured mail provider
  */
 export async function sendEmail(
   params: SendTemplateParams | SendRawEmailParams

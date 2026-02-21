@@ -1,5 +1,6 @@
-import type { WebsiteConfig } from '../types';
+import { clientEnv } from '@/env/client';
 import { messages } from '@/messages';
+import type { WebsiteConfig } from '../types';
 
 /**
  * Website config
@@ -74,42 +75,51 @@ export const websiteConfig: WebsiteConfig = {
     provider: 'stripe',
   },
   price: {
-    enable: true,
     plans: {
       free: {
         id: 'free',
         prices: [],
         isFree: true,
         isLifetime: false,
+        name: messages.pricing.plans.free.name,
+        description: messages.pricing.plans.free.description,
+        features: [...messages.pricing.plans.free.features],
+        limits: [...messages.pricing.plans.free.limits],
       },
       pro: {
         id: 'pro',
         prices: [
           {
             type: 'subscription',
-            priceId: '',
+            priceId: clientEnv.VITE_STRIPE_PRICE_PRO_MONTHLY!,
             amount: 990,
             currency: 'USD',
             interval: 'month',
+            trialPeriodDays: 7,
           },
           {
             type: 'subscription',
-            priceId: '',
+            priceId: clientEnv.VITE_STRIPE_PRICE_PRO_YEARLY!,
             amount: 9900,
             currency: 'USD',
             interval: 'year',
+            trialPeriodDays: 7,
           },
         ],
         isFree: false,
         isLifetime: false,
         popular: true,
+        name: messages.pricing.plans.pro.name,
+        description: messages.pricing.plans.pro.description,
+        features: [...messages.pricing.plans.pro.features],
+        limits: [...messages.pricing.plans.pro.limits],
       },
       lifetime: {
         id: 'lifetime',
         prices: [
           {
             type: 'one_time',
-            priceId: '',
+            priceId: clientEnv.VITE_STRIPE_PRICE_LIFETIME!,
             amount: 19900,
             currency: 'USD',
             allowPromotionCode: true,
@@ -117,6 +127,10 @@ export const websiteConfig: WebsiteConfig = {
         ],
         isFree: false,
         isLifetime: true,
+        name: messages.pricing.plans.lifetime.name,
+        description: messages.pricing.plans.lifetime.description,
+        features: [...messages.pricing.plans.lifetime.features],
+        limits: [...messages.pricing.plans.lifetime.limits],
       },
     },
   },

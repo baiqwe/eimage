@@ -134,14 +134,20 @@ export interface UploadFileResult {
   metadata?: FileMetadata;
 }
 
+/**
+ * Storage provider interface
+ */
 export interface StorageProvider {
+  /** Get the provider's name */
   getProviderName(): string;
 
+  /** Upload a file */
   uploadFile(params: UploadFileParams): Promise<UploadFileResult>;
 
+  /** Delete a file */
   deleteFile(key: string): Promise<void>;
 
-  /** Download by R2 key or by FileMetadata. Returns stream or null. */
+  /** Download by R2 key or by FileMetadata. Returns stream or null */
   downloadFile(
     keyOrMetadata: string | FileMetadata
   ): Promise<ReadableStream | null>;

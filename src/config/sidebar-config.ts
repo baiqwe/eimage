@@ -1,5 +1,6 @@
 import {
   IconBell,
+  IconCreditCard,
   IconFileUpload,
   IconKey,
   IconLayoutDashboard,
@@ -48,6 +49,12 @@ export function getSidebarLinks(): MenuItemConfig[] {
           title: m.profile,
           icon: IconUserCircle,
           href: Routes.SettingsProfile,
+          external: false,
+        },
+        {
+          title: m.billing,
+          icon: IconCreditCard,
+          href: Routes.SettingsBilling,
           external: false,
         },
         {

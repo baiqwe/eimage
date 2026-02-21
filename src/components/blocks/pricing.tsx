@@ -1,5 +1,5 @@
 import { HeaderSection } from '@/components/shared/header-section';
-import { getPricePlans } from '@/config/price-config';
+import { getPricePlans } from '@/lib/price-plan';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Link } from '@tanstack/react-router';
@@ -52,7 +52,7 @@ export default function PricingSection() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-2">
-                  {plan.features.map((f) => (
+                  {plan.features?.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm">
                       <IconCheck className="size-4 shrink-0 text-primary" />
                       {f}
