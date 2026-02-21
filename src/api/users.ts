@@ -20,25 +20,18 @@ const SORT_FIELD_MAP: Record<
   | typeof user.name
   | typeof user.email
   | typeof user.createdAt
-  | typeof user.role
-  | typeof user.banned
 > = {
   name: user.name,
   email: user.email,
   createdAt: user.createdAt,
-  role: user.role,
-  status: user.banned,
-  banned: user.banned,
 };
 
 function normalizeSortId(
   raw: string
-): 'name' | 'email' | 'createdAt' | 'role' | 'status' {
+): 'name' | 'email' | 'createdAt' {
   const s = (raw ?? 'createdAt').trim();
   if (s.toLowerCase() === 'name') return 'name';
   if (s.toLowerCase() === 'email') return 'email';
-  if (s.toLowerCase() === 'role') return 'role';
-  if (s.toLowerCase() === 'status') return 'status';
   return 'createdAt';
 }
 
@@ -60,6 +53,7 @@ export const listUsers = createServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     const db = getDb();
     const { pageIndex, pageSize, search, sortDesc, role, status } = data;
+    console.log('listUsers input', data);
     const offset = pageIndex * pageSize;
     const sortId = normalizeSortId(data.sortId);
 
@@ -89,15 +83,23 @@ export const listUsers = createServerFn({ method: 'GET' })
     const sortField = SORT_FIELD_MAP[sortId] ?? user.createdAt;
     const sortDirection = sortDesc ? desc : asc;
 
+    const selectQuery = db
+      .select()
+      .from(user)
+      .where(where)
+      .orderBy(sortDirection(sortField))
+      .limit(pageSize)
+      .offset(offset);
+    const countQuery = db.select({ count: countFn() }).from(user).where(where);
+
+    const selectSql = selectQuery.toSQL();
+    const countSql = countQuery.toSQL();
+    console.log('listUsers SELECT:', selectSql.sql, selectSql.params);
+    console.log('listUsers COUNT:', countSql.sql, countSql.params);
+
     const [items, [{ count }]] = await Promise.all([
-      db
-        .select()
-        .from(user)
-        .where(where)
-        .orderBy(sortDirection(sortField))
-        .limit(pageSize)
-        .offset(offset),
-      db.select({ count: countFn() }).from(user).where(where),
+      selectQuery,
+      countQuery,
     ]);
 
     return {

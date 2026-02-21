@@ -199,7 +199,7 @@ export function UsersTable({
         id: 'status',
         accessorFn: (row) => (row.banned ? 'inactive' : 'active'),
         enableHiding: true,
-        enableSorting: true,
+        enableSorting: false,
         header: ({ column }) => (
           <DataTableColumnHeader column={column} label={m.columns.status} />
         ),
