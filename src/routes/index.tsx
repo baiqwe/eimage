@@ -50,9 +50,9 @@ function HomePage() {
       <LogoCloudSection />
       <StatsSection />
       <IntegrationSection />
+      <Features3Section />
       <FeaturesSection />
       <Features2Section />
-      <Features3Section />
       <Integration2Section />
       <PricingSection />
       <FaqSection />

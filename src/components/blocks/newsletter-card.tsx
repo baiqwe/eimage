@@ -1,8 +1,5 @@
-import { messages } from '@/messages';
-import { websiteConfig } from '@/config/website';
-import { useSubscribeNewsletter } from '@/hooks/use-newsletter';
-import { HeaderSection } from '@/components/shared/header-section';
 import { FormError } from '@/components/shared/form-error';
+import { HeaderSection } from '@/components/shared/header-section';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -13,10 +10,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { websiteConfig } from '@/config/website';
+import { useSubscribeNewsletter } from '@/hooks/use-newsletter';
+import { messages } from '@/messages';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { IconLoader2, IconSend } from '@tabler/icons-react';
+import { IconLoader2, IconSend2 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 const m = messages.newsletter;
@@ -30,7 +31,6 @@ type FormData = z.infer<typeof schema>;
 export function NewsletterCard() {
   const enabled = websiteConfig.newsletter?.enable ?? false;
   const [error, setError] = useState<string | undefined>();
-  const [success, setSuccess] = useState(false);
   const subscribeMutation = useSubscribeNewsletter();
 
   const form = useForm<FormData>({
@@ -42,14 +42,15 @@ export function NewsletterCard() {
 
   async function onSubmit(data: FormData) {
     setError(undefined);
-    setSuccess(false);
     try {
       await subscribeMutation.mutateAsync(data.email);
-      setSuccess(true);
+      toast.success(m.thanks);
       form.reset();
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : m.error;
+      console.error('newsletter subscription error:', errMsg);
       setError(errMsg);
+      toast.error(errMsg);
     }
   }
 
@@ -80,7 +81,7 @@ export function NewsletterCard() {
                       <Input
                         type="email"
                         placeholder={m.placeholderEmail}
-                        className="h-12 rounded-r-none border-r-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary focus:border-2 focus:border-r-0"
+                        className="h-11.5 rounded-r-none border-r-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary focus:border-0.5 focus:border-r-0"
                         {...field}
                       />
                     </FormControl>
@@ -98,7 +99,7 @@ export function NewsletterCard() {
                 {isPending ? (
                   <IconLoader2 className="size-6 animate-spin" aria-hidden />
                 ) : (
-                  <IconSend className="size-6" aria-hidden />
+                  <IconSend2 className="size-6" aria-hidden />
                 )}
                 <span className="sr-only">{m.subscribe}</span>
               </Button>
@@ -107,9 +108,6 @@ export function NewsletterCard() {
               <div className="w-full">
                 <FormError message={error} />
               </div>
-            )}
-            {success && (
-              <p className="text-muted-foreground text-sm">{m.thanks}</p>
             )}
           </form>
         </Form>

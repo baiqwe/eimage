@@ -21,26 +21,9 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 }
 
 export default function TestimonialsSection() {
-  const testimonials: Testimonial[] = [
-    {
-      name: m.items['item-1'].name,
-      role: m.items['item-1'].role,
-      image: m.items['item-1'].image,
-      quote: m.items['item-1'].quote,
-    },
-    {
-      name: m.items['item-2'].name,
-      role: m.items['item-2'].role,
-      image: m.items['item-2'].image,
-      quote: m.items['item-2'].quote,
-    },
-    {
-      name: m.items['item-3'].name,
-      role: m.items['item-3'].role,
-      image: m.items['item-3'].image,
-      quote: m.items['item-3'].quote,
-    },
-  ];
+  const testimonials: Testimonial[] = (
+    ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6'] as const
+  ).map((key) => m.items[key]);
 
   const testimonialChunks = chunkArray(
     testimonials,

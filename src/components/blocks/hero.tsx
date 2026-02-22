@@ -49,24 +49,24 @@ export default function HeroSection() {
               </a>
 
               {/* title */}
-              <h1 className="mt-8 text-balance text-5xl font-bold lg:mt-16 xl:text-[5rem]">
+              <h1 className="font-heading mt-8 text-balance text-5xl font-bold lg:mt-16 xl:text-[5rem]">
                 {m.title}
               </h1>
 
               {/* description */}
-              <p className="mx-auto mt-8 max-w-4xl text-balance text-lg text-muted-foreground">
+              <p className="mx-auto mt-8 max-w-5xl text-balance text-lg text-muted-foreground">
                 {m.description}
               </p>
 
               {/* action buttons */}
               <div className="mt-12 flex flex-row items-center justify-center gap-4">
-                <div className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5">
+                <div className="bg-foreground/10 rounded-xl">
                   <Link
                     to="/"
                     hash="pricing"
                     className={cn(
                       buttonVariants({ size: 'lg' }),
-                      'rounded-xl px-5 text-base'
+                      'rounded-xl px-5 text-base h-10.5'
                     )}
                   >
                     <span className="text-nowrap">{m.primary}</span>
@@ -92,7 +92,7 @@ export default function HeroSection() {
                 <img
                   className="bg-muted/50 relative hidden rounded-2xl dark:block w-full"
                   src="https://cdn.mksaas.com/blocks/music.png"
-                  alt="App screen"
+                  alt="website screenshot"
                 />
                 <img
                   className="z-2 border-border/25 relative rounded-2xl border dark:hidden w-full"
