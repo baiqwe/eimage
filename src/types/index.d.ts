@@ -59,10 +59,12 @@ export interface SocialConfig {
 
 /** Website features */
 export interface FeaturesConfig {
-  enableUpgradeCard?: boolean;      // Whether to enable the upgrade card in the sidebar
+  enableUpgradeCard?: boolean;       // Whether to enable the upgrade card in the sidebar
   enableUpdateAvatar?: boolean;     // Whether to enable the update avatar in settings
-  enableCrispChat?: boolean;        // Whether to enable the crisp chat
+  enableCrispChat?: boolean;         // Whether to enable the crisp chat
   enableTurnstileCaptcha?: boolean; // Whether to enable turnstile captcha
+  enableAffonsoAffiliate?: boolean;   // Whether to enable Affonso (PromosKit) affiliate
+  enablePromotekitAffiliate?: boolean; // Whether to enable PromoteKit affiliate
 }
 
 /** Routes configuration */

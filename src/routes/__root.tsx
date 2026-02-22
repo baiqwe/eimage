@@ -8,7 +8,10 @@ import {
   useRouterState,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { AffonsoScript } from '@/components/affiliate/affonso';
+import { PromotekitScript } from '@/components/affiliate/promotekit';
 import { Analytics } from '@/components/analytics/analytics';
+import { CrispChat } from '@/components/chatbox/crisp-chat';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { TailwindIndicator } from '@/integrations/tailwindcss/tailwind-indicator';
 import { Navbar } from '@/components/layout/navbar';
@@ -142,6 +145,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           ]}
         />
         <Analytics />
+        <CrispChat />
+        <AffonsoScript />
+        <PromotekitScript />
         <Scripts />
       </body>
     </html>

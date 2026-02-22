@@ -35,6 +35,8 @@ export const websiteConfig: WebsiteConfig = {
     enableUpdateAvatar: true,
     enableCrispChat: false,
     enableTurnstileCaptcha: false,
+    enableAffonsoAffiliate: false,
+    enablePromotekitAffiliate: false,
   },
   routes: {
     defaultLoginRedirect: '/dashboard',

@@ -23,6 +23,13 @@ export const clientEnv = createEnv({
     VITE_UMAMI_SCRIPT: z.string().optional(),
     VITE_DATAFAST_DOMAIN: z.string().optional(),
     VITE_DATAFAST_WEBSITE_ID: z.string().optional(),
+
+    // Chatbot (Crisp Chat)
+    VITE_CRISP_WEBSITE_ID: z.string().optional(),
+
+    // Affiliate (Affonso / PromoteKit)
+    VITE_AFFILIATE_AFFONSO_ID: z.string().optional(),
+    VITE_AFFILIATE_PROMOTEKIT_ID: z.string().optional(),
   },
   runtimeEnv: import.meta.env,
 });
