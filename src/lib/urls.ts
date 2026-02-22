@@ -55,3 +55,16 @@ export function getFileAccessUrl(r2Key: string): string {
   if (typeof window === 'undefined') return '';
   return `${window.location.origin}/api/storage/file?key=${encodeURIComponent(r2Key)}`;
 }
+
+/**
+ * Convert email string to mailto href. Supports "Name <email>" format.
+ * @param email - Plain email or "Display Name <email>"
+ * @returns mailto href, or undefined if email is empty
+ */
+export function getMailtoUrl(email: string | undefined | null): string | undefined {
+  if (!email?.trim()) return undefined;
+  const trimmed = email.trim();
+  return trimmed.includes('<')
+    ? trimmed.replace(/^[^<]*<([^>]*)>.*$/, 'mailto:$1')
+    : `mailto:${trimmed}`;
+}

@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { buttonVariants } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
 import { messages } from '@/messages';
-import { getCanonicalUrl } from '@/lib/urls';
+import { getCanonicalUrl, getMailtoUrl } from '@/lib/urls';
 import { cn } from '@/lib/utils';
 import { IconBrandX, IconMail } from '@tabler/icons-react';
 
@@ -25,12 +25,7 @@ export const Route = createFileRoute('/(pages)/about')({
 
 function AboutPage() {
   const twitter = websiteConfig.social?.twitter;
-  const supportEmail = websiteConfig.mail?.supportEmail;
-  const supportEmailHref = supportEmail?.includes('<')
-    ? supportEmail.replace(/^[^<]*<([^>]*)>.*$/, 'mailto:$1')
-    : supportEmail
-      ? `mailto:${supportEmail}`
-      : undefined;
+  const supportEmailHref = getMailtoUrl(websiteConfig.mail?.supportEmail);
 
   return (
     <Container className="py-16 px-4">

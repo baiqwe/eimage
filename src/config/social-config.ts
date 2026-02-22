@@ -13,6 +13,7 @@ import {
   IconMail,
 } from '@tabler/icons-react';
 import type { MenuItemConfig } from '@/types';
+import { getMailtoUrl } from '@/lib/urls';
 import { websiteConfig } from './website';
 
 /**
@@ -60,12 +61,9 @@ export function getSocialLinks(): MenuItemConfig[] {
   if (config?.telegram) {
     social.push({ title: 'Telegram', href: config.telegram, icon: IconBrandTelegram, external: true });
   }
-  const supportEmail = websiteConfig.mail?.supportEmail;
-  if (supportEmail) {
-    const href = supportEmail.includes('<')
-      ? supportEmail.replace(/^[^<]*<([^>]*)>.*$/, 'mailto:$1')
-      : `mailto:${supportEmail}`;
-    social.push({ title: 'Email', href, icon: IconMail, external: true });
+  const supportEmailHref = getMailtoUrl(websiteConfig.mail?.supportEmail);
+  if (supportEmailHref) {
+    social.push({ title: 'Email', href: supportEmailHref, icon: IconMail, external: true });
   }
   return social;
 }

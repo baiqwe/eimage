@@ -5,7 +5,7 @@
 export const messages = {
   site: {
     name: 'Tanstack Starter',
-    title: 'Build with TanStack Start & Cloudflare, fast and cheap',
+    title: 'Build with TanStack Start & Cloudflare, fast and affordable',
     description:
       'Tanstack Starter is the complete Tanstack Start boilerplate for building profitable SaaS, packed with AI, auth, payments, blog, database, storage, email, newsletter, dashboard, SEO and more, deployed on Cloudflare Workers',
   },
@@ -78,9 +78,9 @@ export const messages = {
 
   homePage: {
     title: 'Tanstack Starter',
-    description: 'Build with TanStack Start & Cloudflare, fast and cheap',
+    description: 'Build with TanStack Start & Cloudflare, fast and affordable',
     hero: {
-      title: 'Build with TanStack Start & Cloudflare, fast and cheap',
+      title: 'Build with TanStack Start & Cloudflare, fast and affordable',
       description:
         'The complete Tanstack Start boilerplate for building profitable SaaS, packed with AI, auth, payments, blog, database, storage, email, newsletter, dashboard, SEO and more, deployed on Cloudflare Workers',
       introduction: 'Introducing Tanstack Starter',
