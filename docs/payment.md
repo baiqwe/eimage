@@ -1,12 +1,12 @@
 # Payment (Stripe)
 
-Subscription and one-time payment support. No credits.
+Subscription and one-time payment support (no credits). See [Env](./env.md) for all variables.
 
 ## Setup
 
 1. **Env**: Copy `.env.local.example` and set:
-   - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
-   - `VITE_STRIPE_PRICE_PRO_MONTHLY`, `VITE_STRIPE_PRICE_PRO_YEARLY`, `VITE_STRIPE_PRICE_LIFETIME` (Stripe Price IDs)
+   - **Runtime:** `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+   - **Build-time:** `VITE_STRIPE_PRICE_PRO_MONTHLY`, `VITE_STRIPE_PRICE_PRO_YEARLY`, `VITE_STRIPE_PRICE_LIFETIME` (Stripe Price IDs)
 
 2. **DB**: Schema adds `user.customerId` and `payment` table. Generate and apply migrations:
    - `pnpm db:generate`

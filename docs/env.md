@@ -1,80 +1,86 @@
 # Environment Variables
 
-The project uses **T3 Env** (`@t3-oss/env-core`) for type-safe validation at build time and runtime:
+The project uses **T3 Env** (`@t3-oss/env-core`) for type-safe validation:
 
-- **`clientEnv`** (`src/env/client.ts`): Client/build-time only. Variables must be prefixed with `VITE_` and are read from `import.meta.env`.
-- **`serverEnv`** (`src/env/server.ts`): Server-only. Read from `process.env` at runtime (Worker vars and secrets are populated into `process.env` when `nodejs_compat_populate_process_env` is enabled).
+| Source | File | When | Prefix / source |
+|--------|------|------|------------------|
+| **clientEnv** | `src/env/client.ts` | Build time (Vite) | `VITE_*` from `import.meta.env` |
+| **serverEnv** | `src/env/server.ts` | Runtime (Worker) | `process.env` (Wrangler vars/secrets) |
 
-Rule of thumb: use **`clientEnv`** for build-time configuration; use **`serverEnv`** for runtime configuration (secrets, API keys, etc.). The deployment target is Cloudflare Workers.
+**Rule of thumb:** Use **clientEnv** for values inlined at build (public URLs, analytics IDs, feature keys). Use **serverEnv** for secrets and server-only config (API keys, webhook secrets). Deployment target is **Cloudflare Workers**.
 
 ---
 
-## 1. Build-time (clientEnv / `import.meta.env`)
+## 1. Build-time (clientEnv)
 
-Values are read by Vite from `.env*` when you run `vite dev` or `vite build`, inlined into the bundle, and **not** read again at Worker runtime.
+Values are read by Vite from `.env*` during `pnpm dev` / `pnpm build` and inlined into the bundle. They are **not** available again at Worker runtime.
 
-### How to set
+**Where to set:** Local → `.env.local`. Production → `.env.production` or CI/build environment variables. Only **`VITE_`**-prefixed variables are exposed to app code.
 
-| Scenario | Where to set |
-|----------|---------------|
-| Local dev (`pnpm dev`) | **`.env.local`** (or rely on defaults in code) |
-| Production build (`pnpm build`) | **`.env.production`** or environment variables in the **build environment** (CI, etc.) |
-
-Only variables prefixed with **`VITE_`** are exposed to app code; others are only available in Vite config.
-
-### Build-time variables (clientEnv)
+### Variables
 
 | Variable | Purpose | Required | Notes |
 |----------|---------|----------|--------|
-| `VITE_BASE_URL` | Site origin (e.g. for `getBaseUrl()`) | No | Default: `http://localhost:3000` |
+| **Base** | | | |
+| `VITE_BASE_URL` | Site origin (e.g. `getBaseUrl()`) | No | Default: `http://localhost:3000` |
+| **Payment (Stripe)** | | | |
+| `VITE_STRIPE_PRICE_PRO_MONTHLY` | Stripe Price ID (Pro monthly) | No | Required for pricing/checkout when using Stripe |
+| `VITE_STRIPE_PRICE_PRO_YEARLY` | Stripe Price ID (Pro yearly) | No | |
+| `VITE_STRIPE_PRICE_LIFETIME` | Stripe Price ID (Lifetime) | No | |
+| **Analytics** | | | |
 | `VITE_GOOGLE_ANALYTICS_ID` | Google Analytics | No | |
 | `VITE_CLARITY_PROJECT_ID` | Microsoft Clarity | No | |
-| `VITE_PLAUSIBLE_DOMAIN` / `VITE_PLAUSIBLE_SCRIPT` | Plausible Analytics | No | |
-| `VITE_UMAMI_WEBSITE_ID` / `VITE_UMAMI_SCRIPT` | Umami Analytics | No | |
-| `VITE_DATAFAST_DOMAIN` / `VITE_DATAFAST_WEBSITE_ID` | DataFast Analytics | No | |
+| `VITE_PLAUSIBLE_DOMAIN` | Plausible Analytics | No | |
+| `VITE_PLAUSIBLE_SCRIPT` | Plausible script URL | No | |
+| `VITE_UMAMI_WEBSITE_ID` | Umami Analytics | No | |
+| `VITE_UMAMI_SCRIPT` | Umami script URL | No | |
+| `VITE_DATAFAST_DOMAIN` | DataFast Analytics | No | |
+| `VITE_DATAFAST_WEBSITE_ID` | DataFast website ID | No | |
+| **Chat & support** | | | |
+| `VITE_CRISP_WEBSITE_ID` | Crisp chat | No | Requires `features.enableCrispChat: true` in `src/config/website.ts` |
+| **Affiliate** | | | |
+| `VITE_AFFILIATE_AFFONSO_ID` | Affonso (PromosKit) | No | Requires `features.enableAffonsoAffiliate: true`; [affonso.com](https://affonso.com) |
+| `VITE_AFFILIATE_PROMOTEKIT_ID` | PromoteKit | No | Requires `features.enablePromotekitAffiliate: true`; [promotekit.com](https://www.promotekit.com) |
 
-Do **not** put `VITE_*` in Wrangler `vars` or `wrangler secret`—they are build-time only, not Worker runtime env.
+Do **not** put `VITE_*` in Wrangler `vars` or `wrangler secret`—they are build-time only.
 
 ---
 
-## 2. Runtime (serverEnv / `process.env`)
+## 2. Runtime (serverEnv)
 
-Read **at Worker request time**. Used for secrets, API keys, and feature configuration.
+Read at **Worker request time**. Used for secrets, API keys, and server-only config.
 
-### How to set
+**Where to set:** Local → `.env.local` (loaded into `process.env` by the dev process). Cloudflare Workers → **`wrangler secret put <NAME>`** for secrets, or **`vars`** in `wrangler.jsonc` for non-sensitive values. With `nodejs_compat_populate_process_env` enabled, vars and secrets appear on `process.env`. D1/R2 and other **bindings** are accessed via `env.DB`, `env.FILES`, etc., not `process.env`.
 
-| Scenario | Where to set |
-|----------|---------------|
-| Local dev (`pnpm dev`) | **`.env.local`** (loaded into `process.env` by the dev process) |
-| Cloudflare Workers | **`wrangler secret put <NAME>`** for secrets, or **`vars`** in `wrangler.jsonc` for non-sensitive config |
-
-With `nodejs_compat_populate_process_env` enabled, Worker vars and secrets appear on `process.env`. D1, R2, and other **bindings** are still accessed via `env.DB`, `env.FILES`, etc., and do not go on `process.env`.
-
-### Runtime variables (serverEnv)
+### Variables
 
 | Variable | Purpose | Required | Used by |
 |----------|---------|----------|---------|
-| `VITE_BASE_URL` | URL schema validation at runtime | Yes (schema) | Same value as build; can be set in build env |
-| `BETTER_AUTH_SECRET` | Better Auth session signing | Yes | Auth |
-| `GOOGLE_CLIENT_ID` | Google OAuth | No | Auth (when Google login enabled) |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth | No | Auth |
-| `RESEND_API_KEY` | Resend email API | No | Mail, Newsletter (when using Resend) |
-| `BEEHIIV_API_KEY` | Beehiiv API | No | Newsletter (when using Beehiiv) |
-| `BEEHIIV_PUBLICATION_ID` | Beehiiv publication | No | Newsletter |
-| `STORAGE_PUBLIC_URL` | R2 public URL (e.g. custom domain) | No | Storage |
-
-Local: set in **`.env.local`**. Workers: use **`wrangler secret put <NAME>`** for secrets; **vars** in `wrangler.jsonc` for non-sensitive values.
+| **Base** | | | |
+| `VITE_BASE_URL` | URL (schema validation at runtime) | No | Default: `http://localhost:3000`; same value as build |
+| **Auth** | | | |
+| `BETTER_AUTH_SECRET` | Better Auth session signing | Yes (prod) | Auth; default only for CLI; [Mail](./mail.md) for verification/reset |
+| `GOOGLE_CLIENT_ID` | Google OAuth | No | Auth when Google login enabled |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth | No | Auth when Google login enabled |
+| **Mail & newsletter** | | | |
+| `RESEND_API_KEY` | Resend API | No | [Mail](./mail.md), [Newsletter](./newsletter.md) (when using Resend) |
+| `BEEHIIV_API_KEY` | Beehiiv API | No | Newsletter when provider is Beehiiv |
+| `BEEHIIV_PUBLICATION_ID` | Beehiiv publication | No | Newsletter when provider is Beehiiv |
+| **Notification** | | | |
+| `DISCORD_WEBHOOK_URL` | Discord webhook | No | Notification (Discord) |
+| `FEISHU_WEBHOOK_URL` | Feishu webhook | No | Notification (Feishu) |
+| **Payment** | | | |
+| `STRIPE_SECRET_KEY` | Stripe API key | No | [Payment](./payment.md) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing | No | Payment webhook |
 
 ---
 
 ## 3. VITE_BASE_URL and getBaseUrl()
 
-`getBaseUrl()` reads from **`clientEnv.VITE_BASE_URL`** (see `src/lib/urls.ts`), i.e. a **build-time** value.
+`getBaseUrl()` in `src/lib/urls.ts` reads **clientEnv.VITE_BASE_URL** (build-time).
 
-- **Local dev**: Set `VITE_BASE_URL=http://localhost:3000` (or your dev URL) in **`.env.local`**, or omit and use the default.
-- **Production**: Set `VITE_BASE_URL=https://your-domain.com` in the **build environment** (e.g. `.env.production` or CI env vars).
-
-You do **not** need to set `VITE_BASE_URL` in Cloudflare Workers **runtime** vars or secrets—it is inlined at build time.
+- **Local:** Set in `.env.local` or omit to use default `http://localhost:3000`.
+- **Production:** Set in the **build environment** (e.g. `.env.production` or CI). You do **not** set it in Worker runtime vars.
 
 ---
 
@@ -82,13 +88,9 @@ You do **not** need to set `VITE_BASE_URL` in Cloudflare Workers **runtime** var
 
 | File / mechanism | When it applies | Notes |
 |------------------|-----------------|--------|
-| `.env.local` | When present during `pnpm dev` | Build-time and runtime vars locally; git-ignored |
+| `.env.local` | Present during `pnpm dev` | Build + runtime locally; git-ignored |
 | `.env.production` | During `pnpm build` | Production build (e.g. `VITE_BASE_URL`); do not commit secrets |
-| `wrangler.jsonc` `vars` | Worker runtime | Non-sensitive config; ends up on `process.env` if nodejs compat is on |
-| `wrangler secret put <NAME>` | Worker runtime | Secrets; end up on `process.env` |
+| `wrangler.jsonc` `vars` | Worker runtime | Non-sensitive config → `process.env` when nodejs compat is on |
+| `wrangler secret put <NAME>` | Worker runtime | Secrets → `process.env` |
 
----
-
-## 5. Storage (R2)
-
-R2 is configured via **bindings** in `wrangler.jsonc` (e.g. `FILES`), not via environment variables. For a custom public URL (e.g. R2 custom domain), set the **runtime** variable **`STORAGE_PUBLIC_URL`** (in `.env.local` or Worker vars/secret); the app reads it via `serverEnv.STORAGE_PUBLIC_URL`.
+Copy **`.env.local.example`** to **`.env.local`** and fill in values. See module docs ([Auth](./auth.md), [Mail](./mail.md), [Payment](./payment.md), etc.) for which vars each feature needs.

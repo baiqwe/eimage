@@ -1,6 +1,6 @@
 # Newsletter module
 
-Email subscribe / unsubscribe / status, driven by **Resend** or **Beehiiv**. Config via `websiteConfig.newsletter`; env is read from **serverEnv** (`src/env/server.ts`). Add newsletter-related vars there (all optional); Worker/Node populate `process.env` (e.g. `.dev.vars`, Wrangler secrets).
+Email subscribe / unsubscribe / status, driven by **Resend** or **Beehiiv**. Config via `websiteConfig.newsletter`; env from **serverEnv** (`src/env/server.ts`). See [Env](./env.md) for variable list and where to set them.
 
 **Consumers:** API routes (`/api/newsletter/subscribe`, `unsubscribe`, `status`), hooks (`use-newsletter`), settings card (`NewsletterFormCard`), marketing block (`NewsletterCard`). Optional welcome email after subscribe is sent by the **Mail** module when `websiteConfig.mail.fromEmail` is set.
 
@@ -88,7 +88,7 @@ All return 400 when newsletter is disabled or email invalid; throw or return err
 
 - **use-newsletter** — `useNewsletterStatus(email)` (query), `useSubscribeNewsletter()` / `useUnsubscribeNewsletter()` (mutations). Calls API with `getBaseUrl()` for correct origin. Invalidates status query on subscribe/unsubscribe success.
 - **NewsletterFormCard** — Renders only when `newsletter.enable` and user is logged in. Shows Switch bound to subscription status; toggling calls subscribe/unsubscribe and toast.
-- **NewsletterCard** — Renders only when `newsletter.enable`. Email input + submit; calls `POST /api/newsletter/subscribe` (relative URL). Uses `messages.newsletter` (title, description, email, placeholderEmail, subscribe, error, thanks, emailInvalid).
+- **NewsletterCard** — Renders only when `newsletter.enable`. Email input + submit; calls `subscribeNewsletter` server function. Uses `messages.newsletter` (title, description, email, placeholderEmail, subscribe, error, thanks, emailInvalid).
 
 ---
 

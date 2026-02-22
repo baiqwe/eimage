@@ -1,6 +1,6 @@
 # Storage module
 
-The storage module provides file upload (and optional delete) using **Cloudflare R2** via the Worker bucket binding. No S3 SDK or third-party storage library is used—only the [Cloudflare R2 Workers API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/). It is used for avatar uploads (Settings → Profile) when enabled.
+The storage module provides file upload (and optional delete) using **Cloudflare R2** via the Worker bucket binding. No environment variables are required for storage (see [Env](./env.md) for project env overview). No S3 SDK or third-party storage library is used—only the [Cloudflare R2 Workers API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/). It is used for avatar uploads (Settings → Profile) when enabled.
 
 ## Enabling storage (3 steps)
 
@@ -60,7 +60,7 @@ src/storage/
 - **wrangler.jsonc**
   - `r2_buckets`: Bind the R2 bucket with `binding: "FILES"` (and `bucket_name`). `getR2Bucket()` in `provider/r2.ts` reads `env.FILES` and is exported from `@/storage`.
 
-No storage-specific environment variables are required. Files are always served via the same-origin route `/api/storage/file?key=...`.
+Files are always served via the same-origin route `/api/storage/file?key=...`.
 
 ## Core API
 

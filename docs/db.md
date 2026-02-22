@@ -1,6 +1,6 @@
 # DB module
 
-The database uses **Drizzle ORM** with **Cloudflare D1** (SQLite). Table definitions live in two files: **auth.schema.ts** (Better Auth, script-generatable) and **app.schema.ts** (application tables). Both are merged in **schema.ts** into a single schema for Drizzle and migrations.
+The database uses **Drizzle ORM** with **Cloudflare D1** (SQLite). D1 is configured via **bindings** in `wrangler.jsonc`, not environment variables (see [Env](./env.md) for project env overview). Table definitions live in two files: **auth.schema.ts** (Better Auth, script-generatable) and **app.schema.ts** (application tables). Both are merged in **schema.ts** into a single schema for Drizzle and migrations.
 
 ## Directory structure
 

@@ -20,7 +20,8 @@ export const Route = createFileRoute('/blog/$slug')({
     if (!post) return {};
     return seo(`/blog/${params.slug}`, {
       title: `${post.title} | ${websiteConfig.metadata?.name}`,
-      description: post.description ?? websiteConfig.metadata?.description ?? '',
+      description:
+        post.description ?? websiteConfig.metadata?.description ?? '',
       image: post.image ? getImageUrl(post.image) : undefined,
       type: 'article',
     });
