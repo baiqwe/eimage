@@ -1,63 +1,97 @@
 import { HeaderSection } from '@/components/shared/header-section';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
+import { messages } from '@/messages';
 
-const testimonials = [
-  {
-    name: 'Jane Doe',
-    role: 'CTO, Acme Inc',
-    image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
-    quote:
-      'MkFast saved us months of development. We shipped our MVP in 2 weeks.',
-  },
-  {
-    name: 'John Smith',
-    role: 'Founder, Startup',
-    image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
-    quote: 'The best SaaS starter we evaluated. Auth and billing just work.',
-  },
-  {
-    name: 'Alex Chen',
-    role: 'Engineer, Tech Co',
-    image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
-    quote: 'Clean code, great DX. We extended it for our use case easily.',
-  },
-];
+const m = messages.homePage.testimonials;
 
-export default function TestimonialsSection() {
+type Testimonial = {
+  name: string;
+  role: string;
+  image: string;
+  quote: string;
+};
+
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    result.push(array.slice(i, i + chunkSize));
+  }
+  return result;
+}
+
+export default function TestimonialsSection() {  
+  const testimonials: Testimonial[] = [
+    {
+      name: m.items['item-1'].name,
+      role: m.items['item-1'].role,
+      image: m.items['item-1'].image,
+      quote: m.items['item-1'].quote,
+    },
+    {
+      name: m.items['item-2'].name,
+      role: m.items['item-2'].role,
+      image: m.items['item-2'].image,
+      quote: m.items['item-2'].quote,
+    },
+    {
+      name: m.items['item-3'].name,
+      role: m.items['item-3'].role,
+      image: m.items['item-3'].image,
+      quote: m.items['item-3'].quote,
+    },
+  ];
+
+  const testimonialChunks = chunkArray(
+    testimonials,
+    Math.ceil(testimonials.length / 3)
+  );
+
   return (
     <section id="testimonials" className="px-4 py-16">
       <div className="mx-auto max-w-6xl">
         <HeaderSection
-          title="TESTIMONIALS"
+          title={m.title}
           titleAs="h2"
-          subtitle="Loved by teams"
+          subtitle={m.subtitle}
           subtitleAs="p"
         />
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2 md:mt-12 lg:grid-cols-3">
-          {testimonials.map(({ name, role, quote, image }) => (
-            <Card
-              key={name}
-              className="bg-transparent shadow-none hover:bg-accent dark:hover:bg-card"
-            >
-              <CardContent className="grid grid-cols-[auto_1fr] gap-3 pt-4">
-                <Avatar className="size-9 border-2 border-gray-200">
-                  <AvatarImage alt={name} src={image} />
-                  <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-                </Avatar>
+          {testimonialChunks.map((chunk, chunkIndex) => (
+            <div key={chunkIndex} className="space-y-3">
+              {chunk.map(({ name, role, quote, image }, index) => (
+                <Card
+                  key={index}
+                  className="bg-transparent shadow-none hover:bg-accent dark:hover:bg-card"
+                >
+                  <CardContent className="grid grid-cols-[auto_1fr] gap-3 pt-4">
+                    <Avatar className="size-9 border-2 border-gray-200">
+                      <AvatarImage
+                        alt={name}
+                        src={image}
+                        loading="lazy"
+                        width={120}
+                        height={120}
+                      />
+                      <AvatarFallback />
+                    </Avatar>
 
-                <div>
-                  <h3 className="font-medium">{name}</h3>
-                  <span className="text-muted-foreground block text-sm tracking-wide">
-                    {role}
-                  </span>
-                  <blockquote className="mt-3">
-                    <p className="text-gray-700 dark:text-gray-300">{quote}</p>
-                  </blockquote>
-                </div>
-              </CardContent>
-            </Card>
+                    <div>
+                      <h3 className="font-medium">{name}</h3>
+                      <span className="text-muted-foreground block text-sm tracking-wide">
+                        {role}
+                      </span>
+                      <blockquote className="mt-3">
+                        <p className="text-gray-700 dark:text-gray-300">
+                          {quote}
+                        </p>
+                      </blockquote>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           ))}
         </div>
       </div>

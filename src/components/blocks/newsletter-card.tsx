@@ -58,7 +58,11 @@ export function NewsletterCard() {
   return (
     <div className="w-full rounded-lg bg-muted/50 p-16">
       <div className="flex flex-col items-center justify-center gap-8">
-        <HeaderSection title={m.title} description={m.description} />
+        <HeaderSection
+          title={m.title}
+          subtitle={m.subtitle}
+          description={m.description}
+        />
 
         <Form {...form}>
           <form

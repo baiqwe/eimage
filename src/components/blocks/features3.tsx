@@ -7,61 +7,40 @@ import {
   IconSettings,
   IconSparkles,
 } from '@tabler/icons-react';
+import { messages } from '@/messages';
+
+const m = messages.homePage.features3;
 
 const items = [
-  {
-    icon: IconBolt,
-    title: 'Fast',
-    description: 'Optimized for speed and low latency.',
-  },
-  {
-    icon: IconCpu,
-    title: 'Scalable',
-    description: 'Handles growth from zero to millions.',
-  },
-  {
-    icon: IconFingerprint,
-    title: 'Secure',
-    description: 'Auth and encryption built in.',
-  },
-  {
-    icon: IconPencil,
-    title: 'Customizable',
-    description: 'Theme and extend to fit your brand.',
-  },
-  {
-    icon: IconSettings,
-    title: 'Configurable',
-    description: 'Environment-based configuration.',
-  },
-  {
-    icon: IconSparkles,
-    title: 'AI-ready',
-    description: 'Integrate LLMs and agents easily.',
-  },
-];
+  { key: 'item-1' as const, Icon: IconBolt },
+  { key: 'item-2' as const, Icon: IconCpu },
+  { key: 'item-3' as const, Icon: IconFingerprint },
+  { key: 'item-4' as const, Icon: IconPencil },
+  { key: 'item-5' as const, Icon: IconSettings },
+  { key: 'item-6' as const, Icon: IconSparkles },
+] as const;
 
 export default function Features3Section() {
   return (
     <section id="features3" className="px-4 py-16">
       <div className="mx-auto max-w-6xl space-y-8 lg:space-y-20">
         <HeaderSection
-          title="FEATURES"
-          subtitle="Built for developers"
+          title={m.title}
+          subtitle={m.subtitle}
           subtitleAs="h2"
-          description="Developer experience first."
+          description={m.description}
           descriptionAs="p"
         />
 
         <div className="relative mx-auto grid divide-x divide-y border *:p-8 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => (
-            <div key={item.title} className="space-y-2">
+          {items.map(({ key, Icon }) => (
+            <div key={key} className="space-y-2">
               <div className="flex items-center gap-2">
-                <item.icon className="size-4 shrink-0" />
-                <h3 className="text-base font-medium">{item.title}</h3>
+                <Icon className="size-4 shrink-0" />
+                <h3 className="text-base font-medium">{m.items[key].title}</h3>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
-                {item.description}
+                {m.items[key].description}
               </p>
             </div>
           ))}

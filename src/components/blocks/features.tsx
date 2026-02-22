@@ -1,5 +1,3 @@
-'use client';
-
 import { HeaderSection } from '@/components/shared/header-section';
 import {
   Accordion,
@@ -13,98 +11,129 @@ import {
   IconFingerprint,
   IconId,
 } from '@tabler/icons-react';
+import { messages } from '@/messages';
 import { useState } from 'react';
 
-const items = [
-  {
-    id: 'item-1',
-    icon: IconDatabase,
-    title: 'Database',
-    description:
-      'Store and query your data with a powerful database layer. Supports relations, migrations, and type-safe access.',
+const m = messages.homePage.features;
+
+type ImageKey = 'item-1' | 'item-2' | 'item-3' | 'item-4';
+
+const images: Record<
+  ImageKey,
+  { image: string; darkImage: string; alt: string }
+> = {
+  'item-1': {
+    image: 'https://cdn.mksaas.com/blocks/charts-light.png',
+    darkImage: 'https://cdn.mksaas.com/blocks/charts.png',
+    alt: 'Product Feature One',
   },
-  {
-    id: 'item-2',
-    icon: IconFingerprint,
-    title: 'Authentication',
-    description:
-      'Secure auth with email, OAuth, and magic links. Session management and role-based access built in.',
+  'item-2': {
+    image: 'https://cdn.mksaas.com/blocks/music-light.png',
+    darkImage: 'https://cdn.mksaas.com/blocks/music.png',
+    alt: 'Product Feature Two',
   },
-  {
-    id: 'item-3',
-    icon: IconId,
-    title: 'Identity',
-    description:
-      'User profiles, avatars, and account management. Connect multiple providers per user.',
+  'item-3': {
+    image: 'https://cdn.mksaas.com/blocks/mail2-light.png',
+    darkImage: 'https://cdn.mksaas.com/blocks/mail2.png',
+    alt: 'Product Feature Three',
   },
-  {
-    id: 'item-4',
-    icon: IconChartBar,
-    title: 'Analytics',
-    description:
-      'Track usage and conversions. Dashboards and reports out of the box.',
+  'item-4': {
+    image: 'https://cdn.mksaas.com/blocks/payments-light.png',
+    darkImage: 'https://cdn.mksaas.com/blocks/payments.png',
+    alt: 'Product Feature Four',
   },
-];
+};
 
 export default function FeaturesSection() {
-  const [activeItem, setActiveItem] = useState('item-1');
+  const [activeItem, setActiveItem] = useState<ImageKey>('item-1');
 
   return (
     <section id="features" className="px-4 py-16">
-      <div className="mx-auto max-w-6xl space-y-8 lg:space-y-20">
+      <div className="mx-auto max-w-6xl space-y-8 lg:space-y-20 dark:[--color-border:color-mix(in_oklab,var(--color-white)_10%,transparent)]">
         <HeaderSection
-          title="FEATURES"
-          subtitle="Everything you need to ship"
+          title={m.title}
+          subtitle={m.subtitle}
           subtitleAs="h2"
-          description="Built-in features so you can focus on your product."
+          description={m.description}
           descriptionAs="p"
         />
 
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-24">
+        <div className="grid gap-12 sm:px-12 lg:grid-cols-12 lg:gap-24 lg:px-0">
           <div className="flex flex-col gap-8 lg:col-span-5">
-            <div className="text-left">
+            <div className="text-left lg:pr-0">
               <h3 className="py-1 text-3xl font-semibold leading-normal text-foreground lg:text-4xl">
-                Features
+                {m.title}
               </h3>
-              <p className="mt-4 text-muted-foreground">
-                Built-in features so you can focus on your product.
-              </p>
+              <p className="mt-4 text-muted-foreground">{m.description}</p>
             </div>
             <Accordion
               value={[activeItem]}
               onValueChange={(v) =>
-                setActiveItem((v?.[0] as string) ?? 'item-1')
+                setActiveItem((v?.[0] as ImageKey) ?? 'item-1')
               }
               className="w-full"
             >
-              {items.map((item) => (
-                <AccordionItem key={item.id} value={item.id}>
-                  <AccordionTrigger>
-                    <div className="flex items-center gap-2 text-base">
-                      <item.icon className="size-4" />
-                      {item.title}
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground">
-                    {item.description}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+              <AccordionItem value="item-1">
+                <AccordionTrigger>
+                  <div className="flex items-center gap-2 text-base">
+                    <IconDatabase className="size-4" />
+                    {m.items['item-1'].title}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {m.items['item-1'].description}
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-2">
+                <AccordionTrigger>
+                  <div className="flex items-center gap-2 text-base">
+                    <IconFingerprint className="size-4" />
+                    {m.items['item-2'].title}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {m.items['item-2'].description}
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-3">
+                <AccordionTrigger>
+                  <div className="flex items-center gap-2 text-base">
+                    <IconId className="size-4" />
+                    {m.items['item-3'].title}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {m.items['item-3'].description}
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-4">
+                <AccordionTrigger>
+                  <div className="flex items-center gap-2 text-base">
+                    <IconChartBar className="size-4" />
+                    {m.items['item-4'].title}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground">
+                  {m.items['item-4'].description}
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
           </div>
 
-          <div className="relative flex w-full overflow-hidden rounded-2xl border bg-background p-2 lg:col-span-7">
-            <div className="aspect-[76/59] relative w-full rounded-2xl bg-muted">
-              <img
-                src="https://cdn.mksaas.com/blocks/charts.png"
-                alt="Feature"
-                className="size-full object-cover object-left-top rounded-2xl dark:block"
-              />
-              <img
-                src="https://cdn.mksaas.com/blocks/charts-light.png"
-                alt="Feature"
-                className="size-full object-cover object-left-top rounded-2xl dark:hidden"
-              />
+          <div className="relative flex w-full overflow-hidden rounded-2xl border bg-background p-2 lg:col-span-7 lg:h-auto">
+            <div className="relative w-full rounded-2xl aspect-76/59 bg-background">
+              <div key={activeItem} className="size-full overflow-hidden rounded-2xl border bg-zinc-900 shadow-md">
+                <img
+                  src={images[activeItem].image}
+                  alt={images[activeItem].alt}
+                  className="size-full object-cover object-top-left rounded-2xl dark:hidden"
+                />
+                <img
+                  src={images[activeItem].darkImage}
+                  alt={images[activeItem].alt}
+                  className="hidden size-full object-cover object-top-left rounded-2xl dark:block"
+                />
+              </div>
             </div>
           </div>
         </div>

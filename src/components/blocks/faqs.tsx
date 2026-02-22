@@ -5,53 +5,31 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { messages } from '@/messages';
+
+const m = messages.homePage.faqs;
 
 const faqItems = [
-  {
-    id: '1',
-    question: 'Can I change my plan later?',
-    answer:
-      'Yes, you can upgrade or downgrade your plan at any time. Changes take effect at the start of the next billing cycle.',
-  },
-  {
-    id: '2',
-    question: 'What payment methods do you accept?',
-    answer:
-      'We accept all major credit cards, PayPal, and wire transfer for annual plans.',
-  },
-  {
-    id: '3',
-    question: 'Is there a free trial?',
-    answer:
-      'Yes, we offer a 14-day free trial on all paid plans. No credit card required.',
-  },
-  {
-    id: '4',
-    question: 'What is your refund policy?',
-    answer:
-      'We offer a 30-day money-back guarantee. Contact support for a full refund.',
-  },
-  {
-    id: '5',
-    question: 'How do I get support?',
-    answer:
-      'Email support is included for all plans. Pro and above get priority support.',
-  },
-];
+  { id: 'item-1', question: m.items['item-1'].question, answer: m.items['item-1'].answer },
+  { id: 'item-2', question: m.items['item-2'].question, answer: m.items['item-2'].answer },
+  { id: 'item-3', question: m.items['item-3'].question, answer: m.items['item-3'].answer },
+  { id: 'item-4', question: m.items['item-4'].question, answer: m.items['item-4'].answer },
+  { id: 'item-5', question: m.items['item-5'].question, answer: m.items['item-5'].answer },
+] as const;
 
 export default function FaqSection() {
   return (
     <section id="faqs" className="px-4 py-16">
       <div className="mx-auto max-w-4xl">
         <HeaderSection
-          title="FAQs"
+          title={m.title}
           titleAs="h2"
-          subtitle="Frequently asked questions"
+          subtitle={m.subtitle}
           subtitleAs="p"
         />
 
         <div className="mx-auto mt-12 max-w-4xl">
-          <Accordion className="w-full rounded-2xl border px-8 py-3 shadow-sm">
+          <Accordion className="ring-muted w-full rounded-2xl border px-8 py-3 shadow-sm ring-4 dark:ring-0">
             {faqItems.map((item) => (
               <AccordionItem
                 key={item.id}

@@ -18,6 +18,7 @@ import { getCanonicalUrl } from '@/lib/urls';
 export const Route = createFileRoute('/')({
   head: () => {
     const name = websiteConfig.metadata?.name ?? '';
+    const title = websiteConfig.metadata?.title ?? '';
     const description = websiteConfig.metadata?.description ?? '';
     const url = getCanonicalUrl('/');
     const webSiteJsonLd = {
@@ -29,7 +30,7 @@ export const Route = createFileRoute('/')({
     };
     return {
       meta: [
-        { title: websiteConfig.metadata?.title },
+        { title },
         { name: 'description', content: description },
       ],
       links: [{ rel: 'canonical', href: url }],

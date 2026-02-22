@@ -5,6 +5,9 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Link } from '@tanstack/react-router';
 import { IconCheck } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
+import { messages } from '@/messages';
+
+const m = messages.homePage.pricing;
 
 export default function PricingSection() {
   const plans = getPricePlans();
@@ -14,10 +17,10 @@ export default function PricingSection() {
     <section id="pricing" className="px-4 py-16">
       <div className="mx-auto max-w-6xl space-y-16 px-6">
         <HeaderSection
-          subtitle="Simple pricing"
+          subtitle={m.subtitle}
           subtitleAs="h2"
           subtitleClassName="text-4xl font-bold"
-          description="Choose the plan that fits your needs."
+          description={m.description}
           descriptionAs="p"
         />
 

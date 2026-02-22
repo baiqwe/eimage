@@ -1,6 +1,9 @@
 import { buttonVariants } from '@/components/ui/button';
-import { Link } from '@tanstack/react-router';
+import { messages } from '@/messages';
 import { cn } from '@/lib/utils';
+import { Link } from '@tanstack/react-router';
+
+const m = messages.homePage.calltoaction;
 
 export default function CallToActionSection() {
   return (
@@ -8,25 +11,23 @@ export default function CallToActionSection() {
       <div className="mx-auto max-w-5xl px-6">
         <div className="text-center">
           <h2 className="text-balance text-4xl font-semibold lg:text-5xl">
-            Ready to get started?
+            {m.title}
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            Join thousands of teams building with MkFast today.
-          </p>
+          <p className="mt-4 text-muted-foreground">{m.description}</p>
 
           <div className="mt-12 flex flex-wrap justify-center gap-4">
             <Link
               to="/auth/register"
               className={cn(buttonVariants({ size: 'lg' }))}
             >
-              Get started free
+              <span>{m.primaryButton}</span>
             </Link>
             <Link
               to="/"
               hash="pricing"
               className={cn(buttonVariants({ size: 'lg', variant: 'outline' }))}
             >
-              View pricing
+              <span>{m.secondaryButton}</span>
             </Link>
           </div>
         </div>

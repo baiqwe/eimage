@@ -1,23 +1,34 @@
-export default function LogoCloudSection() {
-  const logos = [
-    { src: 'https://cdn.mksaas.com/svg/nvidia.svg', alt: 'Nvidia', h: 'h-5' },
-    { src: 'https://cdn.mksaas.com/svg/column.svg', alt: 'Column', h: 'h-4' },
-    { src: 'https://cdn.mksaas.com/svg/github.svg', alt: 'GitHub', h: 'h-4' },
-    { src: 'https://cdn.mksaas.com/svg/nike.svg', alt: 'Nike', h: 'h-5' },
-    { src: 'https://cdn.mksaas.com/svg/laravel.svg', alt: 'Laravel', h: 'h-4' },
-    { src: 'https://cdn.mksaas.com/svg/openai.svg', alt: 'OpenAI', h: 'h-6' },
-    {
-      src: 'https://cdn.mksaas.com/svg/tailwindcss.svg',
-      alt: 'Tailwind',
-      h: 'h-4',
-    },
-    { src: 'https://cdn.mksaas.com/svg/vercel.svg', alt: 'Vercel', h: 'h-5' },
-  ];
+import { messages } from '@/messages';
 
+const m = messages.homePage.logocloud;
+
+const logos = [
+  { src: 'https://cdn.mksaas.com/svg/nvidia.svg', alt: 'Nvidia Logo', h: 'h-5' },
+  { src: 'https://cdn.mksaas.com/svg/column.svg', alt: 'Column Logo', h: 'h-4' },
+  { src: 'https://cdn.mksaas.com/svg/github.svg', alt: 'GitHub Logo', h: 'h-4' },
+  { src: 'https://cdn.mksaas.com/svg/nike.svg', alt: 'Nike Logo', h: 'h-5' },
+  { src: 'https://cdn.mksaas.com/svg/laravel.svg', alt: 'Laravel Logo', h: 'h-4' },
+  { src: 'https://cdn.mksaas.com/svg/lilly.svg', alt: 'Lilly Logo', h: 'h-7' },
+  {
+    src: 'https://cdn.mksaas.com/svg/lemonsqueezy.svg',
+    alt: 'Lemon Squeezy Logo',
+    h: 'h-5',
+  },
+  { src: 'https://cdn.mksaas.com/svg/openai.svg', alt: 'OpenAI Logo', h: 'h-6' },
+  {
+    src: 'https://cdn.mksaas.com/svg/tailwindcss.svg',
+    alt: 'Tailwind CSS Logo',
+    h: 'h-4',
+  },
+  { src: 'https://cdn.mksaas.com/svg/vercel.svg', alt: 'Vercel Logo', h: 'h-5' },
+  { src: 'https://cdn.mksaas.com/svg/zapier.svg', alt: 'Zapier Logo', h: 'h-5' },
+];
+
+export default function LogoCloudSection() {
   return (
     <section id="logo-cloud" className="bg-muted/50 px-4 py-16">
       <div className="mx-auto max-w-5xl px-6">
-        <h2 className="text-center text-xl font-medium">Trusted by teams at</h2>
+        <h2 className="text-center text-xl font-medium">{m.title}</h2>
         <div className="mx-auto mt-20 flex max-w-4xl flex-wrap items-center justify-center gap-x-12 gap-y-8 sm:gap-x-16 sm:gap-y-12">
           {logos.map((logo) => (
             <img
