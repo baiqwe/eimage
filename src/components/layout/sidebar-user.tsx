@@ -85,7 +85,7 @@ export function SidebarUser({ user }: SidebarUserProps) {
                 />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                 </div>
                 <IconSelector className="ml-auto size-4" />
               </SidebarMenuButton>
@@ -106,8 +106,8 @@ export function SidebarUser({ user }: SidebarUserProps) {
                     className="size-8 border"
                   />
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
+                    <span className="truncate font-semibold text-foreground">{user.name}</span>
+                    <span className="truncate text-xs text-muted-foreground">{user.email}</span>
                   </div>
                 </div>
               </DropdownMenuLabel>

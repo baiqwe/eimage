@@ -3,7 +3,7 @@ import { userFiles } from '@/db/app.schema';
 import { getBaseUrl } from '@/lib/urls';
 import { authApiMiddleware } from '@/middleware/auth-middleware';
 import { deleteFile, uploadFile } from '@/storage';
-import { StorageError, UploadError } from '@/storage/types';
+import { DEFAULT_AVATARS_FOLDER, StorageError, UploadError } from '@/storage/types';
 import { createServerFn } from '@tanstack/react-start';
 import { and, count, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
@@ -55,7 +55,7 @@ export const deleteUserFile = createServerFn({ method: 'POST' })
       .limit(1);
 
     if (!row) {
-      throw new Error('Not found');
+      throw new Error('File not found');
     }
 
     await deleteFile(row.r2Key);
@@ -67,7 +67,7 @@ const uploadSchema = z
   .transform((fd) => {
     const file = fd.get('file');
     if (!file || !(file instanceof File)) {
-      throw new Error('No file provided');
+      throw new Error('File not provided');
     }
     const folderRaw = fd.get('folder');
     const folder = typeof folderRaw === 'string' ? folderRaw : undefined;
@@ -101,7 +101,8 @@ export const uploadUserFile = createServerFn({ method: 'POST' })
         requestOrigin,
       });
 
-      if (userId && result.metadata) {
+      // Skip userFiles record for avatars
+      if (userId && result.metadata && data.folder !== DEFAULT_AVATARS_FOLDER) {
         const db = getDb();
         const now = result.metadata.uploadedAt;
         await db.insert(userFiles).values({

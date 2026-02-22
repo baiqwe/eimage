@@ -15,6 +15,10 @@ export const DEFAULT_ALLOWED_TYPES: string[] = [];
  * Default parent folder for per-user files (e.g. userfiles => userfiles/{userId}/)
  */
 export const DEFAULT_USER_FILES_FOLDER = 'userfiles';
+/**
+ * Default parent folder for avatars (e.g. avatars => avatars/{userId}/)
+ */
+export const DEFAULT_AVATARS_FOLDER = 'avatars';
 
 /**
  * Storage config
@@ -22,7 +26,6 @@ export const DEFAULT_USER_FILES_FOLDER = 'userfiles';
 export interface StorageConfig {
   maxFileSize: number; // Max file size in bytes, default 10MB
   allowedTypes: string[]; // Allowed file extensions or MIME types. e.g. ['.jpg', '.png', 'image/webp']. Empty = all allowed.
-  userFilesFolder?: string; // Parent folder for per-user files (default userfiles)
 }
 
 /**

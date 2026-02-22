@@ -9,8 +9,7 @@ import type {
 } from './types';
 import {
   DEFAULT_ALLOWED_TYPES,
-  DEFAULT_MAX_FILE_SIZE,
-  DEFAULT_USER_FILES_FOLDER,
+  DEFAULT_MAX_FILE_SIZE
 } from './types';
 
 function buildStorageConfig(): StorageConfig {
@@ -18,7 +17,6 @@ function buildStorageConfig(): StorageConfig {
   return {
     maxFileSize: config?.maxFileSize ?? DEFAULT_MAX_FILE_SIZE,
     allowedTypes: config?.allowedTypes ?? DEFAULT_ALLOWED_TYPES,
-    userFilesFolder: config?.userFilesFolder ?? DEFAULT_USER_FILES_FOLDER,
   };
 }
 

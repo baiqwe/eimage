@@ -100,7 +100,7 @@ export class R2Provider {
 
   constructor(config: StorageConfig) {
     this.bucket = getFilesBucket();
-    this.userFilesFolder = config.userFilesFolder ?? DEFAULT_USER_FILES_FOLDER;
+    this.userFilesFolder = DEFAULT_USER_FILES_FOLDER;
     this.validator = createFileValidator(config);
   }
 

@@ -9,6 +9,7 @@ import {
   listUserFiles,
   uploadUserFile,
 } from '@/api/user-files';
+import { DEFAULT_AVATARS_FOLDER } from '@/storage/types';
 
 export const userFilesKeys = {
   all: ['user-files'] as const,
@@ -76,8 +77,8 @@ export function useUploadUserAvatar() {
     mutationFn: async (file: File) => {
       const form = new FormData();
       form.append('file', file);
-      form.append('folder', 'avatars');
       form.append('isPublic', 'true');
+      form.append('folder', DEFAULT_AVATARS_FOLDER);
       return uploadUserFile({ data: form });
     },
   });
