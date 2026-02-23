@@ -8,9 +8,6 @@ import { Link, useLocation } from '@tanstack/react-router';
 import { websiteConfig } from '@/config/website';
 import { messages } from '@/messages';
 
-const footerLinkClass =
-  'text-sm text-muted-foreground hover:text-primary data-[active=true]:font-medium data-[active=true]:text-foreground';
-
 export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
   const pathname = useLocation().pathname;
   const footerLinks = getFooterLinks();
@@ -67,7 +64,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
                             href={item.href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={footerLinkClass}
+                            className="text-sm text-muted-foreground hover:text-primary data-[active=true]:font-medium data-[active=true]:text-foreground"
                           >
                             {item.title}
                           </a>
@@ -81,7 +78,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
                                   ? 'true'
                                   : undefined
                             }
-                            className={footerLinkClass}
+                            className="text-sm text-muted-foreground hover:text-primary data-[active=true]:font-medium data-[active=true]:text-foreground"
                           >
                             {item.title}
                           </Link>

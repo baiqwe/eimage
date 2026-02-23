@@ -81,8 +81,7 @@ export function getMailtoUrl(
 }
 
 /**
- * Whether the current pathname exactly matches the given href (no prefix match).
- * Ignores hash in href; use only for path-only comparison.
+ * Whether the current pathname exactly matches the given link
  */
 export function isLinkActive(
   href: string | undefined,
