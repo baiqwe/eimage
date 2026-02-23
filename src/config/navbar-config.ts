@@ -20,7 +20,6 @@ const m = messages.nav;
  */
 export function getNavbarLinks(): MenuItemConfig[] {
   const links: MenuItemConfig[] = [
-    { title: m.features, href: Routes.Features, external: false },
     { title: m.pricing, href: Routes.Pricing, external: false },
   ];
   if (websiteConfig.blog?.enable) {

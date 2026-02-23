@@ -2,7 +2,7 @@ import { HeaderSection } from '@/components/shared/header-section';
 import { PricingTable } from '@/components/pricing/pricing-table';
 
 const m = {
-  title: 'Pricing',
+  subtitle: 'Pricing',
   description: 'Choose the plan that fits your needs',
 };
 
@@ -11,9 +11,9 @@ export default function PricingSection() {
     <section id="pricing" className="px-4 py-16">
       <div className="mx-auto max-w-6xl space-y-16 px-6">
         <HeaderSection
-          title={m.title}
-          titleAs="h2"
-          titleClassName="text-4xl font-bold"
+          subtitle={m.subtitle}
+          subtitleAs="h2"
+          subtitleClassName="text-4xl font-bold"
           description={m.description}
           descriptionAs="p"
         />
