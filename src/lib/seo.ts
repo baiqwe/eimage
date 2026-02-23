@@ -1,4 +1,5 @@
-import { getCanonicalUrl, getOgImage } from '@/lib/urls';
+import { websiteConfig } from '@/config/website';
+import { getCanonicalUrl, getOgImage, twitterHandleFromUrl } from '@/lib/urls';
 
 /**
  * Build metadata + canonical link for a page
@@ -39,6 +40,9 @@ export const metadata = ({
   keywords?: string;
   type?: 'website' | 'article';
 }) => {
+  const twitterSite = websiteConfig.social?.twitter
+    ? twitterHandleFromUrl(websiteConfig.social.twitter)
+    : null;
   const metadata: Array<{
     title?: string;
     name?: string;
@@ -56,8 +60,9 @@ export const metadata = ({
       : []),
     ...(url ? [{ property: 'og:url', content: url }] : []),
     ...(image ? [{ property: 'og:image', content: image }] : []),
-    // Twitter metadata
+    // Twitter metadata (twitter:site = site's @username, not domain)
     { name: 'twitter:title', content: title },
+    ...(twitterSite ? [{ name: 'twitter:site', content: twitterSite }] : []),
     ...(description
       ? [{ name: 'twitter:description', content: description }]
       : []),

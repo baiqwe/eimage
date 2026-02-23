@@ -81,6 +81,20 @@ export function getMailtoUrl(
 }
 
 /**
+ * Extract @handle from twitter/x profile URL, e.g. https://twitter.com/Me -> @Me
+ */
+export function twitterHandleFromUrl(href: string): string | null {
+  try {
+    const u = new URL(href);
+    if (u.hostname !== 'twitter.com' && u.hostname !== 'x.com') return null;
+    const segment = u.pathname.replace(/^\/+|\/+$/g, '').split('/')[0];
+    return segment ? `@${segment}` : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Whether the current pathname exactly matches the given link
  */
 export function isLinkActive(
