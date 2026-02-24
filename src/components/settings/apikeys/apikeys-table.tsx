@@ -161,7 +161,9 @@ export function ApiKeysTable({
           return (
             <DropdownMenu>
               <DropdownMenuTrigger
-                className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }))}
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'icon' })
+                )}
               >
                 <IconDots className="size-4" />
                 <span className="sr-only">{t.columns.actions}</span>
@@ -241,7 +243,9 @@ export function ApiKeysTable({
       <div className="flex items-center justify-between">
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger
-            className={cn(buttonVariants({ variant: 'default', size: 'default' }))}
+            className={cn(
+              buttonVariants({ variant: 'default', size: 'default' })
+            )}
           >
             <IconPlus className="size-4" />
             {t.createButton}

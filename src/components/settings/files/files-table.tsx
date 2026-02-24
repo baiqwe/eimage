@@ -205,7 +205,9 @@ export function FilesTable({
           return (
             <DropdownMenu>
               <DropdownMenuTrigger
-                className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }))}
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'icon' })
+                )}
               >
                 <IconDots className="size-4" />
                 <span className="sr-only">{t.columns.actions}</span>
@@ -279,7 +281,9 @@ export function FilesTable({
       <div className="flex items-center justify-between">
         <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
           <DialogTrigger
-            className={cn(buttonVariants({ variant: 'default', size: 'default' }))}
+            className={cn(
+              buttonVariants({ variant: 'default', size: 'default' })
+            )}
           >
             <IconPlus className="size-4" />
             {t.uploadButton}
