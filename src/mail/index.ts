@@ -39,6 +39,7 @@ export function getMailProvider(): MailProvider {
 export async function sendEmail(
   params: SendTemplateParams | SendRawEmailParams
 ): Promise<boolean> {
+  if (!websiteConfig.mail?.enable) return false;
   const provider = getMailProvider();
   const result =
     'template' in params

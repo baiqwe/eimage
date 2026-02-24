@@ -14,7 +14,7 @@ const emailSchema = z
 
 function ensureNewsletterEnabled(): void {
   if (!websiteConfig.newsletter?.enable) {
-    throw new Error('Newsletter is not enabled');
+    throw new Error('Newsletter is disabled');
   }
 }
 

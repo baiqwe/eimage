@@ -142,11 +142,11 @@ export const auth = betterAuth({
  * Runs after a new user is created. Auto-subscribes to newsletter when enabled.
  */
 async function onCreateUser(user: User) {
-  const newsletter = websiteConfig.newsletter;
+  const newsletterConfig = websiteConfig.newsletter;
   if (
     !user.email ||
-    !newsletter?.enable ||
-    !newsletter.autoSubscribeAfterSignUp
+    !newsletterConfig?.enable ||
+    !newsletterConfig.autoSubscribeAfterSignUp
   ) {
     return;
   }
@@ -155,12 +155,12 @@ async function onCreateUser(user: User) {
     try {
       const subscribed = await subscribe(user.email!);
       if (!subscribed) {
-        console.error(`Failed to subscribe user ${user.email} to newsletter`);
+        console.error(`onCreateUser, user ${user.email} failed to subscribe`);
       } else {
         console.log(`User ${user.email} subscribed to newsletter`);
       }
     } catch (error) {
-      console.error('Newsletter subscription error:', error);
+      console.error('onCreateUser, newsletter subscription error:', error);
     }
   }, 2000);
 }

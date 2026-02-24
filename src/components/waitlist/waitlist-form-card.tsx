@@ -33,6 +33,8 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export function WaitlistFormCard() {
+  if (!websiteConfig.newsletter?.enable) return null;
+
   const [error, setError] = useState<string | undefined>();
   const subscribeMutation = useSubscribeNewsletter();
 
@@ -52,8 +54,6 @@ export function WaitlistFormCard() {
       setError(err instanceof Error ? err.message : m.error);
     }
   }
-
-  if (!websiteConfig.newsletter?.enable) return null;
 
   return (
     <Card className="mx-auto max-w-lg overflow-hidden pt-6 pb-0">

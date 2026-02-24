@@ -29,7 +29,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function NewsletterCard() {
-  const enabled = websiteConfig.newsletter?.enable ?? false;
+  if (!websiteConfig.newsletter?.enable) return null;
+
   const [error, setError] = useState<string | undefined>();
   const subscribeMutation = useSubscribeNewsletter();
 
@@ -53,8 +54,6 @@ export default function NewsletterCard() {
       toast.error(errMsg);
     }
   }
-
-  if (!enabled) return null;
 
   return (
     <div className="w-full rounded-lg bg-muted/50 p-16">
