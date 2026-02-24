@@ -15,7 +15,6 @@ export interface WebsiteConfig {
   notification?: NotificationConfig;
   storage?: StorageConfig;
   payment?: PaymentConfig;
-  price?: PriceConfig;
 }
 
 /** UI configuration */
@@ -28,10 +27,10 @@ export interface UiConfig {
 
 /** Website metadata */
 export interface MetadataConfig {
-  name?: string;
-  title?: string;
-  description?: string;
-  images?: ImagesConfig;
+  name?: string;         // The name of the website, e.g. 'TanStack Starter'
+  title?: string;        // The title of the website, e.g. 'TanStack Starter - The Ultimate SaaS Template'
+  description?: string;  // The description of the website, e.g. 'TanStack Starter is the ultimate SaaS template for building your next SaaS application.'
+  images?: ImagesConfig; // The images of the website
 }
 
 /** Website metadata */
@@ -58,7 +57,7 @@ export interface SocialConfig {
 
 /** Routes configuration */
 export interface RoutesConfig {
-  defaultLoginRedirect?: string;    // The default login redirect route
+  defaultLoginRedirect?: string;   // The default login redirect route
 }
 
 /** Auth configuration */
@@ -113,7 +112,8 @@ export interface StorageConfig {
 
 /** Payment configuration */
 export interface PaymentConfig {
-  provider?: 'stripe';  // The payment provider, only stripe is supported for now
+  provider?: 'stripe';               // The payment provider, only stripe is supported for now
+  price?: PriceConfig;               // The price plans configuration
 }
 
 /** Price configuration */

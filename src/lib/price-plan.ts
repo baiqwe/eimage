@@ -5,7 +5,10 @@ import type { Price, PricePlan } from '@/payment/types';
  * Get price plans from website config
  */
 export const getPricePlans = (): Record<string, PricePlan> => {
-  return (websiteConfig.price?.plans ?? {}) as Record<string, PricePlan>;
+  return (websiteConfig.payment?.price?.plans ?? {}) as Record<
+    string,
+    PricePlan
+  >;
 };
 
 /**

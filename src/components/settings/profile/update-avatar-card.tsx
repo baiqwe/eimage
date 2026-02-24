@@ -29,9 +29,7 @@ const m = messages.settings.profile.avatar;
  * Update user avatar card
  */
 export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
-  if (!websiteConfig.storage?.enable) {
-    return null;
-  }
+  if (!websiteConfig.storage?.enable) return null;
 
   const [error, setError] = useState<string | undefined>('');
   const [avatarUrl, setAvatarUrl] = useState('');
