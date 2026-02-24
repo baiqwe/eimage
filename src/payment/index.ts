@@ -18,13 +18,22 @@ const providerRegistry: Record<PaymentProviderName, ProviderFactory> = {
 };
 
 function createProvider(): PaymentProvider {
-  const name = websiteConfig.payment?.provider;
-  if (!name) throw new Error('payment.provider is required in websiteConfig.');
+  const paymentConfig = websiteConfig.payment;
+  if (!paymentConfig?.enable) {
+    throw new Error('Payment is disabled');
+  }
+  const name = paymentConfig.provider;
+  if (!name) throw new Error('Payment provider is required.');
   const factory = providerRegistry[name as PaymentProviderName];
   if (!factory) {
     throw new Error(`Unsupported payment provider: ${name}.`);
   }
   return factory();
+}
+
+/** Whether payment (checkout/billing) is enabled */
+export function isPaymentEnabled(): boolean {
+  return !!websiteConfig.payment?.enable;
 }
 
 /**

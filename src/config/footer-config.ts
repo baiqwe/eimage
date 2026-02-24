@@ -9,11 +9,24 @@ const m = messages.nav;
  * Footer links, grouped by section
  */
 export function getFooterLinks(): MenuItemConfig[] {
-  const productItems: MenuItemConfig[] = [
-    { title: m.features, href: Routes.Features, external: false },
-    { title: m.pricing, href: Routes.Pricing, external: false },
-    { title: m.faq, href: Routes.Faqs, external: false },
-  ];
+  const productItems: MenuItemConfig[] = [];
+  productItems.push({
+    title: m.features,
+    href: Routes.Features,
+    external: false,
+  });
+  if (websiteConfig.payment?.enable) {
+    productItems.push({
+      title: m.pricing,
+      href: Routes.Pricing,
+      external: false,
+    });
+  }
+  productItems.push({
+    title: m.faq,
+    href: Routes.Faqs,
+    external: false,
+  });
 
   const resourcesItems: MenuItemConfig[] = [];
   if (websiteConfig.blog?.enable) {

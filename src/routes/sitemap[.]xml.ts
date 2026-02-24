@@ -19,8 +19,6 @@ export const Route = createFileRoute('/sitemap.xml')({
         }[] = [
           { path: '/', changefreq: 'daily', priority: '1.0' },
           { path: '/about', changefreq: 'monthly' },
-          { path: '/pricing', changefreq: 'weekly' },
-          { path: '/blog', changefreq: 'weekly' },
           { path: '/changelog', changefreq: 'weekly' },
           { path: '/roadmap', changefreq: 'monthly' },
           { path: '/contact', changefreq: 'monthly' },
@@ -29,6 +27,13 @@ export const Route = createFileRoute('/sitemap.xml')({
           { path: '/privacy', changefreq: 'monthly' },
           { path: '/cookie', changefreq: 'monthly' },
         ];
+
+        if (websiteConfig.blog?.enable) {
+          staticUrls.push({ path: '/blog', changefreq: 'weekly' });
+        }
+        if (websiteConfig.payment?.enable) {
+          staticUrls.push({ path: '/pricing', changefreq: 'weekly' });
+        }
 
         const urlEntry = (
           path: string,

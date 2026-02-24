@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { handleWebhookEvent } from '@/payment';
+import { handleWebhookEvent, isPaymentEnabled } from '@/payment';
 
 /**
  * Stripe webhook endpoint
@@ -11,6 +11,9 @@ export const Route = createFileRoute('/api/webhooks/stripe')({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        if (!isPaymentEnabled()) {
+          return Response.json({ received: true }, { status: 200 });
+        }
         const payload = await request.text();
         const signature = request.headers.get('stripe-signature') ?? '';
         if (!payload || !signature) {

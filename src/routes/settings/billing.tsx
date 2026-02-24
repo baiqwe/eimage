@@ -1,11 +1,18 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import { BillingCard } from '@/components/settings/billing-card';
+import { websiteConfig } from '@/config/website';
 import { messages } from '@/messages';
+import { Routes } from '@/lib/routes';
 
 const m = messages.settings.billing;
 
 export const Route = createFileRoute('/settings/billing')({
+  beforeLoad: () => {
+    if (websiteConfig.payment?.enable === false) {
+      throw redirect({ to: Routes.SettingsProfile });
+    }
+  },
   component: BillingPage,
 });
 

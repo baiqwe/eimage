@@ -13,6 +13,7 @@ import {
 import { Routes } from '@/lib/routes';
 import type { MenuItemConfig } from '../types';
 import { messages } from '@/messages';
+import { websiteConfig } from './website';
 
 const m = messages.dashboard.sidebar;
 const am = messages.admin;
@@ -51,12 +52,16 @@ export function getSidebarLinks(): MenuItemConfig[] {
           href: Routes.SettingsProfile,
           external: false,
         },
-        {
-          title: m.billing,
-          icon: IconCreditCard,
-          href: Routes.SettingsBilling,
-          external: false,
-        },
+        ...(websiteConfig.payment?.enable
+          ? [
+              {
+                title: m.billing,
+                icon: IconCreditCard,
+                href: Routes.SettingsBilling,
+                external: false,
+              },
+            ]
+          : []),
         {
           title: m.security,
           icon: IconLock,

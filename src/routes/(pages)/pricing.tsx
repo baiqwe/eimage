@@ -1,16 +1,22 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { authClient } from '@/auth/client';
+import FaqSection from '@/components/blocks/faqs';
 import Container from '@/components/layout/container';
 import { PricingTable } from '@/components/pricing/pricing-table';
 import { websiteConfig } from '@/config/website';
 import { useCurrentPlan } from '@/hooks/use-payment';
-import { authClient } from '@/auth/client';
+import { Routes } from '@/lib/routes';
 import { seo } from '@/lib/seo';
 import { messages } from '@/messages';
-import FaqSection from '@/components/blocks/faqs';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 const m = messages.pricing;
 
 export const Route = createFileRoute('/(pages)/pricing')({
+  beforeLoad: () => {
+    if (websiteConfig.payment?.enable === false) {
+      throw redirect({ to: Routes.Root });
+    }
+  },
   head: () =>
     seo('/pricing', {
       title: `${m.title} | ${websiteConfig.metadata?.name}`,

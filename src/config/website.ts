@@ -73,6 +73,7 @@ export const websiteConfig: WebsiteConfig = {
     userFilesFolder: DEFAULT_USER_FILES_FOLDER,
   },
   payment: {
+    enable: true,
     provider: 'stripe',
     price: {
       plans: {
