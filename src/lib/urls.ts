@@ -95,13 +95,16 @@ export function twitterHandleFromUrl(href: string): string | null {
 }
 
 /**
- * Whether the current pathname exactly matches the given link
+ * Whether the current pathname exactly matches the given link.
+ * Anchor links (e.g. /#features) are never considered active when only pathname
+ * is compared, so the homepage root does not highlight "Features" / "Faqs" etc.
  */
 export function isLinkActive(
   href: string | undefined,
   pathname: string
 ): boolean {
   if (!href) return false;
+  if (href.includes('#')) return false;
   const path = href.split('#')[0] ?? '/';
   const normalizedHref = path === '/' ? '/' : path.replace(/\/$/, '') || '/';
   const normalizedPath =
