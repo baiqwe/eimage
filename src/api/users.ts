@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import type { User } from '@/db/types';
-import { adminApiMiddleware } from '@/middleware/admin-middleware';
+import { adminApiMiddleware } from '@/middlewares/admin-middleware';
 import { getDb } from '@/db';
 import { user } from '@/db/auth.schema';
 import {

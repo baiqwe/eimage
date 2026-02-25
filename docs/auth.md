@@ -16,7 +16,7 @@ src/auth/
 **Related (outside `src/auth/`):**
 
 - **API route**: `src/routes/api/auth/$.ts` — forwards GET/POST to `auth.handler(request)`.
-- **Middleware**: `src/middleware/auth-middleware.ts`, `src/middleware/admin-middleware.ts`. Both use `auth.api.getSession({ headers })` to obtain the session; there is no separate `lib/session.ts`.
+- **Middleware**: `src/middlewares/auth-middleware.ts`, `src/middlewares/admin-middleware.ts`. Both use `auth.api.getSession({ headers })` to obtain the session; there is no separate `lib/session.ts`.
 - **Routes**: `src/routes/auth.tsx` (layout), `src/routes/auth/login.tsx`, `src/routes/auth/register.tsx`, `auth/forgot-password`, `auth/reset-password`, `auth/error`.
 - **Components**: `src/components/auth/` (login-form, register-form, forgot-password-form, auth-card, error-card, login-wrapper, social-login-button, etc.); `UserButton`, `SidebarUser` use `SessionUser` from `@/auth/types`.
 - **Hooks**: `src/hooks/use-auth.ts` — `useUserAccounts`, `useHasCredentialProvider`.
@@ -77,8 +77,8 @@ Server functions that need a session (e.g. `listUsers` in `src/api/users.ts`) us
 
 ## Route protection (middleware)
 
-- **authMiddleware** (`src/middleware/auth-middleware.ts`): Requires an authenticated user; redirects to `Routes.Login` when there is no session. Use in route definitions via `server: { middleware: [authMiddleware] }` (e.g. dashboard, settings).
-- **adminMiddleware** (`src/middleware/admin-middleware.ts`): Requires `session.user.role === 'admin'`; redirects to login if not signed in, otherwise to dashboard if not admin. Use on admin routes (e.g. `/admin/users`).
+- **authMiddleware** (`src/middlewares/auth-middleware.ts`): Requires an authenticated user; redirects to `Routes.Login` when there is no session. Use in route definitions via `server: { middleware: [authMiddleware] }` (e.g. dashboard, settings).
+- **adminMiddleware** (`src/middlewares/admin-middleware.ts`): Requires `session.user.role === 'admin'`; redirects to login if not signed in, otherwise to dashboard if not admin. Use on admin routes (e.g. `/admin/users`).
 
 ---
 

@@ -2,7 +2,7 @@ import { getDb } from '@/db';
 import { payment } from '@/db/app.schema';
 import { user } from '@/db/auth.schema';
 import { findPlanByPriceId, getAllPricePlans } from '@/lib/price-plan';
-import { authApiMiddleware } from '@/middleware/auth-middleware';
+import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createCheckout, createCustomerPortal } from '@/payment';
 import type {
   PaymentStatus,

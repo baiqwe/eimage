@@ -1,5 +1,5 @@
 import { SidebarLayout } from '@/components/layout/sidebar-layout';
-import { authRouteMiddleware } from '@/middleware/auth-middleware';
+import { authRouteMiddleware } from '@/middlewares/auth-middleware';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/dashboard')({
