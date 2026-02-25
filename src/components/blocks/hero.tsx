@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router';
 import { IconArrowRight } from '@tabler/icons-react';
 
 const m = {
-  title: 'Ship Faster, Cost Less',
+  title: 'Ship Faster with TanStack, Cost Less with Cloudflare',
   description:
     'The complete TanStack Start boilerplate for building profitable SaaS, packed with AI, auth, database, storage, blog, email, newsletter, payments, dashboard, SEO, and more, fully deployed on Cloudflare Workers',
   introduction: 'Introducing TanStarter',
@@ -52,7 +52,7 @@ export default function HeroSection() {
               </a>
 
               {/* title */}
-              <h1 className="mt-8 text-balance text-5xl font-bold lg:mt-16 xl:text-[5rem]">
+              <h1 className="mt-8 text-balance text-5xl font-bold lg:mt-16 xl:text-[4rem]">
                 {m.title}
               </h1>
 
