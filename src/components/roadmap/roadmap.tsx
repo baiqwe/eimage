@@ -81,7 +81,8 @@ export function Roadmap() {
           value={columnValue}
           tasks={tasks}
           title={
-            columnTitles[columnValue as keyof typeof columnTitles] ?? columnValue
+            columnTitles[columnValue as keyof typeof columnTitles] ??
+            columnValue
           }
         />
       ))}

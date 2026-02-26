@@ -72,8 +72,7 @@ export const messages = {
   },
 
   footer: {
-    tagline:
-      'Ship Faster with TanStack, Cost Less with Cloudflare',
+    tagline: 'Ship Faster with TanStack, Cost Less with Cloudflare',
     rightsReserved: 'All Rights Reserved',
   },
 
