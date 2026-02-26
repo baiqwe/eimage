@@ -7,7 +7,12 @@ import { clientEnv } from '@/env/client';
  * https://affonso.io
  */
 export function AffonsoScript() {
-  if (!websiteConfig.features?.enableAffonsoAffiliate) return null;
+  if (
+    !websiteConfig.affiliates?.enable ||
+    websiteConfig.affiliates.provider !== 'affonso'
+  ) {
+    return null;
+  }
   const affiliateId = clientEnv.VITE_AFFILIATE_AFFONSO_ID;
   if (!affiliateId) return null;
 

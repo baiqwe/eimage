@@ -7,7 +7,12 @@ import { clientEnv } from '@/env/client';
  * https://www.promotekit.com
  */
 export function PromotekitScript() {
-  if (!websiteConfig.features?.enablePromotekitAffiliate) return null;
+  if (
+    !websiteConfig.affiliates?.enable ||
+    websiteConfig.affiliates.provider !== 'promotekit'
+  ) {
+    return null;
+  }
   const promotekitKey = clientEnv.VITE_AFFILIATE_PROMOTEKIT_ID;
   if (!promotekitKey) return null;
 
