@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ScriptOnce } from '@tanstack/react-router';
 import { websiteConfig } from '@/config/website';
 
 type Theme = 'dark' | 'light' | 'system';
@@ -22,12 +23,23 @@ type ThemeProviderState = {
 const initialState: ThemeProviderState = {
   theme: 'system',
   setTheme: () => null,
-  resolvedTheme: 'dark', // Default for SSR
+  resolvedTheme: 'dark',
   systemTheme: undefined,
 };
 
 const ThemeProviderContext =
   React.createContext<ThemeProviderState>(initialState);
+
+const themeScript = `(function() {
+  try {
+    var theme = localStorage.getItem('theme') || '${websiteConfig.ui?.mode?.defaultMode ?? 'dark'}';
+    var systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    var resolved = theme === 'system' ? systemTheme : theme;
+    document.documentElement.classList.add(resolved);
+  } catch (e) {
+    document.documentElement.classList.add('${websiteConfig.ui?.mode?.defaultMode ?? 'dark'}');
+  }
+})();`;
 
 /**
  * Single theme provider: SSR-safe, prevents FOUC via inline script, configurable.
@@ -153,35 +165,6 @@ export function ThemeProvider({
     applyTheme(currentTheme);
   }, [theme, systemTheme, applyTheme]);
 
-  // Prevent flash during SSR by applying theme via script
-  React.useEffect(() => {
-    if (typeof document === 'undefined') return;
-
-    // Create a script that runs before React hydration to prevent FOIT
-    const script = document.createElement('script');
-    script.innerHTML = `
-      try {
-        var theme = localStorage.getItem('${storageKey}') || '${defaultTheme}';
-        var systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        var resolvedTheme = theme === 'system' ? systemTheme : theme;
-        
-        if (resolvedTheme === 'dark') {
-          document.documentElement.classList.add('dark');
-          document.documentElement.classList.remove('light');
-        } else {
-          document.documentElement.classList.add('light');
-          document.documentElement.classList.remove('dark');
-        }
-      } catch (e) {}
-    `;
-
-    // Only add if not already present
-    if (!document.querySelector('script[data-theme-script]')) {
-      script.setAttribute('data-theme-script', 'true');
-      document.head.appendChild(script);
-    }
-  }, [storageKey, defaultTheme]);
-
   const value = React.useMemo(
     () => ({
       theme,
@@ -195,6 +178,7 @@ export function ThemeProvider({
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
+      <ScriptOnce>{themeScript}</ScriptOnce>
       {children}
     </ThemeProviderContext.Provider>
   );
