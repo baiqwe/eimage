@@ -4,13 +4,7 @@ import { sendEmail } from '@/mail';
 import { isSubscribed, subscribe, unsubscribe } from '@/newsletter';
 import { z } from 'zod';
 
-const emailSchema = z
-  .string()
-  .min(1, 'Valid email required')
-  .refine(
-    (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
-    'Please enter a valid email address'
-  );
+const emailSchema = z.string().email('Please enter a valid email address');
 
 function ensureNewsletterEnabled(): void {
   if (!websiteConfig.newsletter?.enable) {
