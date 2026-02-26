@@ -56,7 +56,7 @@ export const websiteConfig: WebsiteConfig = {
   newsletter: {
     enable: true,
     provider: 'resend',
-    autoSubscribeAfterSignUp: false,
+    autoSubscribeAfterSignUp: true,
   },
   notification: {
     enable: true,
