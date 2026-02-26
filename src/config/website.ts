@@ -50,8 +50,8 @@ export const websiteConfig: WebsiteConfig = {
   mail: {
     enable: true,
     provider: 'resend',
-    fromEmail: 'TanStarter <noreply@example.com>',
-    supportEmail: 'TanStarter <support@example.com>',
+    fromEmail: 'TanStarter <support@tanstarter.dev>',
+    supportEmail: 'TanStarter <support@tanstarter.dev>',
   },
   newsletter: {
     enable: true,
