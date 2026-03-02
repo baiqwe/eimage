@@ -4,7 +4,7 @@ Subscription and one-time payment support (no credits). See [Env](./env.md) for 
 
 ## Setup
 
-1. **Env**: Copy `.env.local.example` and set:
+1. **Env**: Set the following environment variables (see [Env](./env.md)):
    - **Runtime:** `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
    - **Build-time:** `VITE_STRIPE_PRICE_PRO_MONTHLY`, `VITE_STRIPE_PRICE_PRO_YEARLY`, `VITE_STRIPE_PRICE_LIFETIME` (Stripe Price IDs)
 

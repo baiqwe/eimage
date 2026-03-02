@@ -93,4 +93,4 @@ Read at **Worker request time**. Used for secrets, API keys, and server-only con
 | `wrangler.jsonc` `vars` | Worker runtime | Non-sensitive config → `process.env` when nodejs compat is on |
 | `wrangler secret put <NAME>` | Worker runtime | Secrets → `process.env` |
 
-Copy **`.env.local.example`** to **`.env.local`** and fill in values. See module docs ([Auth](./auth.md), [Mail](./mail.md), [Payment](./payment.md), etc.) for which vars each feature needs.
+Copy **`.env.example`** to **`.env.local`** and fill in values. See module docs ([Auth](./auth.md), [Mail](./mail.md), [Payment](./payment.md), etc.) for which vars each feature needs.

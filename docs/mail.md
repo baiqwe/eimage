@@ -34,7 +34,7 @@ src/mail/
 | `websiteConfig.mail` | `provider` | `'resend'`. Extend in `src/types/index.d.ts` when adding providers. |
 | | `fromEmail` | Sender address (required for sending). |
 | | `supportEmail` | Used by contact form target. |
-| Env / Worker | `RESEND_API_KEY` | Required for Resend. Set in `.env.local` or Wrangler secrets. See [Env](./env.md). |
+| Env / Worker | `RESEND_API_KEY` | Required for Resend. Set in the environment file or Wrangler secrets. See [Env](./env.md). |
 
 ---
 
