@@ -25,9 +25,7 @@ export function SocialLoginButton({
   const defaultCallbackUrl = DEFAULT_LOGIN_REDIRECT;
   const callbackUrl =
     propCallbackUrl ??
-    (paramCallbackUrl
-      ? paramCallbackUrl
-      : defaultCallbackUrl);
+    (paramCallbackUrl ? paramCallbackUrl : defaultCallbackUrl);
   const errorCallbackUrl = Routes.AuthError;
 
   const [isLoading, setIsLoading] = useState<'google' | null>(null);

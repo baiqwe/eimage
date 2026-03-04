@@ -38,9 +38,7 @@ export function RegisterForm({
   const defaultCallbackUrl = DEFAULT_LOGIN_REDIRECT;
   const callbackUrl =
     propCallbackUrl ??
-    (paramCallbackUrl
-      ? paramCallbackUrl
-      : defaultCallbackUrl);
+    (paramCallbackUrl ? paramCallbackUrl : defaultCallbackUrl);
 
   const [error, setError] = useState<string | undefined>('');
   const [success, setSuccess] = useState<string | undefined>('');
