@@ -13,7 +13,7 @@
     "postinstall": "pnpm run cf-typegen",
     "email:dev": "email dev --dir src/mail/templates --port 3333",
     "cf-typegen": "wrangler types --env-interface Env",
-    "auth:schema:generate": "pnpm dlx @better-auth/cli@latest generate --yes --output src/db/auth.schema.ts",
+    "auth:schema:generate": "better-auth generate --yes --output src/db/auth.schema.ts",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio:local": "drizzle-kit studio --config drizzle.config.local.ts",
@@ -78,6 +78,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@better-auth/cli": "^1.4.12",
     "@biomejs/biome": "2.3.12",
     "@content-collections/core": "^0.13.1",
     "@content-collections/vite": "^0.2.8",
