@@ -35,18 +35,18 @@ export default function HeroSection() {
                 href="https://x.com/tanstarter"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="animate-fade-up delay-0 hover:bg-primary/5 group mx-auto flex w-fit items-center gap-2 rounded-full border border-primary/20 p-1 pl-4 transition-colors"
+                className="animate-fade-up delay-0 hover:bg-muted group mx-auto flex w-fit items-center gap-2 rounded-full border border-border p-1 pl-4 transition-colors"
               >
                 <span className="text-foreground text-sm font-medium">
                   {m.introduction}
                 </span>
-                <div className="size-6 overflow-hidden rounded-full bg-primary/10 duration-500">
+                <div className="size-6 overflow-hidden rounded-full bg-muted duration-500">
                   <div className="flex w-12 -translate-x-1/2 duration-500 ease-in-out group-hover:translate-x-0">
                     <span className="flex size-6">
-                      <IconArrowRight className="m-auto size-3 text-primary" />
+                      <IconArrowRight className="m-auto size-3 text-foreground" />
                     </span>
                     <span className="flex size-6">
-                      <IconArrowRight className="m-auto size-3 text-primary" />
+                      <IconArrowRight className="m-auto size-3 text-foreground" />
                     </span>
                   </div>
                 </div>
