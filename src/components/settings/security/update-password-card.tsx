@@ -119,9 +119,9 @@ export function UpdatePasswordCard({ className }: UpdatePasswordCardProps) {
                       onClick={() => setShowCurrent(!showCurrent)}
                     >
                       {showCurrent ? (
-                        <IconEyeOff className="h-4 w-4" />
+                        <IconEyeOff className="size-4" />
                       ) : (
-                        <IconEye className="h-4 w-4" />
+                        <IconEye className="size-4" />
                       )}
                       <span className="sr-only">
                         {showCurrent ? m.hidePassword : m.showPassword}

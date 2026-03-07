@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
 
 export default function Container({
+  id,
   className,
   children,
 }: {
@@ -10,7 +11,7 @@ export default function Container({
   children?: ReactNode;
 }) {
   return (
-    <div className={cn('container mx-auto max-w-7xl', className)}>
+    <div id={id} className={cn('container mx-auto max-w-7xl', className)}>
       {children}
     </div>
   );

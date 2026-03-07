@@ -37,7 +37,7 @@ export function UserButtonMobile({ user }: UserButtonMobileProps) {
           router.navigate({ to: '/' });
         },
         onError: (err) => {
-          toast.error('Log out failed');
+          toast.error(messages.auth.common.logoutFailed);
           console.error(err);
         },
       },

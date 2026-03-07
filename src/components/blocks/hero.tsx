@@ -1,3 +1,4 @@
+import Container from '@/components/layout/container';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Link } from '@tanstack/react-router';
@@ -27,7 +28,7 @@ export default function HeroSection() {
 
       <section>
         <div className="relative pt-12">
-          <div className="mx-auto max-w-7xl px-6">
+          <Container className="px-6">
             <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
               {/* introduction */}
               <a
@@ -102,7 +103,7 @@ export default function HeroSection() {
                 />
               </div>
             </div>
-          </div>
+          </Container>
         </div>
       </section>
     </section>

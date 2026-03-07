@@ -7,6 +7,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Routes } from '@/lib/routes';
+import { messages } from '@/messages';
 import { useRouter } from '@tanstack/react-router';
 import React, { useEffect, useState } from 'react';
 
@@ -66,9 +67,9 @@ export function LoginWrapper({
             )
           }
         />
-        <DialogContent className="sm:max-w-[400px] p-0 border-0 overflow-hidden">
+        <DialogContent className="sm:max-w-100 p-0 border-0 overflow-hidden">
           <DialogHeader className="sr-only">
-            <DialogTitle>Sign in</DialogTitle>
+            <DialogTitle>{messages.auth.login.signIn}</DialogTitle>
           </DialogHeader>
           <LoginForm
             callbackUrl={callbackUrl}

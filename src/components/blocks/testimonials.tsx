@@ -93,7 +93,7 @@ export default function TestimonialsSection() {
                   className="bg-transparent shadow-none hover:bg-accent dark:hover:bg-card"
                 >
                   <CardContent className="grid grid-cols-[auto_1fr] gap-3 pt-4">
-                    <Avatar className="size-9 border-2 border-gray-200">
+                    <Avatar className="size-9 border-2 border-border">
                       <AvatarImage
                         alt={name}
                         src={image}
@@ -110,7 +110,7 @@ export default function TestimonialsSection() {
                         {role}
                       </span>
                       <blockquote className="mt-3">
-                        <p className="text-gray-700 dark:text-gray-300">
+                        <p className="text-muted-foreground">
                           {quote}
                         </p>
                       </blockquote>

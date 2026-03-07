@@ -19,15 +19,7 @@ const m = {
   secondaryButton: 'View Pricing',
 };
 
-// Same brand icons and colors as integration.tsx
-const BRAND_COLORS = {
-  openai: '#10a37f',
-  codesandbox: '#f38020',
-  react: '#61dafb',
-  vs: '#007acc',
-  wikipedia: '#636466',
-  google: '#4285f4',
-} as const;
+import { BRAND_COLORS } from '@/components/blocks/integration';
 
 const BRAND_ICONS = [
   { Icon: IconBrandOpenai, color: BRAND_COLORS.openai },

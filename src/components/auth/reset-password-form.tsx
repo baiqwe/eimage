@@ -116,14 +116,14 @@ export function ResetPasswordForm() {
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      className="absolute right-0 top-0 h-full px-3 border-0 bg-transparent hover:bg-transparent dark:hover:bg-transparent"
                       onClick={togglePasswordVisibility}
                       disabled={isPending}
                     >
                       {showPassword ? (
-                        <IconEyeOff className="h-4 w-4 text-muted-foreground" />
+                        <IconEyeOff className="size-4 text-muted-foreground" />
                       ) : (
-                        <IconEye className="h-4 w-4 text-muted-foreground" />
+                        <IconEye className="size-4 text-muted-foreground" />
                       )}
                       <span className="sr-only">
                         {showPassword ? m.hidePassword : m.showPassword}
@@ -141,7 +141,7 @@ export function ResetPasswordForm() {
             disabled={isPending}
             size="lg"
             type="submit"
-            className="w-full"
+            className="w-full flex items-center justify-center gap-2"
           >
             {isPending && <IconLoader2 className="mr-2 size-4 animate-spin" />}
             <span>{m.reset}</span>

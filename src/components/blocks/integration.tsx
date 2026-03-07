@@ -45,7 +45,7 @@ const m = {
 };
 
 // Brand colors (visible on both light and dark backgrounds)
-const BRAND_COLORS = {
+export const BRAND_COLORS = {
   openai: '#10a37f',
   codesandbox: '#f38020',
   react: '#61dafb',
