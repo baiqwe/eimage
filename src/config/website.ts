@@ -93,7 +93,6 @@ export const websiteConfig: WebsiteConfig = {
               amount: 990,
               currency: 'USD',
               interval: 'month',
-              trialPeriodDays: 7,
             },
             {
               type: 'subscription',
@@ -101,7 +100,6 @@ export const websiteConfig: WebsiteConfig = {
               amount: 9900,
               currency: 'USD',
               interval: 'year',
-              trialPeriodDays: 7,
             },
           ],
           isFree: false,
