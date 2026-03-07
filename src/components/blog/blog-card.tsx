@@ -14,30 +14,28 @@ export function BlogCard({ post }: { post: BlogPost }) {
 
   return (
     <Link to="/blog/$slug" params={{ slug }} className="h-full">
-      <Card className="h-full rounded-lg ring-1 ring-border/50 py-0 transition-all hover:ring-primary/30 dark:hover:ring-primary/60 hover:shadow-md">
+      <Card className="h-full py-0 transition-[box-shadow,ring-color] hover:shadow-md dark:hover:ring-foreground/20">
         {post.image && (
-          <div className="relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted">
+          <div className="aspect-video w-full overflow-hidden rounded-t-xl bg-muted">
             <img
               src={post.image}
-              alt=""
+              alt="blog post"
               className="object-cover transition-transform hover:scale-[1.05]"
             />
           </div>
         )}
-        <CardHeader className="shrink-0 flex-row items-center justify-between gap-2 px-4 pt-4 pb-0">
-          <span className="rounded-full bg-muted px-2.5 py-0.5 text-muted-foreground text-xs font-medium capitalize">
+        <CardHeader className="flex flex-row items-center justify-between gap-2 pt-4 pb-0">
+          <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground capitalize">
             {post.category}
           </span>
-          <span className="text-muted-foreground text-xs">
+          <span className="text-xs text-muted-foreground">
             {formatDate(new Date(post.date))}
           </span>
         </CardHeader>
-        <CardContent className="flex min-h-18 flex-1 flex-col px-4 pb-4">
-          <CardTitle className="line-clamp-2 text-lg font-semibold">
-            {post.title}
-          </CardTitle>
+        <CardContent className="pb-4">
+          <CardTitle className="line-clamp-2 text-lg">{post.title}</CardTitle>
           {post.description && (
-            <CardDescription className="mt-2 line-clamp-2 text-sm leading-relaxed">
+            <CardDescription className="mt-2 line-clamp-2">
               {post.description}
             </CardDescription>
           )}
