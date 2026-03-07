@@ -61,11 +61,13 @@ export default function Features2Section() {
                 src="https://cdn.mksaas.com/blocks/dark-card.webp"
                 alt="Card illustration dark"
                 className="hidden size-full rounded-[15px] object-cover dark:block"
+                loading="lazy"
               />
               <img
                 src="https://cdn.mksaas.com/blocks/card.png"
                 alt="Card illustration light"
                 className="size-full rounded-[15px] object-cover shadow dark:hidden"
+                loading="lazy"
               />
             </div>
           </div>

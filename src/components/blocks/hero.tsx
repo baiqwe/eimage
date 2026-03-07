@@ -95,11 +95,17 @@ export default function HeroSection() {
                   className="bg-muted/50 relative hidden rounded-2xl dark:block w-full"
                   src="https://cdn.mksaas.com/blocks/music.png"
                   alt="website screenshot"
+                  fetchPriority="high"
+                  width={1200}
+                  height={750}
                 />
                 <img
                   className="z-2 border-border/25 relative rounded-2xl border dark:hidden w-full"
                   src="https://cdn.mksaas.com/blocks/music-light.png"
                   alt="website screenshot"
+                  fetchPriority="high"
+                  width={1200}
+                  height={750}
                 />
               </div>
             </div>

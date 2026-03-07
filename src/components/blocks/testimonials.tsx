@@ -65,9 +65,7 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 }
 
 export default function TestimonialsSection() {
-  const testimonials: Testimonial[] = (
-    ['item-1', 'item-2', 'item-3', 'item-4', 'item-5', 'item-6'] as const
-  ).map((key) => m.items[key]);
+  const testimonials: Testimonial[] = Object.values(m.items);
 
   const testimonialChunks = chunkArray(
     testimonials,
