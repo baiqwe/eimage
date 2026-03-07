@@ -62,7 +62,7 @@ export default function Integration2Section() {
   const [b0, b1, b2, b3, b4, b5] = BRAND_ICONS;
   return (
     <section>
-      <div className="relative overflow-hidden py-24">
+      <div className="relative overflow-hidden py-16 md:py-24">
         <div className="absolute inset-0 bg-linear-to-tl from-primary/5 via-muted/70 to-chart-1/6 dark:from-primary/6 dark:via-muted/40 dark:to-chart-1/4" />
         <div className="relative mx-auto max-w-5xl px-6">
           <div className="grid items-center gap-8 sm:grid-cols-2 sm:gap-0">

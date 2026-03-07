@@ -19,15 +19,13 @@ const m = {
 
 export default function Features2Section() {
   return (
-    <section id="features2" className="px-4 py-16">
+    <section id="features2" className="px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6 space-y-8 lg:space-y-20">
         <ScrollReveal>
           <HeaderSection
             title={m.title}
             subtitle={m.subtitle}
-            subtitleAs="h2"
             description={m.description}
-            descriptionAs="p"
           />
         </ScrollReveal>
 

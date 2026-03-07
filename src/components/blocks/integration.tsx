@@ -93,7 +93,7 @@ function IntegrationCard({
   color: string;
 }) {
   return (
-    <Card className="bg-transparent p-6 transition-colors duration-200 hover:bg-accent dark:hover:bg-card">
+    <Card className="bg-transparent p-6 transition-all duration-200 hover:bg-accent hover:-translate-y-0.5 dark:hover:bg-card">
       <div className="relative">
         <div className="*:size-10">
           <Icon className="size-10 shrink-0" style={{ color }} />
@@ -125,15 +125,13 @@ function IntegrationCard({
 
 export default function IntegrationSection() {
   return (
-    <section id="integration" className="px-4 py-16">
+    <section id="integration" className="px-4 py-16 md:py-24">
       <div className="mx-auto max-w-5xl">
         <ScrollReveal>
           <HeaderSection
             title={m.title}
             subtitle={m.subtitle}
             description={m.description}
-            subtitleAs="h2"
-            descriptionAs="p"
           />
         </ScrollReveal>
 

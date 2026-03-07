@@ -82,15 +82,13 @@ export default function FeaturesSection() {
   const [activeItem, setActiveItem] = useState<ImageKey>('item-1');
 
   return (
-    <section id="features" className="px-4 py-16">
+    <section id="features" className="px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-6 space-y-8 lg:space-y-20 dark:[--color-border:color-mix(in_oklab,var(--color-white)_10%,transparent)]">
         <ScrollReveal>
           <HeaderSection
             title={m.title}
             subtitle={m.subtitle}
-            subtitleAs="h2"
             description={m.description}
-            descriptionAs="p"
           />
         </ScrollReveal>
 

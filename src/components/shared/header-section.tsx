@@ -18,10 +18,10 @@ interface HeaderSectionProps {
 export function HeaderSection({
   id,
   title,
-  titleAs = 'h2',
+  titleAs = 'p',
   titleClassName,
   subtitle,
-  subtitleAs = 'p',
+  subtitleAs = 'h2',
   subtitleClassName,
   description,
   descriptionAs = 'p',

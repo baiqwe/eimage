@@ -9,15 +9,13 @@ const m = {
 
 export default function PricingSection() {
   return (
-    <section id="pricing" className="px-4 py-16">
+    <section id="pricing" className="px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl space-y-16">
         <ScrollReveal>
           <HeaderSection
             subtitle={m.subtitle}
-            subtitleAs="h2"
             subtitleClassName="text-4xl font-bold"
             description={m.description}
-            descriptionAs="p"
           />
         </ScrollReveal>
         <ScrollReveal delay={150}>

@@ -38,7 +38,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={link.title}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all duration-200"
                   >
                     {Icon ? <Icon className="size-4" /> : null}
                   </a>
@@ -65,7 +65,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
                             href={item.href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-muted-foreground hover:text-primary data-[active=true]:font-medium data-[active=true]:text-foreground"
+                            className="text-sm text-muted-foreground transition-colors duration-150 hover:text-primary data-[active=true]:font-medium data-[active=true]:text-foreground"
                           >
                             {item.title}
                           </a>
@@ -79,7 +79,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
                                   ? 'true'
                                   : undefined
                             }
-                            className="text-sm text-muted-foreground hover:text-primary data-[active=true]:font-medium data-[active=true]:text-foreground"
+                            className="text-sm text-muted-foreground transition-colors duration-150 hover:text-primary data-[active=true]:font-medium data-[active=true]:text-foreground"
                           >
                             {item.title}
                           </Link>

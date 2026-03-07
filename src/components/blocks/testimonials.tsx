@@ -74,15 +74,10 @@ export default function TestimonialsSection() {
   );
 
   return (
-    <section id="testimonials" className="px-4 py-16">
+    <section id="testimonials" className="px-4 py-16 md:py-24">
       <div className="mx-auto max-w-6xl">
         <ScrollReveal>
-          <HeaderSection
-            title={m.title}
-            titleAs="h2"
-            subtitle={m.subtitle}
-            subtitleAs="p"
-          />
+          <HeaderSection title={m.title} subtitle={m.subtitle} />
         </ScrollReveal>
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2 md:mt-12 lg:grid-cols-3">
@@ -95,7 +90,7 @@ export default function TestimonialsSection() {
               {chunk.map(({ name, role, quote, image }, index) => (
                 <Card
                   key={index}
-                  className="bg-transparent shadow-none transition-colors duration-200 hover:bg-accent dark:hover:bg-card"
+                  className="bg-transparent shadow-none transition-all duration-200 hover:bg-accent hover:-translate-y-0.5 dark:hover:bg-card"
                 >
                   <CardContent className="grid grid-cols-[auto_1fr] gap-3 pt-4">
                     <Avatar className="size-9 border-2 border-primary/25">

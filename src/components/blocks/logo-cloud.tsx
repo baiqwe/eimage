@@ -56,14 +56,17 @@ const logos = [
 
 export default function LogoCloudSection() {
   return (
-    <section id="logo-cloud" className="relative overflow-hidden px-4 py-16">
+    <section
+      id="logo-cloud"
+      className="relative overflow-hidden px-4 py-16 md:py-24"
+    >
       <div className="absolute inset-0 bg-linear-to-b from-muted/60 to-transparent" />
       <div className="relative mx-auto max-w-5xl px-6">
         <ScrollReveal>
           <h2 className="text-center text-xl font-medium">{m.title}</h2>
         </ScrollReveal>
         <ScrollReveal delay={150}>
-          <div className="mx-auto mt-20 flex max-w-4xl flex-wrap items-center justify-center gap-x-12 gap-y-8 sm:gap-x-16 sm:gap-y-12">
+          <div className="mx-auto mt-12 flex max-w-4xl flex-wrap items-center justify-center gap-x-12 gap-y-8 sm:gap-x-16 sm:gap-y-12">
             {logos.map((logo) => (
               <img
                 key={logo.alt}

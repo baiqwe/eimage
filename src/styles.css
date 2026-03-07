@@ -127,6 +127,6 @@
     font-weight: 500; /* default body weight for better readability (was 400) */
   }
   html {
-    @apply font-custom;
+    @apply font-custom scroll-smooth;
   }
 }

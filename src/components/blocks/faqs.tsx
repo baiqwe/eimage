@@ -46,15 +46,10 @@ const faqItems = Object.entries(m.items).map(([id, item]) => ({
 
 export default function FaqSection() {
   return (
-    <section id="faqs" className="px-4 py-16">
+    <section id="faqs" className="px-4 py-16 md:py-24">
       <div className="mx-auto max-w-4xl">
         <ScrollReveal>
-          <HeaderSection
-            title={m.title}
-            titleAs="h2"
-            subtitle={m.subtitle}
-            subtitleAs="p"
-          />
+          <HeaderSection title={m.title} subtitle={m.subtitle} />
         </ScrollReveal>
 
         <ScrollReveal delay={150} className="mx-auto mt-12 max-w-4xl">

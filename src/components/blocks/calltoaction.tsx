@@ -14,7 +14,7 @@ export default function CallToActionSection() {
   return (
     <section
       id="call-to-action"
-      className="relative overflow-hidden px-4 py-24"
+      className="relative overflow-hidden px-4 py-16 md:py-24"
     >
       {/* Warm gradient background */}
       <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-muted/80 to-chart-1/8 dark:from-primary/8 dark:via-muted/50 dark:to-chart-1/5" />
