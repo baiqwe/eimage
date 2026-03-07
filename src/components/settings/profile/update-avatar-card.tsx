@@ -1,7 +1,7 @@
 import { messages } from '@/messages';
 import { FormError } from '@/components/shared/form-error';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -29,8 +29,6 @@ const m = messages.settings.profile.avatar;
  * Update user avatar card
  */
 export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
-  if (!websiteConfig.storage?.enable) return null;
-
   const [error, setError] = useState<string | undefined>('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const { data: session, refetch } = authClient.useSession();
@@ -40,18 +38,16 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
     if (session?.user?.image) setAvatarUrl(session.user.image);
   }, [session]);
 
+  if (!websiteConfig.storage?.enable) return null;
+
   const user = session?.user;
   if (!user) return null;
 
-  const handleUploadClick = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/png, image/jpeg, image/webp';
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) handleFileUpload(file);
-    };
-    input.click();
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFileUpload(file);
+    // Reset so selecting the same file again triggers onChange
+    e.target.value = '';
   };
 
   const handleFileUpload = (file: File) => {
@@ -114,14 +110,22 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
               <IconUser className="h-8 w-8 text-muted-foreground" />
             </AvatarFallback>
           </Avatar>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleUploadClick}
-            disabled={uploadMutation.isPending}
+          <label
+            className={cn(
+              buttonVariants({ variant: 'outline', size: 'sm' }),
+              'cursor-pointer',
+              uploadMutation.isPending && 'pointer-events-none opacity-50'
+            )}
           >
+            <input
+              type="file"
+              accept="image/png, image/jpeg, image/webp"
+              onChange={handleFileChange}
+              className="sr-only"
+              disabled={uploadMutation.isPending}
+            />
             {uploadMutation.isPending ? m.uploading : m.uploadAvatar}
-          </Button>
+          </label>
         </div>
         <FormError message={error} />
       </CardContent>
