@@ -28,7 +28,10 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
             <p className="text-muted-foreground text-base py-2 md:pr-12">
               {messages.footer.tagline}
             </p>
-            <nav aria-label="Social links" className="flex items-center gap-4 pt-6">
+            <nav
+              aria-label="Social links"
+              className="flex items-center gap-4 pt-6"
+            >
               {socialLinks?.map((link) => {
                 const Icon = link.icon;
                 return (

@@ -96,7 +96,10 @@ export default function NewsletterCard() {
                 disabled={isPending}
               >
                 {isPending ? (
-                  <IconLoader2 className="size-6 animate-spin" aria-hidden="true" />
+                  <IconLoader2
+                    className="size-6 animate-spin"
+                    aria-hidden="true"
+                  />
                 ) : (
                   <IconSend2 className="size-6" aria-hidden="true" />
                 )}

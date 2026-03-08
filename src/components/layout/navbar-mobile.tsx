@@ -130,9 +130,9 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
                               type="button"
                               variant="ghost"
                               className={cn(
-                            'w-full justify-between text-left text-base',
-                              'bg-transparent text-muted-foreground hover:text-foreground',
-                              active && 'font-semibold text-primary'
+                                'w-full justify-between text-left text-base',
+                                'bg-transparent text-muted-foreground hover:text-foreground',
+                                active && 'font-semibold text-primary'
                               )}
                             >
                               {item.title}

@@ -87,7 +87,7 @@ export default function TestimonialsSection() {
               delay={chunkIndex * 120}
               className="space-y-3"
             >
-              {chunk.map(({ name, role, quote, image }, index) => (
+              {chunk.map(({ name, role, quote, image }, _index) => (
                 <Card
                   key={`${name}-${role}`}
                   className="bg-transparent shadow-none transition-colors duration-200 hover:bg-accent dark:hover:bg-card"

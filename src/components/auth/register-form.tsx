@@ -183,9 +183,7 @@ export function RegisterForm({
               type="submit"
               className="w-full flex items-center justify-center gap-2"
             >
-              {isPending && (
-                <IconLoader2 className="size-4 animate-spin" />
-              )}
+              {isPending && <IconLoader2 className="size-4 animate-spin" />}
               <span>{m.signUp}</span>
             </Button>
           </form>
