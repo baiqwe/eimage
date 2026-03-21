@@ -106,7 +106,7 @@ export function UpdateAvatarCard({ className }: UpdateAvatarCardProps) {
         <div className="flex flex-col items-center sm:flex-row gap-4 sm:gap-8">
           <Avatar className="h-16 w-16 border">
             <AvatarImage src={avatarUrl ?? ''} alt={user.name ?? ''} />
-            <AvatarFallback>
+            <AvatarFallback className="absolute inset-0">
               <IconUser className="h-8 w-8 text-muted-foreground" />
             </AvatarFallback>
           </Avatar>

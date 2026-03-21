@@ -21,7 +21,7 @@ export function UserAvatar({
         src={image ?? undefined}
         referrerPolicy="no-referrer"
       />
-      <AvatarFallback>
+      <AvatarFallback className="absolute inset-0">
         <span className="sr-only">{name ?? 'User'}</span>
         <IconUser className="size-4" />
       </AvatarFallback>
