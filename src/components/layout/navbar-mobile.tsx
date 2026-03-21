@@ -93,7 +93,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
           <div className="flex flex-1 flex-col items-start gap-4 p-4">
             {websiteConfig.auth?.enable && !user && (
               <div className="flex w-full flex-col gap-4">
-                <LoginWrapper mode="modal" asChild>
+                <LoginWrapper mode="redirect" asChild>
                   <Button
                     type="button"
                     variant="outline"
