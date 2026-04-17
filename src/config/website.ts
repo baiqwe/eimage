@@ -5,7 +5,7 @@ import {
   DEFAULT_ALLOWED_TYPES,
   DEFAULT_MAX_FILE_SIZE,
   DEFAULT_USER_FILES_FOLDER,
-} from '@/storage/types';
+} from '@/storage/constants';
 
 // Set `enable: true` to enable payment, `enable: false` to disable.
 const isPaymentEnabled = true;

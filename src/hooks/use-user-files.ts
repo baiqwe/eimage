@@ -9,7 +9,7 @@ import {
   listUserFiles,
   uploadUserFile,
 } from '@/api/user-files';
-import { DEFAULT_AVATARS_FOLDER } from '@/storage/types';
+import { DEFAULT_AVATARS_FOLDER } from '@/storage/constants';
 
 export const userFilesKeys = {
   all: ['user-files'] as const,

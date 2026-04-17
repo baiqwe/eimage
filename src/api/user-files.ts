@@ -3,11 +3,8 @@ import { userFiles } from '@/db/app.schema';
 import { getBaseUrl } from '@/lib/urls';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { deleteFile, uploadFile } from '@/storage';
-import {
-  DEFAULT_AVATARS_FOLDER,
-  StorageError,
-  UploadError,
-} from '@/storage/types';
+import { DEFAULT_AVATARS_FOLDER } from '@/storage/constants';
+import { StorageError, UploadError } from '@/storage/types';
 import { createServerFn } from '@tanstack/react-start';
 import { and, count, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';

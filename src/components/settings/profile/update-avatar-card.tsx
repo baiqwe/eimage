@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 import { IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { DEFAULT_MAX_FILE_SIZE } from '@/storage/types';
+import { DEFAULT_MAX_FILE_SIZE } from '@/storage/constants';
 
 interface UpdateAvatarCardProps {
   className?: string;

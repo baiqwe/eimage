@@ -1,5 +1,10 @@
 import { env } from 'cloudflare:workers';
 import {
+  DEFAULT_ALLOWED_TYPES,
+  DEFAULT_MAX_FILE_SIZE,
+  DEFAULT_USER_FILES_FOLDER,
+} from '../constants';
+import {
   type FileMetadata,
   type R2BucketInterface,
   type StorageProvider,
@@ -7,9 +12,6 @@ import {
   type UploadFileResult,
   type ValidationResult,
   ConfigurationError,
-  DEFAULT_ALLOWED_TYPES,
-  DEFAULT_MAX_FILE_SIZE,
-  DEFAULT_USER_FILES_FOLDER,
   R2_ERROR_CODES,
   StorageError,
   UploadError,
