@@ -1,4 +1,5 @@
 import { websiteConfig } from '@/config/website';
+import { BeehiivNewsletterProvider } from './provider/beehiiv';
 import { ResendNewsletterProvider } from './provider/resend';
 import type { NewsletterProvider, NewsletterProviderName } from './types';
 
@@ -6,6 +7,7 @@ type ProviderFactory = () => NewsletterProvider;
 
 const providerRegistry: Record<NewsletterProviderName, ProviderFactory> = {
   resend: () => new ResendNewsletterProvider(),
+  beehiiv: () => new BeehiivNewsletterProvider(),
 };
 
 function createProvider(): NewsletterProvider {

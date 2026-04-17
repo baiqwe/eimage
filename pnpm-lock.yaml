@@ -11,6 +11,9 @@ importers:
       '@base-ui/react':
         specifier: ^1.2.0
         version: 1.2.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@beehiiv/sdk':
+        specifier: ^0.1.9
+        version: 0.1.9
       '@cloudflare/vite-plugin':
         specifier: ^1.13.8
         version: 1.25.0(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2))(workerd@1.20260212.0)(wrangler@4.65.0)
@@ -446,6 +449,10 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  '@beehiiv/sdk@0.1.9':
+    resolution: {integrity: sha512-kJdD7ZTFW8cyxPbvjeFU67QiNMC/cCSr23E1Ga7jbMi9jMwUHN3ahlW7plHUwOQGQ0yvYNlqTSJ8v3ywy52Fqg==}
+    engines: {node: '>=18.0.0'}
 
   '@better-auth/cli@1.4.21':
     resolution: {integrity: sha512-bKEa8BupnZxNjLk9ZDntvgQGm5jogeE2wHdMbYifhet3GTyxgDi6pXoOK8+aqHYQGg1C3OALi9hVVWnrv7JJWQ==}
@@ -6362,6 +6369,8 @@ snapshots:
       use-sync-external-store: 1.6.0(react@19.2.4)
     optionalDependencies:
       '@types/react': 19.2.14
+
+  '@beehiiv/sdk@0.1.9': {}
 
   '@better-auth/cli@1.4.21(@better-fetch/fetch@1.1.21)(@libsql/client@0.15.15)(@opentelemetry/api@1.9.0)(@tanstack/react-start@1.159.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)))(better-call@1.1.8(zod@4.3.6))(drizzle-kit@0.31.9)(jose@6.1.3)(kysely@0.28.11)(nanostores@1.1.0)(next@16.0.10(@babel/core@7.29.0)(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)(vitest@3.2.4(@types/debug@4.1.12)(@types/node@22.19.11)(jiti@2.6.1)(jsdom@27.4.0(@noble/hashes@2.0.1))(lightningcss@1.30.2)(msw@2.12.10(@types/node@22.19.11)(typescript@5.9.3))(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:

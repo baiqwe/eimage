@@ -84,9 +84,9 @@ export interface MailConfig {
 
 /** Newsletter configuration */
 export interface NewsletterConfig {
-  enable: boolean;                    // Whether to enable the newsletter
-  provider?: 'resend';                // The newsletter provider, only resend is supported for now
-  autoSubscribeAfterSignUp?: boolean; // Whether to automatically subscribe users after sign up
+  enable: boolean;                        // Whether to enable the newsletter
+  provider?: 'resend' | 'beehiiv';        // The newsletter provider
+  autoSubscribeAfterSignUp?: boolean;     // Whether to automatically subscribe users after sign up
 }
 
 /** Notification configuration */
