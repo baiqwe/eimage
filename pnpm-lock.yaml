@@ -80,6 +80,9 @@ importers:
       cmdk:
         specifier: ^1.1.1
         version: 1.1.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      creem:
+        specifier: ^1.4.4
+        version: 1.4.4
       crisp-sdk-web:
         specifier: ^1.0.27
         version: 1.0.27
@@ -3213,6 +3216,10 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  creem@1.4.4:
+    resolution: {integrity: sha512-hfnHOIqNERf783FMJOOpbmD701y4t6HuVKR8kIm16X3l5OK6yMM0ifd2zY8CbRqSLeqK/iQV1D8FLgZEVs7Alg==}
+    hasBin: true
 
   crisp-sdk-web@1.0.27:
     resolution: {integrity: sha512-aNWR3te65YiaVFu/iwdqOo3cyUBZHUheE4d6EtgQu/T18jh/9SpoYXjXF/OzUD3Cqy0pGryoqtuy5gxD8tqX9Q==}
@@ -7155,6 +7162,28 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@modelcontextprotocol/sdk@1.26.0(zod@4.3.6)':
+    dependencies:
+      '@hono/node-server': 1.19.9(hono@4.11.9)
+      ajv: 8.17.1
+      ajv-formats: 3.0.1(ajv@8.17.1)
+      content-type: 1.0.5
+      cors: 2.8.6
+      cross-spawn: 7.0.6
+      eventsource: 3.0.7
+      eventsource-parser: 3.0.6
+      express: 5.2.1
+      express-rate-limit: 8.2.1(express@5.2.1)
+      hono: 4.11.9
+      jose: 6.1.3
+      json-schema-typed: 8.0.2
+      pkce-challenge: 5.0.1
+      raw-body: 3.0.2
+      zod: 4.3.6
+      zod-to-json-schema: 3.25.1(zod@4.3.6)
+    transitivePeerDependencies:
+      - supports-color
+
   '@mrleebo/prisma-ast@0.13.1':
     dependencies:
       chevrotain: 10.5.0
@@ -8769,6 +8798,14 @@ snapshots:
       parse-json: 5.2.0
     optionalDependencies:
       typescript: 5.9.3
+
+  creem@1.4.4:
+    dependencies:
+      '@modelcontextprotocol/sdk': 1.26.0(zod@4.3.6)
+      zod: 4.3.6
+    transitivePeerDependencies:
+      - '@cfworker/json-schema'
+      - supports-color
 
   crisp-sdk-web@1.0.27: {}
 
@@ -11838,6 +11875,10 @@ snapshots:
   zod-to-json-schema@3.25.1(zod@3.25.76):
     dependencies:
       zod: 3.25.76
+
+  zod-to-json-schema@3.25.1(zod@4.3.6):
+    dependencies:
+      zod: 4.3.6
 
   zod@3.25.76: {}
 

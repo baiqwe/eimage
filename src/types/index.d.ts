@@ -106,9 +106,9 @@ export interface StorageConfig {
 
 /** Payment configuration */
 export interface PaymentConfig {
-  enable?: boolean;                  // Whether to enable payment (Stripe); when false, no checkout/billing
-  provider?: 'stripe';               // The payment provider, only stripe is supported for now
-  price?: PriceConfig;               // The price plans configuration
+  enable?: boolean;                           // Whether to enable payment; when false, no checkout/billing
+  provider?: 'stripe' | 'creem' | '';         // The payment provider (stripe, creem, or '' for disabled)
+  price?: PriceConfig;                        // The price plans configuration
 }
 
 /** Price configuration */

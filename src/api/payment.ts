@@ -11,6 +11,7 @@ import type {
   Subscription,
 } from '@/payment/types';
 import { PaymentScenes, PaymentTypes } from '@/payment/types';
+import { websiteConfig } from '@/config/website';
 import { createServerFn } from '@tanstack/react-start';
 import { and, desc, eq, or } from 'drizzle-orm';
 import { z } from 'zod';
@@ -37,17 +38,30 @@ export const createCheckoutSession = createServerFn({ method: 'POST' })
     if (!userRow?.email) throw new Error('User email not found');
     const { planId, priceId, successUrl, cancelUrl, metadata } = data;
     const baseUrl = process.env.VITE_BASE_URL ?? '';
-    const success =
-      successUrl ??
-      `${baseUrl}/settings/payment?session_id={CHECKOUT_SESSION_ID}&callback=/settings/billing`;
+    const isCreem = websiteConfig.payment?.provider === 'creem';
     const cancel = cancelUrl ?? `${baseUrl}/settings/billing`;
+
+    // For Stripe: {CHECKOUT_SESSION_ID} is replaced by Stripe on redirect,
+    // then the Payment page polls by sessionId until the webhook writes the DB record.
+    // For Creem: Creem does NOT replace URL placeholders and has its own
+    // payment confirmation page, so redirect straight to billing.
+    const success = isCreem
+      ? (successUrl ?? `${baseUrl}/settings/billing`)
+      : (successUrl ??
+        `${baseUrl}/settings/payment?session_id={CHECKOUT_SESSION_ID}&callback=/settings/billing`);
+    const checkoutMetadata = {
+      ...metadata,
+      userId,
+      userName: userRow.name ?? '',
+    };
+
     const result = await createCheckout({
       planId,
       priceId,
       customerEmail: userRow.email,
       successUrl: success,
       cancelUrl: cancel,
-      metadata: { ...metadata, userId, userName: userRow.name ?? '' },
+      metadata: checkoutMetadata,
     });
     return { url: result.url, id: result.id };
   });
@@ -182,6 +196,10 @@ export const getCurrentPlan = createServerFn({ method: 'GET' })
 
 const checkCompletionSchema = z.object({ sessionId: z.string().min(1) });
 
+/**
+ * Check payment completion by Stripe session ID.
+ * Used by Stripe flow where the session ID is embedded in the redirect URL.
+ */
 export const checkPaymentCompletion = createServerFn({ method: 'GET' })
   .inputValidator(checkCompletionSchema)
   .middleware([authApiMiddleware])

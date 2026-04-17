@@ -26,6 +26,11 @@ export const serverEnv = createEnv({
     // Payment (Stripe)
     STRIPE_SECRET_KEY: z.string().optional(),
     STRIPE_WEBHOOK_SECRET: z.string().optional(),
+
+    // Payment (Creem)
+    CREEM_DEBUG: z.string().optional(),
+    CREEM_API_KEY: z.string().optional(),
+    CREEM_WEBHOOK_SECRET: z.string().optional(),
   },
   runtimeEnv: process.env,
 });

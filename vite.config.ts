@@ -13,6 +13,9 @@ import contentCollections from '@content-collections/vite';
  * https://vite.dev/config/
  */
 const config = defineConfig({
+  server: {
+    allowedHosts: ['.trycloudflare.com', '.tanstarter.dev'],
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
