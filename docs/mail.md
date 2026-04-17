@@ -1,6 +1,6 @@
 # Mail module
 
-Transactional email (verification, password reset, contact form, subscription welcome). Runs in Cloudflare Worker; **Resend** is the built-in provider. Design allows adding other providers (e.g. Cloudflare Emails) via a provider registry without changing callers.
+Transactional email (verification, password reset, contact form, subscription welcome). Runs in Cloudflare Worker; **Resend** and **Cloudflare Email Service** are the built-in providers. Design allows adding other providers via a provider registry without changing callers.
 
 **Consumers:** Auth (`sendVerificationEmail`, `sendResetPassword`), contact form (`sendContactMessage` in `src/api/contact.ts`), newsletter subscribe — all use `sendEmail(...)` only.
 
@@ -14,7 +14,8 @@ src/mail/
 ├── types.ts           # EmailTemplate, MailProviderName, Send*Params, MailProvider
 ├── render.ts          # getTemplate, renderEmailHtml, toPlainText; subjectByTemplate
 ├── provider/
-│   └── resend.ts      # ResendProvider implements MailProvider
+│   ├── resend.ts      # ResendProvider implements MailProvider
+│   └── cloudflare.ts  # CloudflareProvider implements MailProvider
 ├── templates/
 │   ├── verify-email.tsx
 │   ├── forgot-password.tsx
@@ -31,10 +32,61 @@ src/mail/
 
 | Source | Key | Description |
 |--------|-----|-------------|
-| `websiteConfig.mail` | `provider` | `'resend'`. Extend in `src/types/index.d.ts` when adding providers. |
+| `websiteConfig.mail` | `provider` | `'resend'` or `'cloudflare'`. Extend in `src/types/index.d.ts` when adding providers. |
 | | `fromEmail` | Sender address (required for sending). |
 | | `supportEmail` | Used by contact form target. |
-| Env / Worker | `RESEND_API_KEY` | Required for Resend. Set in the environment file or Wrangler secrets. See [Env](./env.md). |
+| Env / Worker | `RESEND_API_KEY` | Required when using the **Resend** provider. Set in the environment file or Wrangler secrets. See [Env](./env.md). |
+| Wrangler binding | `EMAIL` | Required when using the **Cloudflare** provider. Configured via `send_email` binding in `wrangler.jsonc`. |
+
+---
+
+## Providers
+
+### Resend
+
+Uses the [Resend](https://resend.com/docs) SDK. Requires `RESEND_API_KEY` env var.
+
+```ts
+// src/config/website.ts
+mail: {
+  enable: true,
+  provider: 'resend',
+  fromEmail: 'MyApp <support@example.com>',
+}
+```
+
+### Cloudflare Email Service
+
+Uses the [Cloudflare Email Service Workers API](https://developers.cloudflare.com/email-service/get-started/send-emails/) via the `send_email` binding. No API key needed — authentication is handled by the Worker binding.
+
+**Prerequisites:**
+1. Your domain must be using Cloudflare DNS.
+2. Onboard your domain in the Cloudflare dashboard under **Email Sending**.
+3. Add the `send_email` binding in `wrangler.jsonc` (already included in the template):
+
+```jsonc
+// wrangler.jsonc
+"send_email": [
+  {
+    "name": "EMAIL"
+  }
+]
+```
+
+4. Run `pnpm cf-typegen` to regenerate Worker types.
+
+**Usage:**
+
+```ts
+// src/config/website.ts
+mail: {
+  enable: true,
+  provider: 'cloudflare',
+  fromEmail: 'MyApp <support@example.com>',
+}
+```
+
+> **Note:** The `fromEmail` address must be on a verified domain in your Cloudflare account.
 
 ---
 
@@ -42,7 +94,7 @@ src/mail/
 
 | Export | Description |
 |--------|-------------|
-| **sendEmail(params)** | `SendTemplateParams` → render template + send; `SendRawEmailParams` → send raw. Returns `Promise<boolean>`. |
+| **sendEmail(params)** | `SendTemplateParams` → render template + send; `SendRawEmailParams` → send raw. Returns `Promise<SendEmailResult>`. |
 | **getMailProvider()** | Lazy-initialized provider from `websiteConfig.mail.provider`. |
 | **getTemplate({ template, context })** | Returns `{ html, text, subject }`; used by providers internally. |
 
@@ -65,11 +117,11 @@ src/mail/
 
 ## Adding a new mail provider
 
-The module uses a **provider registry** (`providerRegistry` in `index.ts`). To add e.g. Cloudflare Emails:
+The module uses a **provider registry** (`providerRegistry` in `index.ts`). To add a new provider:
 
-1. **Types** — In `src/mail/types.ts`, extend `MailProviderName` (e.g. `'resend' | 'cloudflare'`). In `src/types/index.d.ts`, extend `MailConfig.provider` with the same union.
-2. **Implementation** — Add `src/mail/provider/cloudflare.ts` implementing `MailProvider` (`sendTemplate`, `sendRawEmail`, `getProviderName`). Use `getTemplate` from `../render` for template-based sends.
-3. **Registration** — In `src/mail/index.ts`, add a factory to `providerRegistry`: `cloudflare: () => new CloudflareProvider(...)`, reading provider-specific env/bindings inside.
+1. **Types** — In `src/types/index.d.ts`, extend `MailConfig.provider` union (e.g. `'resend' | 'cloudflare' | 'newprovider'`).
+2. **Implementation** — Add `src/mail/provider/<name>.ts` implementing `MailProvider` (`sendTemplate`, `sendRawEmail`, `getProviderName`). Use `getTemplate` from `../render` for template-based sends.
+3. **Registration** — In `src/mail/index.ts`, add a factory to `providerRegistry`: `newprovider: () => new NewProvider(...)`, reading provider-specific env/bindings inside.
 
 Callers continue using `sendEmail(...)` only.
 
@@ -78,4 +130,5 @@ Callers continue using `sendEmail(...)` only.
 ## Dependencies
 
 - **resend** — Resend SDK (when using Resend provider).
+- **cloudflare:workers** — Cloudflare Workers env binding (when using Cloudflare provider; no extra npm dependency).
 - **React / react-dom/server** — Template rendering (`renderToReadableStream` or `renderToStaticMarkup`).

@@ -76,5 +76,15 @@
       "bucket_name": "mkfast-template",
       "binding": "BUCKET"
     }
+  ],
+  /**
+   * Cloudflare Email Service: send emails via Workers binding
+   * https://developers.cloudflare.com/email-service/get-started/send-emails/
+   * Enable this binding when using 'cloudflare' as the mail provider.
+   */
+  "send_email": [
+    {
+      "name": "EMAIL"
+    }
   ]
 }

@@ -76,10 +76,10 @@ export interface AffiliatesConfig {
 
 /** Mail configuration */
 export interface MailConfig {
-  enable: boolean;          // Whether to enable the mail
-  provider?: 'resend';      // The email provider, only resend is supported for now
-  fromEmail?: string;       // The email address to send notification emails from
-  supportEmail?: string;    // The email address to send support or contact emails to
+  enable: boolean;                      // Whether to enable the mail
+  provider?: 'resend' | 'cloudflare';   // The email provider, supports resend and cloudflare
+  fromEmail?: string;                   // The email address to send notification emails from
+  supportEmail?: string;                // The email address to send support or contact emails to
 }
 
 /** Newsletter configuration */
