@@ -1,6 +1,6 @@
 # Newsletter module
 
-Email subscribe / unsubscribe / status, driven by **Resend** or **Beehiiv**. Config via `websiteConfig.newsletter`; env from **serverEnv** (`src/env/server.ts`). See [Env](./env.md) for variable list and where to set them.
+Email subscribe / unsubscribe / status, driven by **Beehiiv**. Config via `websiteConfig.newsletter`; env from **serverEnv** (`src/env/server.ts`). See [Env](./env.md) for variable list and where to set them.
 
 **Consumers:** API routes (`/api/newsletter/subscribe`, `unsubscribe`, `status`), hooks (`use-newsletter`), settings card (`NewsletterFormCard`), marketing block (`NewsletterCard`). Optional welcome email after subscribe is sent by the **Mail** module when `websiteConfig.mail.fromEmail` is set.
 
@@ -15,7 +15,6 @@ src/newsletter/
 ├── index.ts           # subscribe, unsubscribe, isSubscribed, getNewsletterProvider; providerRegistry
 ├── types.ts           # NewsletterProviderName, NewsletterProvider, params & handler types
 └── provider/
-    ├── resend.ts      # ResendNewsletterProvider (Resend Audiences contacts)
     └── beehiiv.ts     # BeehiivNewsletterProvider (@beehiiv/sdk)
 ```
 
@@ -33,10 +32,9 @@ src/newsletter/
 | Source | Key | Description |
 |--------|-----|-------------|
 | `websiteConfig.newsletter` | `enable` | Master switch; when false, API returns 400 and UI hides. |
-| | `provider` | `'resend'` \| `'beehiiv'`. |
+| | `provider` | `'beehiiv'`. |
 | | `autoSubscribeAfterSignUp` | If true, call `subscribe(user.email)` after sign-up (implement in auth/sign-up flow). |
-| `serverEnv` (`src/env/server.ts`) | `RESEND_API_KEY` | Optional; required when provider is `resend` (shared with Mail if used). |
-| | `BEEHIIV_API_KEY`, `BEEHIIV_PUBLICATION_ID` | Optional; both required when provider is `beehiiv`. |
+| `serverEnv` (`src/env/server.ts`) | `BEEHIIV_API_KEY`, `BEEHIIV_PUBLICATION_ID` | Both required when provider is `beehiiv`. |
 
 Env is defined in `serverEnv` (runtime: `process.env`; Worker vars/secrets populate it).
 
@@ -61,8 +59,6 @@ Env is defined in `serverEnv` (runtime: `process.env`; Worker vars/secrets popul
 - `unsubscribe({ email })` → `Promise<boolean>`
 - `checkSubscribeStatus({ email })` → `Promise<boolean>`
 - `getProviderName()` → string
-
-**Resend:** Uses Resend Audiences contacts (`contacts.create` / `contacts.update` / `contacts.get`). Subscribe: create contact with `unsubscribed: false`; on conflict, update to subscribed.
 
 **Beehiiv:** Uses `@beehiiv/sdk` (subscriptions + bulk updates). Subscribe: get by email, reactivate if needed or create; unsubscribe: patch subscription to unsubscribed.
 
@@ -94,5 +90,4 @@ All return 400 when newsletter is disabled or email invalid; throw or return err
 
 ## Dependencies
 
-- **resend** — Resend SDK (audiences/contacts).
-- **@beehiiv/sdk** — Beehiiv API client (when using Beehiiv provider).
+- **@beehiiv/sdk** — Beehiiv API client.

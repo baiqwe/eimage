@@ -69,13 +69,13 @@ export const websiteConfig: WebsiteConfig = {
   },
   mail: {
     enable: true,
-    provider: 'resend',
+    provider: 'cloudflare',
     fromEmail: 'TanStarter <support@tanstarter.dev>',
     supportEmail: 'TanStarter <support@tanstarter.dev>',
   },
   newsletter: {
     enable: true,
-    provider: 'resend',
+    provider: 'beehiiv',
     autoSubscribeAfterSignUp: true,
   },
   notification: {

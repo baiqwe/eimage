@@ -46,8 +46,6 @@ src/auth/
   - `emailHarmony()` — email normalization/validation; `allowNormalizedSignin: false`.
 - **onAPIError**: `errorURL: '/auth/error'`; optional `onError` logging.
 
-All email sending goes through the Mail module (no direct Resend dependency).
-
 ---
 
 ## Client (client.ts)
@@ -86,7 +84,7 @@ Server functions that need a session (e.g. `listUsers` in `src/api/users.ts`) us
 
 - **websiteConfig.auth** (`src/config/website.ts`): `enable`, `enableGoogleLogin`, `enableCredentialLogin`.
 - **D1**: Configure `d1_databases` in `wrangler.jsonc` with binding name **`DB`**; `getDb()` uses `env.DB`.
-- **Mail**: Verification and password reset depend on the Mail module; configure `RESEND_API_KEY`, `mail.fromEmail`, etc. (see [Mail](./mail.md)).
+- **Mail**: Verification and password reset depend on the Mail module; configure `mail.fromEmail`, Cloudflare Email binding, etc. (see [Mail](./mail.md)).
 - **Google OAuth**: Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in server env. Full list: [Env](./env.md).
 
 ---

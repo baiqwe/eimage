@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**TanStarter** (mkfast-template) — a full-stack SaaS boilerplate built with TanStack Start + React 19, deployed on Cloudflare Workers. Includes auth (Better Auth), payments (Stripe), email (Resend), storage (R2), database (D1/SQLite via Drizzle ORM), blog (Content Collections), and admin dashboard.
+**TanStarter** (mkfast-template) — a full-stack SaaS boilerplate built with TanStack Start + React 19, deployed on Cloudflare Workers. Includes auth (Better Auth), payments (Stripe), email (Cloudflare Email), storage (R2), database (D1/SQLite via Drizzle ORM), blog (Content Collections), and admin dashboard.
 
 ## Commands
 
@@ -42,7 +42,7 @@ Incoming request → Cloudflare Worker (`src/server.ts`) → TanStack Start hand
 
 - **Server functions**: Defined with `createServerFn()` from `@tanstack/react-start`. Located in `src/api/`. Support `.inputValidator()` (Zod) and `.middleware()` chains. Called directly from client code.
 
-- **Provider pattern**: Mail, storage, newsletter, notification, and payment each use a provider abstraction (`src/*/provider/`) so implementations can be swapped (e.g., `src/mail/provider/resend.ts`, `src/storage/provider/r2.ts`).
+- **Provider pattern**: Mail, storage, newsletter, notification, and payment each use a provider abstraction (`src/*/provider/`) so implementations can be swapped (e.g., `src/mail/provider/cloudflare.ts`, `src/storage/provider/r2.ts`).
 
 - **Middleware**: `src/middlewares/auth-middleware.ts` (requires login) and `src/middlewares/admin-middleware.ts` (requires admin role) used with server functions.
 
@@ -57,9 +57,9 @@ Incoming request → Cloudflare Worker (`src/server.ts`) → TanStack Start hand
 | `src/auth/` | Better Auth config (`auth.ts` server, `client.ts` client) |
 | `src/db/` | Drizzle schemas (`auth.schema.ts` auto-generated, `app.schema.ts` app tables), migrations, types |
 | `src/payment/` | Stripe integration (checkout, portal, webhooks) |
-| `src/mail/` | Resend email — provider, templates (React components), rendering |
+| `src/mail/` | Cloudflare Email — provider, templates (React components), rendering |
 | `src/storage/` | Cloudflare R2 file storage |
-| `src/newsletter/` | Resend and Beehiiv newsletter via API |
+| `src/newsletter/` | Beehiiv newsletter via API |
 | `src/notification/` | Discord/Feishu webhook notifications |
 | `src/components/ui/` | shadcn/ui components (auto-generated, excluded from linting) |
 | `src/config/` | Site configuration (website.ts is the main config for features, pricing, metadata) |

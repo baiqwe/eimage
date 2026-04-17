@@ -63,7 +63,6 @@ Read at **Worker request time**. Used for secrets, API keys, and server-only con
 | `GOOGLE_CLIENT_ID` | Google OAuth | No | Auth when Google login enabled |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth | No | Auth when Google login enabled |
 | **Mail & newsletter** | | | |
-| `RESEND_API_KEY` | Resend API | No | [Mail](./mail.md), [Newsletter](./newsletter.md) (when using Resend) |
 | `BEEHIIV_API_KEY` | Beehiiv API | No | Newsletter when provider is Beehiiv |
 | `BEEHIIV_PUBLICATION_ID` | Beehiiv publication | No | Newsletter when provider is Beehiiv |
 | **Notification** | | | |
