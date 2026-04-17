@@ -26,7 +26,7 @@ function createProvider(): PaymentProvider {
   }
   const name = paymentConfig.provider;
   if (!name) throw new Error('Payment provider is required.');
-  const factory = providerRegistry[name as PaymentProviderName];
+  const factory = providerRegistry[name];
   if (!factory) {
     throw new Error(`Unsupported payment provider: ${name}.`);
   }

@@ -7,21 +7,22 @@ import {
   DEFAULT_USER_FILES_FOLDER,
 } from '@/storage/types';
 
-// Payment provider controlled by env var: 'stripe' | 'creem' | '' (empty means disabled)
+// Set `enable: true` to enable payment, `enable: false` to disable.
+const isPaymentEnabled = true;
+// Payment provider from env var: 'stripe' | 'creem'
 const paymentProvider = clientEnv.VITE_PAYMENT_PROVIDER;
-const isPaymentEnabled = paymentProvider !== '';
-const isCreem = paymentProvider === 'creem';
+const isCreemPayment = paymentProvider === 'creem';
 
 // Resolve price/product IDs based on the active payment provider
 const priceIds = isPaymentEnabled
   ? {
-      proMonthly: isCreem
+      proMonthly: isCreemPayment
         ? (clientEnv.VITE_CREEM_PRODUCT_PRO_MONTHLY ?? '')
         : (clientEnv.VITE_STRIPE_PRICE_PRO_MONTHLY ?? ''),
-      proYearly: isCreem
+      proYearly: isCreemPayment
         ? (clientEnv.VITE_CREEM_PRODUCT_PRO_YEARLY ?? '')
         : (clientEnv.VITE_STRIPE_PRICE_PRO_YEARLY ?? ''),
-      lifetime: isCreem
+      lifetime: isCreemPayment
         ? (clientEnv.VITE_CREEM_PRODUCT_LIFETIME ?? '')
         : (clientEnv.VITE_STRIPE_PRICE_LIFETIME ?? ''),
     }
@@ -74,7 +75,7 @@ export const websiteConfig: WebsiteConfig = {
     supportEmail: 'TanStarter <support@tanstarter.dev>',
   },
   newsletter: {
-    enable: true,
+    enable: false,
     provider: 'beehiiv',
     autoSubscribeAfterSignUp: true,
   },
@@ -91,7 +92,7 @@ export const websiteConfig: WebsiteConfig = {
   },
   payment: {
     enable: isPaymentEnabled,
-    provider: isPaymentEnabled ? paymentProvider : undefined,
+    provider: paymentProvider,
     price: {
       plans: {
         free: {

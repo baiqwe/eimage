@@ -150,12 +150,9 @@ export interface PortalResult {
 }
 
 /**
- * Payment providers (only actual provider names, excludes empty string)
+ * Payment providers (actual provider names from config)
  */
-export type PaymentProviderName = Exclude<
-  NonNullable<PaymentConfig['provider']>,
-  ''
->;
+export type PaymentProviderName = NonNullable<PaymentConfig['provider']>;
 
 /**
  * Payment provider interface
