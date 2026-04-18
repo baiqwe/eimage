@@ -14,6 +14,10 @@ export const serverEnv = createEnv({
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
 
+    // Mail (Cloudflare Email)
+    CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
+    CLOUDFLARE_API_TOKEN: z.string().optional(),
+
     // Newsletter (Beehiiv)
     BEEHIIV_API_KEY: z.string().optional(),
     BEEHIIV_PUBLICATION_ID: z.string().optional(),
