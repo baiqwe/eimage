@@ -276,7 +276,7 @@ export const messages = {
     },
     apiKeys: {
       title: 'API Keys',
-      description: 'Manage your API keys for authentication',
+      description: 'Manage your API keys',
       createButton: 'Create API Key',
       createDialogTitle: 'Create API Key',
       createDialogDescription: 'Give your API key a name to identify it later',
