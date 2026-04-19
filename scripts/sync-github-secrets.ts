@@ -24,6 +24,150 @@ function parseEnvFile(filePath: string): Record<string, string> {
   return env;
 }
 
+// ---------------------------------------------------------------------------
+// Sync deploy.yml env block with .env.example
+// ---------------------------------------------------------------------------
+
+const DEPLOY_YML = path.join(__dirname, '..', '.github', 'workflows', 'deploy.yml');
+
+/** Prefixes of env vars that must appear in the Build step's env block */
+const BUILD_PREFIXES = ['VITE_', 'CLOUDFLARE_'];
+
+function syncDeployYml(): void {
+  const envExamplePath = path.join(__dirname, '..', '.env.example');
+  if (!fs.existsSync(envExamplePath)) {
+    console.log('⚠️  .env.example not found, skipping deploy.yml sync\n');
+    return;
+  }
+  if (!fs.existsSync(DEPLOY_YML)) {
+    console.log('⚠️  deploy.yml not found, skipping deploy.yml sync\n');
+    return;
+  }
+
+  // Collect build-time var names from .env.example
+  const envExample = parseEnvFile(envExamplePath);
+  const requiredKeys = Object.keys(envExample).filter((k) =>
+    BUILD_PREFIXES.some((p) => k.startsWith(p))
+  );
+
+  // Parse deploy.yml and find the Build step env block
+  const ymlContent = fs.readFileSync(DEPLOY_YML, 'utf8');
+  const lines = ymlContent.split('\n');
+
+  // Find "- name: Build" step
+  let buildStepLine = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (/^\s*-\s+name:\s*Build/i.test(lines[i])) {
+      buildStepLine = i;
+      break;
+    }
+  }
+  if (buildStepLine === -1) {
+    console.log('⚠️  Could not find Build step in deploy.yml, skipping sync\n');
+    return;
+  }
+
+  // Find env: under the Build step
+  const stepIndent = lines[buildStepLine].match(/^(\s*)/)?.[1].length ?? 0;
+  let envLineIndex = -1;
+
+  for (let i = buildStepLine + 1; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trimStart();
+
+    // Reached next step or job
+    if (
+      trimmed.startsWith('- name:') ||
+      (trimmed.length > 0 &&
+        (line.match(/^(\s*)/)?.[1].length ?? 0) <= stepIndent &&
+        !trimmed.startsWith('#'))
+    ) {
+      break;
+    }
+
+    if (/^\s+env:\s*$/.test(line)) {
+      envLineIndex = i;
+      break;
+    }
+  }
+
+  if (envLineIndex === -1) {
+    console.log('⚠️  Could not find env: under Build step, skipping sync\n');
+    return;
+  }
+
+  // Collect existing env entries
+  const existingKeys = new Set<string>();
+  let lastEntryIndex = envLineIndex;
+  let indent = '          '; // default 10 spaces
+
+  for (let i = envLineIndex + 1; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Comments inside the block — keep scanning but don't advance lastEntryIndex
+    if (line.trim().startsWith('#')) {
+      lastEntryIndex = i;
+      continue;
+    }
+
+    // Empty line — end of env block
+    if (line.trim() === '') {
+      break;
+    }
+
+    const entryMatch = line.match(/^(\s+)([A-Z_][A-Z0-9_]*):\s/);
+    if (entryMatch) {
+      indent = entryMatch[1];
+      existingKeys.add(entryMatch[2]);
+      lastEntryIndex = i;
+      continue;
+    }
+
+    // Not an env entry → end of block
+    break;
+  }
+
+  // Diff
+  const missing = requiredKeys.filter((k) => !existingKeys.has(k));
+  const extra = [...existingKeys].filter(
+    (k) =>
+      BUILD_PREFIXES.some((p) => k.startsWith(p)) &&
+      !requiredKeys.includes(k)
+  );
+
+  console.log('🔄 Syncing deploy.yml env block with .env.example...');
+  console.log(
+    `   .env.example: ${requiredKeys.length} build-time vars | deploy.yml: ${existingKeys.size} vars`
+  );
+
+  if (missing.length === 0 && extra.length === 0) {
+    console.log('   ✅ deploy.yml is in sync\n');
+    return;
+  }
+
+  if (extra.length > 0) {
+    console.log(`   ⚠️  In deploy.yml but not in .env.example: ${extra.join(', ')}`);
+  }
+
+  if (missing.length > 0) {
+    // Append missing entries
+    const newLines = missing.map(
+      (k) => `${indent}${k}: \${{ secrets.${k} }}`
+    );
+    lines.splice(lastEntryIndex + 1, 0, ...newLines);
+    fs.writeFileSync(DEPLOY_YML, lines.join('\n'), 'utf8');
+
+    console.log(`   ✅ Added ${missing.length} var(s) to deploy.yml: ${missing.join(', ')}`);
+    console.log('   📝 Remember to commit the updated deploy.yml\n');
+  } else {
+    console.log('');
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sync GitHub secrets
+// ---------------------------------------------------------------------------
+
 const DELAY_MS = 1500;
 const MAX_RETRIES = 3;
 
@@ -178,6 +322,10 @@ async function setSecret(
 }
 
 async function main() {
+  // Step 1: Sync deploy.yml env block with .env.example
+  syncDeployYml();
+
+  // Step 2: Push secrets to GitHub
   const envPath = path.join(__dirname, '..', '.env.production');
   const rootDir = path.join(__dirname, '..');
 
