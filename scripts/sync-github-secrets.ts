@@ -50,56 +50,29 @@ function syncDeployYml(): void {
     BUILD_PREFIXES.some((p) => k.startsWith(p))
   );
 
-  // Parse deploy.yml and find the Build step env block
+  // Parse deploy.yml and find the job-level env block (under `deploy:`)
   const ymlContent = fs.readFileSync(DEPLOY_YML, 'utf8');
   const lines = ymlContent.split('\n');
 
-  // Find "- name: Build" step
-  let buildStepLine = -1;
-  for (let i = 0; i < lines.length; i++) {
-    if (/^\s*-\s+name:\s*Build/i.test(lines[i])) {
-      buildStepLine = i;
-      break;
-    }
-  }
-  if (buildStepLine === -1) {
-    console.log('⚠️  Could not find Build step in deploy.yml, skipping sync\n');
-    return;
-  }
-
-  // Find env: under the Build step
-  const stepIndent = lines[buildStepLine].match(/^(\s*)/)?.[1].length ?? 0;
+  // Find the job-level `env:` — sits directly under a job key (e.g. `deploy:`)
+  // with indentation level 4 (4 spaces: `    env:`)
   let envLineIndex = -1;
-
-  for (let i = buildStepLine + 1; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trimStart();
-
-    // Reached next step or job
-    if (
-      trimmed.startsWith('- name:') ||
-      (trimmed.length > 0 &&
-        (line.match(/^(\s*)/)?.[1].length ?? 0) <= stepIndent &&
-        !trimmed.startsWith('#'))
-    ) {
-      break;
-    }
-
-    if (/^\s+env:\s*$/.test(line)) {
+  for (let i = 0; i < lines.length; i++) {
+    if (/^    env:\s*$/.test(lines[i])) {
       envLineIndex = i;
       break;
     }
   }
 
   if (envLineIndex === -1) {
-    console.log('⚠️  Could not find env: under Build step, skipping sync\n');
+    console.log('⚠️  Could not find job-level env: in deploy.yml, skipping sync\n');
     return;
   }
 
   // Collect existing env entries
   const existingKeys = new Set<string>();
   let lastEntryIndex = envLineIndex;
-  let indent = '          '; // default 10 spaces
+  let indent = '      '; // default 6 spaces (job-level env)
 
   for (let i = envLineIndex + 1; i < lines.length; i++) {
     const line = lines[i];
@@ -135,7 +108,7 @@ function syncDeployYml(): void {
       !requiredKeys.includes(k)
   );
 
-  console.log('🔄 Syncing deploy.yml env block with .env.example...');
+  console.log('🔄 Syncing deploy.yml job-level env with .env.example...');
   console.log(
     `   .env.example: ${requiredKeys.length} build-time vars | deploy.yml: ${existingKeys.size} vars`
   );
