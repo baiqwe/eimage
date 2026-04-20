@@ -27,15 +27,6 @@ const priceIds = isPaymentEnabled
     }
   : { proMonthly: '', proYearly: '', lifetime: '' };
 
-// verify CI build injects env vars correctly
-console.info('[build] payment:', {
-  provider: paymentProvider,
-  enabled: isPaymentEnabled,
-  proMonthly: priceIds.proMonthly ? '✓' : '✗',
-  proYearly: priceIds.proYearly ? '✓' : '✗',
-  lifetime: priceIds.lifetime ? '✓' : '✗',
-});
-
 /**
  * Website config
  */

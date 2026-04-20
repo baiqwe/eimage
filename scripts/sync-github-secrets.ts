@@ -28,7 +28,13 @@ function parseEnvFile(filePath: string): Record<string, string> {
 // Sync deploy.yml env block with .env.example
 // ---------------------------------------------------------------------------
 
-const DEPLOY_YML = path.join(__dirname, '..', '.github', 'workflows', 'deploy.yml');
+const DEPLOY_YML = path.join(
+  __dirname,
+  '..',
+  '.github',
+  'workflows',
+  'deploy.yml'
+);
 
 /** Prefixes of env vars that must appear in the Build step's env block */
 const BUILD_PREFIXES = ['VITE_', 'CLOUDFLARE_'];
@@ -58,14 +64,16 @@ function syncDeployYml(): void {
   // with indentation level 4 (4 spaces: `    env:`)
   let envLineIndex = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (/^    env:\s*$/.test(lines[i])) {
+    if (/^ {4}env:\s*$/.test(lines[i])) {
       envLineIndex = i;
       break;
     }
   }
 
   if (envLineIndex === -1) {
-    console.log('⚠️  Could not find job-level env: in deploy.yml, skipping sync\n');
+    console.log(
+      '⚠️  Could not find job-level env: in deploy.yml, skipping sync\n'
+    );
     return;
   }
 
@@ -104,8 +112,7 @@ function syncDeployYml(): void {
   const missing = requiredKeys.filter((k) => !existingKeys.has(k));
   const extra = [...existingKeys].filter(
     (k) =>
-      BUILD_PREFIXES.some((p) => k.startsWith(p)) &&
-      !requiredKeys.includes(k)
+      BUILD_PREFIXES.some((p) => k.startsWith(p)) && !requiredKeys.includes(k)
   );
 
   console.log('🔄 Syncing deploy.yml job-level env with .env.example...');
@@ -119,18 +126,20 @@ function syncDeployYml(): void {
   }
 
   if (extra.length > 0) {
-    console.log(`   ⚠️  In deploy.yml but not in .env.example: ${extra.join(', ')}`);
+    console.log(
+      `   ⚠️  In deploy.yml but not in .env.example: ${extra.join(', ')}`
+    );
   }
 
   if (missing.length > 0) {
     // Append missing entries
-    const newLines = missing.map(
-      (k) => `${indent}${k}: \${{ secrets.${k} }}`
-    );
+    const newLines = missing.map((k) => `${indent}${k}: \${{ secrets.${k} }}`);
     lines.splice(lastEntryIndex + 1, 0, ...newLines);
     fs.writeFileSync(DEPLOY_YML, lines.join('\n'), 'utf8');
 
-    console.log(`   ✅ Added ${missing.length} var(s) to deploy.yml: ${missing.join(', ')}`);
+    console.log(
+      `   ✅ Added ${missing.length} var(s) to deploy.yml: ${missing.join(', ')}`
+    );
     console.log('   📝 Remember to commit the updated deploy.yml\n');
   } else {
     console.log('');
