@@ -145,4 +145,10 @@ html::-webkit-scrollbar {
   display: none;
 } */
 
+/* ── Scrollbar styling ── */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: gray transparent;
+}
+
 /* custom markdown styles end */
