@@ -22,7 +22,11 @@ const config = defineConfig({
     },
   },
   plugins: [
-    devtools(),
+    devtools({
+      eventBusConfig: {
+        port: 0,
+      },
+    }),
     tailwindcss(),
     contentCollections(),
     // this is the plugin that enables path aliases
