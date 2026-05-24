@@ -18,6 +18,10 @@ jobs:
     timeout-minutes: 15
     env:
       NODE_OPTIONS: '--max-old-space-size=4096'
+      # --- Cloudflare credentials (needed by cf-typegen in postinstall) ---
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_DATABASE_ID: ${{ secrets.CLOUDFLARE_DATABASE_ID }}
       # --- Client-side (VITE_*) env vars baked into the build ---
       VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
       VITE_PAYMENT_PROVIDER: ${{ secrets.VITE_PAYMENT_PROVIDER }}
@@ -35,10 +39,6 @@ jobs:
       VITE_CRISP_WEBSITE_ID: ${{ secrets.VITE_CRISP_WEBSITE_ID }}
       VITE_AFFILIATE_AFFONSO_ID: ${{ secrets.VITE_AFFILIATE_AFFONSO_ID }}
       VITE_AFFILIATE_PROMOTEKIT_ID: ${{ secrets.VITE_AFFILIATE_PROMOTEKIT_ID }}
-      # --- Cloudflare credentials (needed by cf-typegen in postinstall) ---
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_DATABASE_ID: ${{ secrets.CLOUDFLARE_DATABASE_ID }}
 
     steps:
       - name: Checkout code
