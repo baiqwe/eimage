@@ -80,6 +80,37 @@
   border-radius: var(--radius);
 }
 
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+[role="checkbox"]:focus-visible,
+[role="combobox"]:focus-visible,
+[role="radio"]:focus-visible,
+[role="slider"]:focus-visible,
+[role="switch"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+}
+
+:is(
+    [class*="focus-visible:ring"]:focus-visible,
+    [class*="focus:ring"]:focus,
+    [class*="focus-within:ring"]:focus-within,
+    [class*="hover:ring"]:hover,
+    [class*="active:ring"]:active,
+    [class*="aria-invalid:ring"][aria-invalid="true"],
+    [class*="has-aria-invalid:ring"]:has([aria-invalid="true"]),
+    [class*="has-[[data-slot][aria-invalid=true]]:ring"]:has(
+        [data-slot][aria-invalid="true"]
+      )
+  ) {
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-inset-ring-shadow: 0 0 #0000 !important;
+}
+
 /* Smooth transitions for all links and buttons */
 a,
 button,
