@@ -30,7 +30,7 @@ export const Route = createFileRoute('/tools/$slug')({
   head: ({ loaderData }) => {
     const { tool } = loaderData;
     const metadata = seo(`/tools/${tool.slug}`, {
-      title: `${tool.title} | SuiteWorkbench`,
+      title: `${tool.title} | ProdList AI`,
       description: tool.description,
       keywords: `${tool.category}, ecommerce product photography, AI product image generator`,
       alternates: localizedAlternates({

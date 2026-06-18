@@ -6,7 +6,7 @@ import { Link } from '@tanstack/react-router';
 
 const m = {
   title: 'Ready to get started?',
-  description: 'Join thousands of teams building with TanStarter today',
+  description: 'Generate ecommerce product photo sets from one upload today',
   primaryButton: 'Get started',
   secondaryButton: 'View pricing',
 };

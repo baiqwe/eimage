@@ -12,14 +12,14 @@ const m = {
       role: 'CTO, Acme Inc',
       image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jane',
       quote:
-        'The best TanStarter kit we evaluated. Auth and billing just work.',
+        'ProdList AI gives our ecommerce team a faster way to explore product image sets.',
     },
     'item-2': {
       name: 'John Smith',
       role: 'Founder, Startup',
       image: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John',
       quote:
-        'TanStarter really saved us months of development. We shipped our MVP in just 2 weeks.',
+        'We can turn a single source product photo into multiple listing-ready directions.',
     },
     'item-3': {
       name: 'Alex Chen',

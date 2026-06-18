@@ -26,7 +26,7 @@ export const Route = createFileRoute('/zh/tools/$slug')({
   head: ({ loaderData }) => {
     const { tool } = loaderData;
     const metadata = seo(`/zh/tools/${tool.slug}`, {
-      title: `${tool.titleZh} | SuiteWorkbench`,
+      title: `${tool.titleZh} | ProdList AI`,
       description: tool.descriptionZh,
       keywords: `${tool.titleZh}, 电商商品图, AI 商品图生成器`,
       locale: 'zh',

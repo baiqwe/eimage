@@ -32,7 +32,7 @@ export default function HeroSection() {
           <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
             {/* introduction */}
             <a
-              href="https://x.com/tanstarter"
+              href="/generator"
               target="_blank"
               rel="noopener noreferrer"
               className="animate-fade-up delay-0 hover:bg-muted group mx-auto flex w-fit items-center gap-2 rounded-full border border-border p-1 pl-4 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:rounded-full"
@@ -94,7 +94,7 @@ export default function HeroSection() {
               <img
                 className="bg-muted/50 relative hidden rounded-2xl dark:block w-full"
                 src="https://cdn.mksaas.com/blocks/music.png"
-                alt="TanStarter dashboard screenshot in dark mode"
+                alt="ProdList AI workspace in dark mode"
                 fetchPriority="high"
                 width={2796}
                 height={2008}
@@ -102,7 +102,7 @@ export default function HeroSection() {
               <img
                 className="z-2 border-border/25 relative rounded-2xl border dark:hidden w-full"
                 src="https://cdn.mksaas.com/blocks/music-light.png"
-                alt="TanStarter dashboard screenshot in light mode"
+                alt="ProdList AI workspace in light mode"
                 fetchPriority="high"
                 width={2796}
                 height={2008}

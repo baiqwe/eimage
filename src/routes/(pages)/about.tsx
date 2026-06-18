@@ -21,7 +21,7 @@ export const Route = createFileRoute('/(pages)/about')({
   head: () => {
     const title = `About ${websiteConfig.metadata?.name}`;
     const description =
-      'Learn how SuiteWorkbench helps ecommerce sellers create product image asset packs while preserving the original product shape.';
+      'Learn how ProdList AI helps ecommerce sellers create product image asset packs while preserving the original product shape.';
     const metadata = seo('/about', { title, description });
     return {
       ...metadata,
@@ -30,7 +30,7 @@ export const Route = createFileRoute('/(pages)/about')({
           type: 'application/ld+json',
           children: JSON.stringify([
             organizationJsonLd({
-              name: websiteConfig.metadata?.name ?? 'SuiteWorkbench',
+              name: websiteConfig.metadata?.name ?? 'ProdList AI',
               description,
               path: '/about',
             }),
@@ -48,10 +48,10 @@ export const Route = createFileRoute('/(pages)/about')({
 
 const ABOUT_COPY = {
   zh: {
-    badge: '关于 SuiteWorkbench',
+    badge: '关于 ProdList AI',
     title: '我们帮助电商团队把一张商品图变成可复用的视觉资产包',
     description:
-      'SuiteWorkbench 面向独立站、平台卖家和小型设计团队，核心目标是保留商品原始形貌，同时更快生成主图、详情页场景图和广告素材方向。',
+      'ProdList AI 面向独立站、平台卖家和小型设计团队，核心目标是保留商品原始形貌，同时更快生成主图、详情页场景图和广告素材方向。',
     principles: [
       {
         title: '商品不乱变形',
@@ -70,11 +70,11 @@ const ABOUT_COPY = {
     gallery: '查看样例画廊',
   },
   en: {
-    badge: 'About SuiteWorkbench',
+    badge: 'About ProdList AI',
     title:
       'We help ecommerce teams turn one product photo into reusable visual asset packs',
     description:
-      'SuiteWorkbench is built for Shopify, Amazon, marketplace, and DTC sellers who need main images, detail-page scenes, and ad creative directions without changing the original product shape.',
+      'ProdList AI is built for Shopify, Amazon, marketplace, and DTC sellers who need main images, detail-page scenes, and ad creative directions without changing the original product shape.',
     principles: [
       {
         title: 'Preserve the product',
@@ -93,10 +93,10 @@ const ABOUT_COPY = {
     gallery: 'View gallery',
   },
   ja: {
-    badge: 'SuiteWorkbench について',
+    badge: 'ProdList AI について',
     title: '1 枚の商品写真を再利用できるビジュアル素材パックへ',
     description:
-      'SuiteWorkbench は EC チーム向けに、商品の形状を保ちながら主画像、詳細シーン、広告素材の方向性を素早く作るためのワークベンチです。',
+      'ProdList AI は EC チーム向けに、商品の形状を保ちながら主画像、詳細シーン、広告素材の方向性を素早く作るためのワークベンチです。',
     principles: [
       {
         title: '商品形状を保つ',
@@ -115,10 +115,10 @@ const ABOUT_COPY = {
     gallery: 'ギャラリーを見る',
   },
   ko: {
-    badge: 'SuiteWorkbench 소개',
+    badge: 'ProdList AI 소개',
     title: '상품 사진 한 장을 재사용 가능한 비주얼 에셋 팩으로',
     description:
-      'SuiteWorkbench는 상품 형태를 유지하면서 메인 이미지, 상세 장면, 광고 소재 방향을 빠르게 만드는 이커머스 워크벤치입니다.',
+      'ProdList AI는 상품 형태를 유지하면서 메인 이미지, 상세 장면, 광고 소재 방향을 빠르게 만드는 이커머스 워크벤치입니다.',
     principles: [
       {
         title: '상품 형태 유지',
@@ -137,11 +137,11 @@ const ABOUT_COPY = {
     gallery: '갤러리 보기',
   },
   es: {
-    badge: 'Acerca de SuiteWorkbench',
+    badge: 'Acerca de ProdList AI',
     title:
       'Convertimos una foto de producto en paquetes visuales reutilizables',
     description:
-      'SuiteWorkbench ayuda a sellers ecommerce a crear imágenes principales, escenas de detalle y direcciones publicitarias sin cambiar la forma original del producto.',
+      'ProdList AI ayuda a sellers ecommerce a crear imágenes principales, escenas de detalle y direcciones publicitarias sin cambiar la forma original del producto.',
     principles: [
       {
         title: 'Preservar el producto',

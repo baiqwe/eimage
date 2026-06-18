@@ -29,7 +29,7 @@ export const Route = createFileRoute('/ja')({
           type: 'application/ld+json',
           children: JSON.stringify(
             softwareApplicationJsonLd({
-              name: websiteConfig.metadata?.name ?? 'SuiteWorkbench',
+              name: websiteConfig.metadata?.name ?? 'ProdList AI',
               description,
               path: '/ja',
               locale: 'ja',

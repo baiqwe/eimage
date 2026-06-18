@@ -656,7 +656,7 @@ export function SuiteWorkbench() {
               <IconSparkles className="size-5" />
             </div>
             <div>
-              <p className="font-bold text-lg leading-none">SuiteWorkbench</p>
+              <p className="font-bold text-lg leading-none">ProdList AI</p>
               <p className="text-[#74796d] text-xs">{t.subtitle}</p>
             </div>
           </div>

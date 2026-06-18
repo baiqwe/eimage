@@ -198,13 +198,13 @@ export const PUBLIC_PAGE_COPY: Record<
     },
     changelog: {
       title: '更新日志',
-      subtitle: '查看 SuiteWorkbench 的产品迭代、SEO 和生成器能力更新。',
+      subtitle: '查看 ProdList AI 的产品迭代、SEO 和生成器能力更新。',
       description: '追踪我们发布的每个改进、修复和新功能。',
     },
     roadmap: {
       title: '产品路线图',
       subtitle: '围绕电商生图、点数计费、历史资产和 API 集成持续迭代。',
-      description: '了解 SuiteWorkbench 接下来会建设的核心能力。',
+      description: '了解 ProdList AI 接下来会建设的核心能力。',
       columns: { backlog: '计划中', inProgress: '进行中', done: '已完成' },
       priorities: { low: '低', medium: '中', high: '高' },
       tasks: {
@@ -266,14 +266,14 @@ export const PUBLIC_PAGE_COPY: Record<
     changelog: {
       title: 'Changelog',
       subtitle:
-        'Follow SuiteWorkbench updates across product, SEO, and generator capabilities.',
+        'Follow ProdList AI updates across product, SEO, and generator capabilities.',
       description: 'Track every improvement, fix, and new feature we ship.',
     },
     roadmap: {
       title: 'Product roadmap',
       subtitle:
         'We are iterating on ecommerce generation, credits, asset history, and API integrations.',
-      description: 'See what SuiteWorkbench is building next.',
+      description: 'See what ProdList AI is building next.',
       columns: { backlog: 'Backlog', inProgress: 'In progress', done: 'Done' },
       priorities: { low: 'Low', medium: 'Medium', high: 'High' },
       tasks: {
@@ -343,14 +343,14 @@ export const PUBLIC_PAGE_COPY: Record<
     },
     changelog: {
       title: '更新履歴',
-      subtitle: 'SuiteWorkbench の製品、SEO、生成機能の更新を確認できます。',
+      subtitle: 'ProdList AI の製品、SEO、生成機能の更新を確認できます。',
       description: '改善、修正、新機能の履歴を追跡します。',
     },
     roadmap: {
       title: '製品ロードマップ',
       subtitle:
         'EC 画像生成、クレジット、素材履歴、API 連携を継続的に改善します。',
-      description: 'SuiteWorkbench が次に構築する機能を確認できます。',
+      description: 'ProdList AI が次に構築する機能を確認できます。',
       columns: { backlog: '計画中', inProgress: '進行中', done: '完了' },
       priorities: { low: '低', medium: '中', high: '高' },
       tasks: {
@@ -416,13 +416,13 @@ export const PUBLIC_PAGE_COPY: Record<
     },
     changelog: {
       title: '변경 내역',
-      subtitle: 'SuiteWorkbench의 제품, SEO, 생성기 업데이트를 확인하세요.',
+      subtitle: 'ProdList AI의 제품, SEO, 생성기 업데이트를 확인하세요.',
       description: '개선, 수정, 신규 기능을 추적합니다.',
     },
     roadmap: {
       title: '제품 로드맵',
       subtitle: '이커머스 생성, 크레딧, 에셋 기록, API 연동을 계속 개선합니다.',
-      description: 'SuiteWorkbench가 다음에 구축할 기능을 확인하세요.',
+      description: 'ProdList AI가 다음에 구축할 기능을 확인하세요.',
       columns: { backlog: '계획', inProgress: '진행 중', done: '완료' },
       priorities: { low: '낮음', medium: '중간', high: '높음' },
       tasks: {
@@ -488,14 +488,13 @@ export const PUBLIC_PAGE_COPY: Record<
     },
     changelog: {
       title: 'Novedades',
-      subtitle:
-        'Actualizaciones de producto, SEO y generación de SuiteWorkbench.',
+      subtitle: 'Actualizaciones de producto, SEO y generación de ProdList AI.',
       description: 'Sigue cada mejora, corrección y nueva función.',
     },
     roadmap: {
       title: 'Hoja de ruta',
       subtitle: 'Iteramos en generación ecommerce, créditos, historial y API.',
-      description: 'Mira lo que SuiteWorkbench construirá a continuación.',
+      description: 'Mira lo que ProdList AI construirá a continuación.',
       columns: {
         backlog: 'Planificado',
         inProgress: 'En progreso',
@@ -546,7 +545,7 @@ export const LEGAL_PAGE_COPY: Record<
     privacy: {
       title: '隐私政策',
       description:
-        'SuiteWorkbench 如何处理账户数据、上传商品图、Prompt、生成历史和账单记录。',
+        'ProdList AI 如何处理账户数据、上传商品图、Prompt、生成历史和账单记录。',
       sections: [
         {
           title: '我们收集的信息',
@@ -574,12 +573,12 @@ export const LEGAL_PAGE_COPY: Record<
     terms: {
       title: '服务条款',
       description:
-        '使用 SuiteWorkbench 上传商品素材、生成图片、消费点数和管理订阅时适用的条款。',
+        '使用 ProdList AI 上传商品素材、生成图片、消费点数和管理订阅时适用的条款。',
       sections: [
         {
           title: '服务使用',
           body: [
-            'SuiteWorkbench 帮助电商团队基于上传商品图生成主图、详情页场景图和广告素材方向。',
+            'ProdList AI 帮助电商团队基于上传商品图生成主图、详情页场景图和广告素材方向。',
             '你需要确保自己有权上传源素材，并有权使用由这些素材生成的输出。',
           ],
         },
@@ -602,7 +601,7 @@ export const LEGAL_PAGE_COPY: Record<
     cookie: {
       title: 'Cookie 政策',
       description:
-        'SuiteWorkbench 如何使用 Cookie、本地存储和类似技术保存登录、语言、分析与支付状态。',
+        'ProdList AI 如何使用 Cookie、本地存储和类似技术保存登录、语言、分析与支付状态。',
       sections: [
         {
           title: '用途',
@@ -630,7 +629,7 @@ export const LEGAL_PAGE_COPY: Record<
     privacy: {
       title: 'Privacy Policy',
       description:
-        'How SuiteWorkbench handles account data, uploaded product images, prompts, generation history, and billing records.',
+        'How ProdList AI handles account data, uploaded product images, prompts, generation history, and billing records.',
       sections: [
         {
           title: 'Information we collect',
@@ -658,12 +657,12 @@ export const LEGAL_PAGE_COPY: Record<
     terms: {
       title: 'Terms of Service',
       description:
-        'Terms for using SuiteWorkbench uploads, AI generation, credits, subscriptions, and generated assets.',
+        'Terms for using ProdList AI uploads, AI generation, credits, subscriptions, and generated assets.',
       sections: [
         {
           title: 'Use of the service',
           body: [
-            'SuiteWorkbench helps ecommerce teams generate marketplace hero images, detail scenes, and ad creative directions from uploaded product images.',
+            'ProdList AI helps ecommerce teams generate marketplace hero images, detail scenes, and ad creative directions from uploaded product images.',
             'You must have the right to upload source material and use outputs generated from that material.',
           ],
         },
@@ -686,7 +685,7 @@ export const LEGAL_PAGE_COPY: Record<
     cookie: {
       title: 'Cookie Policy',
       description:
-        'How SuiteWorkbench uses cookies, local storage, and similar technologies for login, language, analytics, and payments.',
+        'How ProdList AI uses cookies, local storage, and similar technologies for login, language, analytics, and payments.',
       sections: [
         {
           title: 'Purposes',
@@ -714,7 +713,7 @@ export const LEGAL_PAGE_COPY: Record<
     privacy: {
       title: 'プライバシーポリシー',
       description:
-        'SuiteWorkbench におけるアカウント、商品画像、Prompt、生成履歴、請求情報の扱い。',
+        'ProdList AI におけるアカウント、商品画像、Prompt、生成履歴、請求情報の扱い。',
       sections: [
         {
           title: '収集する情報',
@@ -742,12 +741,12 @@ export const LEGAL_PAGE_COPY: Record<
     terms: {
       title: '利用規約',
       description:
-        'SuiteWorkbench のアップロード、AI 生成、クレジット、契約、生成素材に関する規約。',
+        'ProdList AI のアップロード、AI 生成、クレジット、契約、生成素材に関する規約。',
       sections: [
         {
           title: 'サービス利用',
           body: [
-            'SuiteWorkbench はアップロード商品画像から主画像、詳細シーン、広告素材の方向性を生成します。',
+            'ProdList AI はアップロード商品画像から主画像、詳細シーン、広告素材の方向性を生成します。',
             '素材をアップロードし、その出力を利用する権利を保有している必要があります。',
           ],
         },
@@ -798,7 +797,7 @@ export const LEGAL_PAGE_COPY: Record<
     privacy: {
       title: '개인정보 처리방침',
       description:
-        'SuiteWorkbench가 계정, 상품 이미지, Prompt, 생성 기록, 결제 정보를 처리하는 방식.',
+        'ProdList AI가 계정, 상품 이미지, Prompt, 생성 기록, 결제 정보를 처리하는 방식.',
       sections: [
         {
           title: '수집 정보',
@@ -826,12 +825,12 @@ export const LEGAL_PAGE_COPY: Record<
     terms: {
       title: '서비스 약관',
       description:
-        'SuiteWorkbench 업로드, AI 생성, 크레딧, 구독, 생성 에셋 사용 조건.',
+        'ProdList AI 업로드, AI 생성, 크레딧, 구독, 생성 에셋 사용 조건.',
       sections: [
         {
           title: '서비스 이용',
           body: [
-            'SuiteWorkbench는 업로드된 상품 이미지로 메인 이미지, 상세 장면, 광고 소재 방향을 생성합니다.',
+            'ProdList AI는 업로드된 상품 이미지로 메인 이미지, 상세 장면, 광고 소재 방향을 생성합니다.',
             '소스 소재를 업로드하고 결과물을 사용할 권리가 있어야 합니다.',
           ],
         },
@@ -882,7 +881,7 @@ export const LEGAL_PAGE_COPY: Record<
     privacy: {
       title: 'Política de privacidad',
       description:
-        'Cómo SuiteWorkbench trata cuenta, imágenes, Prompt, historial y facturación.',
+        'Cómo ProdList AI trata cuenta, imágenes, Prompt, historial y facturación.',
       sections: [
         {
           title: 'Información que recopilamos',
@@ -915,7 +914,7 @@ export const LEGAL_PAGE_COPY: Record<
         {
           title: 'Uso del servicio',
           body: [
-            'SuiteWorkbench ayuda a generar imágenes principales, escenas de detalle y creatividades desde imágenes de producto.',
+            'ProdList AI ayuda a generar imágenes principales, escenas de detalle y creatividades desde imágenes de producto.',
             'Debes tener derecho a subir el material fuente y usar los resultados generados.',
           ],
         },

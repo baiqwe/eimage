@@ -24,7 +24,7 @@ const COPY = {
     badge: 'AI Ecommerce Product Photo Generator',
     title: '面向电商卖家的 AI 商品套图生成器',
     description:
-      '上传一张商品图，批量生成平台主图、白底图、详情页场景图和广告素材。SuiteWorkbench 会尽量保留商品原始形貌，把背景、光影和场景重新设计成可上架的电商视觉资产。',
+      '上传一张商品图，批量生成平台主图、白底图、详情页场景图和广告素材。ProdList AI 会尽量保留商品原始形貌，把背景、光影和场景重新设计成可上架的电商视觉资产。',
     start: '进入生成器',
     pricing: '查看定价',
     trust: '为 Amazon、Shopify、Etsy、独立站和高频上新团队设计',
@@ -455,7 +455,7 @@ export function ProductHome({
               <div className="mb-8 flex items-center justify-between">
                 <div>
                   <p className="font-semibold">{t.previewTitle}</p>
-                  <p className="text-[#c8cec0] text-sm">SuiteWorkbench</p>
+                  <p className="text-[#c8cec0] text-sm">ProdList AI</p>
                 </div>
                 <IconBolt className="size-5 text-[#e1a95f]" />
               </div>
