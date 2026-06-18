@@ -8,6 +8,7 @@ export const Route = createFileRoute('/generator')({
       title: 'ProdList AI Generator',
       description:
         'Generate main product images and detail-page scenes from one source product photo.',
+      robots: 'noindex,nofollow',
     }),
   component: SuiteWorkbench,
 });

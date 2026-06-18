@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PublicBreadcrumb } from '@/components/seo/public-breadcrumb';
 import { getProductTool } from '@/lib/product-tools';
+import { ProductToolVisual } from '@/components/product/product-tool-visual';
 import {
   breadcrumbJsonLd,
   localizedAlternates,
@@ -40,6 +41,18 @@ export const Route = createFileRoute('/zh/tools/$slug')({
       { name: '工具', path: '/zh/tools/product-background-generator' },
       { name: tool.titleZh, path: `/zh/tools/${tool.slug}` },
     ]);
+    const faq = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: tool.faqsZh.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    };
     return {
       ...metadata,
       scripts: [
@@ -53,6 +66,7 @@ export const Route = createFileRoute('/zh/tools/$slug')({
               locale: 'zh',
             }),
             breadcrumb,
+            faq,
           ]),
         },
       ],
@@ -99,30 +113,28 @@ function ToolPage() {
         </div>
 
         <div className="rounded-lg border bg-card p-4 shadow-sm">
-          <div
-            role="img"
-            aria-label={tool.imageAltZh}
-            className="grid aspect-[4/3] gap-3 rounded-lg bg-[#20231e] p-4"
-          >
-            <div className="rounded-lg bg-[#eef1e8]" />
-            <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-lg bg-[#2f5f4f]" />
-              <div className="rounded-lg bg-[#c9822f]" />
-              <div className="rounded-lg bg-[#dfe3d8]" />
-            </div>
-          </div>
+          <ProductToolVisual visual={tool.visual} label={tool.imageAltZh} />
           <p className="mt-3 text-muted-foreground text-sm">
             {tool.imageAltZh}
           </p>
         </div>
       </div>
 
-      <div className="mx-auto mt-14 grid max-w-6xl gap-5 md:grid-cols-2">
+      <div className="mx-auto mt-14 grid max-w-6xl gap-5 md:grid-cols-3">
         <section className="rounded-lg border bg-card p-5">
           <IconPhotoScan className="mb-4 size-6 text-primary" />
           <h2 className="font-semibold text-xl">适合场景</h2>
           <ul className="mt-4 space-y-3 text-muted-foreground text-sm">
             {tool.useCasesZh.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+        <section className="rounded-lg border bg-card p-5">
+          <IconSparkles className="mb-4 size-6 text-primary" />
+          <h2 className="font-semibold text-xl">为什么适合这个场景</h2>
+          <ul className="mt-4 space-y-3 text-muted-foreground text-sm">
+            {tool.painPointsZh.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
@@ -139,6 +151,20 @@ function ToolPage() {
           </div>
         </section>
       </div>
+
+      <section className="mx-auto mt-14 max-w-6xl rounded-lg border bg-card p-6">
+        <h2 className="font-semibold text-2xl">常见问题</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {tool.faqsZh.map((item) => (
+            <article key={item.question} className="rounded-lg bg-muted/40 p-4">
+              <h3 className="font-semibold text-base">{item.question}</h3>
+              <p className="mt-2 text-muted-foreground text-sm leading-6">
+                {item.answer}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
     </Container>
   );
 }

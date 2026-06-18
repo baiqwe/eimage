@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PublicBreadcrumb } from '@/components/seo/public-breadcrumb';
 import { getProductTool, getProductToolCopy } from '@/lib/product-tools';
+import { ProductToolVisual } from '@/components/product/product-tool-visual';
 import {
   breadcrumbJsonLd,
   localizedAlternates,
@@ -43,6 +44,18 @@ export const Route = createFileRoute('/tools/$slug')({
       { name: 'Tools', path: '/tools/product-background-generator' },
       { name: tool.title, path: `/tools/${tool.slug}` },
     ]);
+    const faq = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: tool.faqs.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    };
     return {
       ...metadata,
       scripts: [
@@ -56,6 +69,7 @@ export const Route = createFileRoute('/tools/$slug')({
               locale: 'en',
             }),
             breadcrumb,
+            faq,
           ]),
         },
       ],
@@ -107,28 +121,26 @@ function ToolPage() {
         </div>
 
         <div className="rounded-lg border bg-card p-4 shadow-sm">
-          <div
-            role="img"
-            aria-label={copy.imageAlt}
-            className="grid aspect-[4/3] gap-3 rounded-lg bg-[#20231e] p-4"
-          >
-            <div className="rounded-lg bg-[#eef1e8]" />
-            <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-lg bg-[#2f5f4f]" />
-              <div className="rounded-lg bg-[#c9822f]" />
-              <div className="rounded-lg bg-[#dfe3d8]" />
-            </div>
-          </div>
+          <ProductToolVisual visual={tool.visual} label={copy.imageAlt} />
           <p className="mt-3 text-muted-foreground text-sm">{copy.imageAlt}</p>
         </div>
       </div>
 
-      <div className="mx-auto mt-14 grid max-w-6xl gap-5 md:grid-cols-2">
+      <div className="mx-auto mt-14 grid max-w-6xl gap-5 md:grid-cols-3">
         <section className="rounded-lg border bg-card p-5">
           <IconPhotoScan className="mb-4 size-6 text-primary" />
           <h2 className="font-semibold text-xl">{copy.bestFor}</h2>
           <ul className="mt-4 space-y-3 text-muted-foreground text-sm">
             {copy.useCases.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </section>
+        <section className="rounded-lg border bg-card p-5">
+          <IconSparkles className="mb-4 size-6 text-primary" />
+          <h2 className="font-semibold text-xl">{copy.whyTitle}</h2>
+          <ul className="mt-4 space-y-3 text-muted-foreground text-sm">
+            {copy.painPoints.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
@@ -145,6 +157,20 @@ function ToolPage() {
           </div>
         </section>
       </div>
+
+      <section className="mx-auto mt-14 max-w-6xl rounded-lg border bg-card p-6">
+        <h2 className="font-semibold text-2xl">{copy.faqTitle}</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {copy.faqs.map((item) => (
+            <article key={item.question} className="rounded-lg bg-muted/40 p-4">
+              <h3 className="font-semibold text-base">{item.question}</h3>
+              <p className="mt-2 text-muted-foreground text-sm leading-6">
+                {item.answer}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
     </Container>
   );
 }
