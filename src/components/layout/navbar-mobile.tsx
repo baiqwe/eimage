@@ -20,6 +20,10 @@ import { UserButtonMobile } from '@/components/shared/user-button-mobile';
 import { LoginWrapper } from '@/components/auth/login-wrapper';
 import { messages } from '@/messages';
 import { websiteConfig } from '@/config/website';
+import {
+  ProductLanguageSelect,
+  useProductLocale,
+} from '@/components/product/product-locale';
 
 const mobileLinkClass =
   'flex w-full items-center rounded-md p-2 text-base text-muted-foreground transition-colors duration-150 hover:text-foreground';
@@ -35,7 +39,8 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
   const [mounted, setMounted] = useState(false);
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
-  const menuLinks = getNavbarLinks();
+  const { locale, setLocale } = useProductLocale();
+  const menuLinks = getNavbarLinks(locale);
 
   // Sync mount (avoid hydration mismatch) and close drawer on route change
   useEffect(() => {
@@ -189,7 +194,12 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
               })}
             </ul>
 
-            <div className="mt-auto w-full border-t border-border/50 p-4 flex items-center justify-end">
+            <div className="mt-auto flex w-full items-center justify-between border-border/50 border-t p-4">
+              <ProductLanguageSelect
+                locale={locale}
+                onLocaleChange={setLocale}
+                compact
+              />
               <ModeSwitcherHorizontal />
             </div>
           </div>

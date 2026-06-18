@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SuiteWorkbench icon">
+  <rect width="64" height="64" rx="14" fill="#20231e"/>
+  <path d="M20 19h24a5 5 0 0 1 5 5v20a5 5 0 0 1-5 5H20a5 5 0 0 1-5-5V24a5 5 0 0 1 5-5Z" fill="#f7f8f4"/>
+  <path d="M23 40l7-8 5 5 4-5 8 8v4H23v-4Z" fill="#2f5f4f"/>
+  <circle cx="41" cy="28" r="4" fill="#e1a95f"/>
+  <path d="M18 13l2.7 5.3L26 21l-5.3 2.7L18 29l-2.7-5.3L10 21l5.3-2.7L18 13Z" fill="#f7f8f4"/>
+  <path d="M49 9l1.8 3.5 3.7 1.8-3.7 1.8L49 20l-1.8-3.9-3.7-1.8 3.7-1.8L49 9Z" fill="#e1a95f"/>
+</svg>

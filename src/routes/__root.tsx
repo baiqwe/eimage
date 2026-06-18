@@ -50,7 +50,11 @@ export const Route = createRootRouteWithContext<{
       },
       {
         name: 'theme-color',
-        content: '#09090b',
+        content: '#f7f8f4',
+      },
+      {
+        name: 'msapplication-TileColor',
+        content: '#20231e',
       },
     ],
     links: [
@@ -65,6 +69,11 @@ export const Route = createRootRouteWithContext<{
       },
       {
         rel: 'icon',
+        type: 'image/svg+xml',
+        href: '/favicon.svg',
+      },
+      {
+        rel: 'icon',
         type: 'image/png',
         sizes: '32x32',
         href: '/favicon-32x32.png',
@@ -75,8 +84,14 @@ export const Route = createRootRouteWithContext<{
         sizes: '16x16',
         href: '/favicon-16x16.png',
       },
+      {
+        rel: 'mask-icon',
+        href: '/safari-pinned-tab.svg',
+        color: '#20231e',
+      },
       { rel: 'icon', href: '/favicon.ico' },
       { rel: 'manifest', href: '/manifest.json' },
+      { rel: 'msapplication-config', href: '/browserconfig.xml' },
     ],
   }),
   // shellComponent automatically wraps root component, errorComponent, and notFoundComponent
@@ -128,8 +143,11 @@ function RootComponent() {
  * Root document
  */
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname }) ?? '';
+  const lang = pathname.startsWith('/zh') ? 'zh-CN' : 'en';
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

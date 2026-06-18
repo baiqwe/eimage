@@ -1,50 +1,64 @@
 ---
 title: Terms of Service
-description: The terms and conditions governing the use of our services
-date: 2026-02-15
+description: Terms for using SuiteWorkbench, including product uploads, AI generation, credits, subscriptions, and generated assets.
+date: 2026-06-18
 ---
 
-## Introduction
+## Agreement
 
-These Terms of Service ("Terms") govern your use of our website and services. By accessing or using our services, you agree to be bound by these Terms.
+These Terms govern your use of SuiteWorkbench, including the website, generator, dashboard, subscriptions, credit packs, generation history, and related services. By using SuiteWorkbench, you agree to these Terms.
 
-## Use of Services
+## Product Use
 
-Our services are provided "as is" and "as available" without warranties of any kind, either express or implied. We do not guarantee that our services will be uninterrupted, secure, or error-free.
+SuiteWorkbench helps ecommerce teams generate product image variations from uploaded source images and prompts. The service may include prompt planning, background generation, lighting redesign, generated output storage, download tools, and history management.
 
-## User Accounts
+## Accounts
 
-When you create an account with us, you must provide accurate and complete information. You are responsible for safeguarding your account and for all activities that occur under your account.
+You are responsible for your account credentials and for activity under your account. You must provide accurate account and billing information and notify us if you believe your account has been compromised.
 
-## Intellectual Property
+## Uploads and Rights
 
-Our website and its original content, features, and functionality are owned by us and are protected by international copyright, trademark, and other intellectual property laws.
+You keep ownership of the product images, descriptions, prompts, and other content you upload. You grant SuiteWorkbench the rights needed to host, process, transform, transmit, display, and store that content solely to provide and improve the service. You must have the legal right to upload the source material and generate derivative assets from it.
 
-## User Content
+## Generated Outputs
 
-You retain all rights to any content you submit, post, or display on or through our services. By submitting content, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, and distribute your content.
+Subject to your compliance with these Terms and payment obligations, you may use generated outputs for ecommerce, advertising, marketplace listings, product pages, and related commercial workflows. AI systems can produce unexpected errors, artifacts, or similarity to existing material, so you are responsible for reviewing outputs before publication.
 
-## Prohibited Activities
+## Credits and Subscriptions
 
-You agree not to:
+Image generation consumes compute resources. SuiteWorkbench may use subscriptions, credit balances, one-time credit packs, usage limits, or a combination of these. Credits may be checked before a generation task starts. Failed, canceled, refunded, or abusive tasks may be handled according to the rules shown in the product or billing flow.
 
-- Use our services in any way that violates any applicable law or regulation
-- Engage in any conduct that restricts or inhibits anyone's use or enjoyment of our services
-- Attempt to gain unauthorized access to our servers or networks
-- Use our services to distribute malware or other harmful code
+## Prohibited Use
 
-## Termination
+You may not use SuiteWorkbench to:
 
-We may terminate or suspend your account and access to our services immediately, without prior notice or liability, for any reason.
+- upload content you do not have rights to use;
+- generate illegal, deceptive, infringing, harmful, or abusive content;
+- misrepresent generated assets as official brand material without authorization;
+- bypass credit, rate-limit, security, or payment systems;
+- scrape, resell, reverse engineer, or overload the service;
+- use the service in a way that violates applicable law or platform policies.
+
+## AI Availability
+
+Image generation may depend on third-party AI providers, queues, storage, and network services. Generation may be delayed, fail, or produce imperfect results. We may change providers, models, quality settings, limits, or workflows as the product evolves.
+
+## Payments
+
+Payments are processed by third-party payment providers. Subscription renewals, cancellations, taxes, refunds, and invoices are handled according to the checkout and customer portal terms shown at the time of purchase.
+
+## Service Changes
+
+We may add, remove, or modify features, plans, supported languages, generation styles, storage limits, and credit rules. We may suspend or terminate access if we detect fraud, abuse, security risk, non-payment, or violation of these Terms.
+
+## Disclaimer
+
+SuiteWorkbench is provided on an "as is" and "as available" basis. We do not guarantee that generated images will satisfy every marketplace rule, brand guideline, or legal requirement. You should review outputs before using them commercially.
 
 ## Limitation of Liability
 
-In no event shall we be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use our services.
+To the maximum extent permitted by law, SuiteWorkbench is not liable for indirect, incidental, special, consequential, or punitive damages, including lost revenue, lost data, failed listings, ad rejection, or business interruption.
 
-## Changes to Terms
+## Contact
 
-We reserve the right to modify these Terms at any time. If we make changes, we will provide notice by posting the updated Terms on this page.
-
-## Contact Us
-
-If you have any questions about these Terms, please [contact us](/contact).
+Questions about these Terms can be sent through the [contact page](/contact).

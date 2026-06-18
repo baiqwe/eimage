@@ -9,11 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ZhRouteImport } from './routes/zh'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
 import { Route as GeneratorRouteImport } from './routes/generator'
+import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as EnRouteImport } from './routes/en'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -22,6 +25,7 @@ import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as ToolsSlugRouteImport } from './routes/tools/$slug'
 import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
 import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
 import { Route as SettingsPaymentRouteImport } from './routes/settings/payment'
@@ -49,11 +53,17 @@ import { Route as pagesAboutRouteImport } from './routes/(pages)/about'
 import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
+import { Route as ZhToolsSlugRouteImport } from './routes/zh/tools/$slug'
 import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
 import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
 import { Route as ApiStorageFileRouteImport } from './routes/api/storage/file'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const ZhRoute = ZhRouteImport.update({
+  id: '/zh',
+  path: '/zh',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -77,6 +87,16 @@ const ManifestDotjsonRoute = ManifestDotjsonRouteImport.update({
 const GeneratorRoute = GeneratorRouteImport.update({
   id: '/generator',
   path: '/generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnRoute = EnRouteImport.update({
+  id: '/en',
+  path: '/en',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -118,6 +138,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const ToolsSlugRoute = ToolsSlugRouteImport.update({
+  id: '/tools/$slug',
+  path: '/tools/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsSecurityRoute = SettingsSecurityRouteImport.update({
   id: '/security',
@@ -254,6 +279,11 @@ const legalsCookieRoute = legalsCookieRouteImport.update({
   path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ZhToolsSlugRoute = ZhToolsSlugRouteImport.update({
+  id: '/tools/$slug',
+  path: '/tools/$slug',
+  getParentRoute: () => ZhRoute,
+} as any)
 const ApiWebhooksStripeRoute = ApiWebhooksStripeRouteImport.update({
   id: '/api/webhooks/stripe',
   path: '/api/webhooks/stripe',
@@ -280,11 +310,14 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
+  '/en': typeof EnRoute
+  '/gallery': typeof GalleryRoute
   '/generator': typeof GeneratorRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/zh': typeof ZhRouteWithChildren
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
   '/terms': typeof legalsTermsRoute
@@ -312,6 +345,7 @@ export interface FileRoutesByFullPath {
   '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
+  '/tools/$slug': typeof ToolsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -320,14 +354,18 @@ export interface FileRoutesByFullPath {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
+  '/zh/tools/$slug': typeof ZhToolsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/en': typeof EnRoute
+  '/gallery': typeof GalleryRoute
   '/generator': typeof GeneratorRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/zh': typeof ZhRouteWithChildren
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
   '/terms': typeof legalsTermsRoute
@@ -355,6 +393,7 @@ export interface FileRoutesByTo {
   '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
+  '/tools/$slug': typeof ToolsSlugRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -363,6 +402,7 @@ export interface FileRoutesByTo {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
+  '/zh/tools/$slug': typeof ZhToolsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -370,11 +410,14 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
+  '/en': typeof EnRoute
+  '/gallery': typeof GalleryRoute
   '/generator': typeof GeneratorRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/zh': typeof ZhRouteWithChildren
   '/(legals)/cookie': typeof legalsCookieRoute
   '/(legals)/privacy': typeof legalsPrivacyRoute
   '/(legals)/terms': typeof legalsTermsRoute
@@ -402,6 +445,7 @@ export interface FileRoutesById {
   '/settings/payment': typeof SettingsPaymentRoute
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
+  '/tools/$slug': typeof ToolsSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -410,6 +454,7 @@ export interface FileRoutesById {
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
+  '/zh/tools/$slug': typeof ZhToolsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -418,11 +463,14 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/dashboard'
+    | '/en'
+    | '/gallery'
     | '/generator'
     | '/manifest.json'
     | '/robots.txt'
     | '/settings'
     | '/sitemap.xml'
+    | '/zh'
     | '/cookie'
     | '/privacy'
     | '/terms'
@@ -450,6 +498,7 @@ export interface FileRouteTypes {
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
+    | '/tools/$slug'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
@@ -458,14 +507,18 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
+    | '/zh/tools/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/en'
+    | '/gallery'
     | '/generator'
     | '/manifest.json'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/zh'
     | '/cookie'
     | '/privacy'
     | '/terms'
@@ -493,6 +546,7 @@ export interface FileRouteTypes {
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
+    | '/tools/$slug'
     | '/admin'
     | '/blog'
     | '/dashboard'
@@ -501,17 +555,21 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
+    | '/zh/tools/$slug'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/auth'
     | '/dashboard'
+    | '/en'
+    | '/gallery'
     | '/generator'
     | '/manifest.json'
     | '/robots.txt'
     | '/settings'
     | '/sitemap.xml'
+    | '/zh'
     | '/(legals)/cookie'
     | '/(legals)/privacy'
     | '/(legals)/terms'
@@ -539,6 +597,7 @@ export interface FileRouteTypes {
     | '/settings/payment'
     | '/settings/profile'
     | '/settings/security'
+    | '/tools/$slug'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
@@ -547,6 +606,7 @@ export interface FileRouteTypes {
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
+    | '/zh/tools/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -554,11 +614,14 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   DashboardRoute: typeof DashboardRouteWithChildren
+  EnRoute: typeof EnRoute
+  GalleryRoute: typeof GalleryRoute
   GeneratorRoute: typeof GeneratorRoute
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ZhRoute: typeof ZhRouteWithChildren
   legalsCookieRoute: typeof legalsCookieRoute
   legalsPrivacyRoute: typeof legalsPrivacyRoute
   legalsTermsRoute: typeof legalsTermsRoute
@@ -573,6 +636,7 @@ export interface RootRouteChildren {
   testsTestErrorRoute: typeof testsTestErrorRoute
   ApiPingRoute: typeof ApiPingRoute
   BlogSlugRoute: typeof BlogSlugRoute
+  ToolsSlugRoute: typeof ToolsSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
@@ -582,6 +646,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/zh': {
+      id: '/zh'
+      path: '/zh'
+      fullPath: '/zh'
+      preLoaderRoute: typeof ZhRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -615,6 +686,20 @@ declare module '@tanstack/react-router' {
       path: '/generator'
       fullPath: '/generator'
       preLoaderRoute: typeof GeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/en': {
+      id: '/en'
+      path: '/en'
+      fullPath: '/en'
+      preLoaderRoute: typeof EnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -672,6 +757,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/tools/$slug': {
+      id: '/tools/$slug'
+      path: '/tools/$slug'
+      fullPath: '/tools/$slug'
+      preLoaderRoute: typeof ToolsSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/settings/security': {
       id: '/settings/security'
@@ -862,6 +954,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof legalsCookieRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/zh/tools/$slug': {
+      id: '/zh/tools/$slug'
+      path: '/tools/$slug'
+      fullPath: '/zh/tools/$slug'
+      preLoaderRoute: typeof ZhToolsSlugRouteImport
+      parentRoute: typeof ZhRoute
+    }
     '/api/webhooks/stripe': {
       id: '/api/webhooks/stripe'
       path: '/api/webhooks/stripe'
@@ -961,16 +1060,29 @@ const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
   SettingsRouteChildren,
 )
 
+interface ZhRouteChildren {
+  ZhToolsSlugRoute: typeof ZhToolsSlugRoute
+}
+
+const ZhRouteChildren: ZhRouteChildren = {
+  ZhToolsSlugRoute: ZhToolsSlugRoute,
+}
+
+const ZhRouteWithChildren = ZhRoute._addFileChildren(ZhRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   DashboardRoute: DashboardRouteWithChildren,
+  EnRoute: EnRoute,
+  GalleryRoute: GalleryRoute,
   GeneratorRoute: GeneratorRoute,
   ManifestDotjsonRoute: ManifestDotjsonRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ZhRoute: ZhRouteWithChildren,
   legalsCookieRoute: legalsCookieRoute,
   legalsPrivacyRoute: legalsPrivacyRoute,
   legalsTermsRoute: legalsTermsRoute,
@@ -985,6 +1097,7 @@ const rootRouteChildren: RootRouteChildren = {
   testsTestErrorRoute: testsTestErrorRoute,
   ApiPingRoute: ApiPingRoute,
   BlogSlugRoute: BlogSlugRoute,
+  ToolsSlugRoute: ToolsSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,

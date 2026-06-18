@@ -1,44 +1,62 @@
 ---
 title: Privacy Policy
-description: Our commitment to protecting your privacy and personal data
-date: 2026-02-15
+description: How SuiteWorkbench handles account data, uploaded product images, prompts, generation history, and billing records.
+date: 2026-06-18
 ---
 
-## Introduction
+## Overview
 
-Welcome to our Privacy Policy. This document explains how we collect, use, and protect your personal information when you use our services.
+SuiteWorkbench is an AI product image workspace for ecommerce teams. This policy explains what we collect when you use the website, generator, dashboard, subscriptions, credits, and image history features.
 
 ## Information We Collect
 
-We may collect the following types of information:
+- **Account information**: name, email address, authentication provider, and profile details you provide.
+- **Product generation inputs**: uploaded product images, base product descriptions, selected styles, prompts, aspect ratios, resolutions, and task settings.
+- **Generated assets and history**: generated images, task status, output metadata, credit usage, timestamps, and download activity.
+- **Billing records**: plan, subscription status, credit purchases, invoices, and payment events processed by our payment providers.
+- **Usage and device data**: pages visited, feature usage, browser type, approximate location, IP address, and error logs.
+- **Support messages**: information you send when contacting us about product, billing, or technical issues.
 
-- **Personal Information**: Name, email address, and contact details you provide when registering or contacting us.
-- **Usage Data**: Information about how you interact with our website, including pages visited and time spent.
-- **Device Information**: Details about the device you use to access our services, such as IP address, browser type, and operating system.
+## How We Use Information
 
-## How We Use Your Information
+We use this information to:
 
-We use your information for the following purposes:
+- provide the generator, gallery, dashboard, subscriptions, and generation history;
+- preserve your product assets so you can reuse prompts and outputs;
+- check credit balances before starting generation tasks;
+- improve prompt quality, reliability, page performance, and product workflows;
+- prevent abuse, spam, scraping, and unauthorized account access;
+- provide customer support and account notices;
+- comply with legal, tax, payment, and security obligations.
 
-- To provide and maintain our services
-- To notify you about changes to our services
-- To provide customer support
-- To gather analysis or valuable information to improve our services
-- To monitor the usage of our services
-- To detect, prevent, and address technical issues
+## AI Processing
 
-## Data Security
+When image-generation APIs are connected, your uploaded product image, mask data, prompts, and task settings may be sent to third-party AI infrastructure so the requested image can be generated. We design the workflow to preserve product structure while generating background and lighting variations, but you are responsible for ensuring you have the right to upload the source material and use the outputs.
 
-We implement appropriate security measures to protect your personal information from unauthorized access, alteration, disclosure, or destruction.
+## Storage and Retention
 
-## Third-Party Services
+We may store source images, generated assets, prompts, and task records so your dashboard can show history and allow reuse. We may apply storage limits, retention windows, or deletion rules based on your plan, credit usage, or abuse controls. You can contact us to request deletion of account data or generated assets where applicable.
 
-We may employ third-party companies and individuals to facilitate our services, provide services on our behalf, or assist us in analyzing how our services are used.
+## Third-Party Providers
 
-## Changes to This Privacy Policy
+We may use third-party providers for authentication, hosting, analytics, payments, storage, email, customer support, and AI generation. These providers process data only as needed to provide their services to SuiteWorkbench.
 
-We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.
+## Security
 
-## Contact Us
+We use reasonable technical and organizational safeguards to protect account data, images, prompts, and billing records. No online service can guarantee perfect security, so please use a strong password and avoid uploading material you are not authorized to use.
 
-If you have any questions about this Privacy Policy, please [contact us](/contact).
+## Your Choices
+
+You can update account details, manage subscriptions, review generation history, and delete or replace product inputs where the product interface supports it. You may also contact us to request access, correction, export, or deletion of your personal data.
+
+## International Users
+
+SuiteWorkbench may be accessed globally. By using the service, you understand that your information may be processed in countries where our service providers operate.
+
+## Changes
+
+We may update this policy as the product, payment system, or AI provider integrations evolve. We will post the updated version on this page and adjust the effective date when appropriate.
+
+## Contact
+
+Questions about privacy or data deletion can be sent through the [contact page](/contact).

@@ -173,7 +173,7 @@ const workbenchPromptSchema = z.object({
     .max(800, 'Description is too long, please keep it under 800 characters.'),
   imageType: z.enum(['main', 'detail']),
   style: z.string().min(2).max(120),
-  locale: z.enum(['zh', 'en']).default('zh'),
+  locale: z.enum(['zh', 'en', 'ja', 'ko', 'es']).default('zh'),
 });
 
 /**
@@ -567,8 +567,13 @@ export const draftProductImagePrompt = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const systemPrompt =
       'You are a senior ecommerce visual director. Return strict JSON only.';
-    const reasoningLanguage =
-      data.locale === 'zh' ? 'Simplified Chinese' : 'English';
+    const reasoningLanguage = {
+      zh: 'Simplified Chinese',
+      en: 'English',
+      ja: 'Japanese',
+      ko: 'Korean',
+      es: 'Spanish',
+    }[data.locale];
     const userPrompt = `Product base description: ${data.description}
 Image type: ${data.imageType === 'main' ? 'main hero image' : 'lifestyle detail image'}
 Style preset: ${data.style}
@@ -654,23 +659,55 @@ function createLocalProductPrompt(data: z.infer<typeof workbenchPromptSchema>) {
 
   return {
     prompt,
-    reasoning:
-      data.locale === 'zh'
-        ? isMain
-          ? '通过干净背景和受控反射突出商品轮廓，同时避免改变原图里的主体结构。'
-          : '用环境光和生活化道具制造场景感，但让商品仍保持原始形貌作为视觉锚点。'
-        : isMain
-          ? 'A clean background and controlled reflections emphasize the product silhouette without changing its source structure.'
-          : 'Environmental light and lifestyle props add context while keeping the uploaded product as the fixed visual anchor.',
-    keywords:
-      data.locale === 'zh'
-        ? isMain
-          ? ['锁定轮廓', '棚拍光影', '高级反射']
-          : ['生活场景', '自然光', '主体不变']
-        : isMain
-          ? ['Silhouette lock', 'Studio light', 'Premium reflection']
-          : ['Lifestyle scene', 'Natural light', 'Shape preserved'],
+    reasoning: getLocalPromptReasoning(data.locale, isMain),
+    keywords: getLocalPromptKeywords(data.locale, isMain),
   };
+}
+
+function getLocalPromptReasoning(
+  locale: z.infer<typeof workbenchPromptSchema>['locale'],
+  isMain: boolean
+) {
+  return {
+    zh: isMain
+      ? '通过干净背景和受控反射突出商品轮廓，同时避免改变原图里的主体结构。'
+      : '用环境光和生活化道具制造场景感，但让商品仍保持原始形貌作为视觉锚点。',
+    en: isMain
+      ? 'A clean background and controlled reflections emphasize the product silhouette without changing its source structure.'
+      : 'Environmental light and lifestyle props add context while keeping the uploaded product as the fixed visual anchor.',
+    ja: isMain
+      ? 'クリーンな背景と制御された反射で商品輪郭を強調し、元画像の主体構造は変更しません。'
+      : '環境光とライフスタイル小物で文脈を加えつつ、商品を固定された視覚アンカーとして保ちます。',
+    ko: isMain
+      ? '깨끗한 배경과 제어된 반사로 상품 윤곽을 강조하면서 원본 구조는 변경하지 않습니다.'
+      : '환경광과 라이프스타일 소품으로 맥락을 더하되 업로드된 상품을 고정된 시각 기준으로 유지합니다.',
+    es: isMain
+      ? 'Un fondo limpio y reflejos controlados resaltan la silueta sin cambiar la estructura original.'
+      : 'La luz ambiental y los props lifestyle añaden contexto manteniendo el producto como ancla visual fija.',
+  }[locale];
+}
+
+function getLocalPromptKeywords(
+  locale: z.infer<typeof workbenchPromptSchema>['locale'],
+  isMain: boolean
+) {
+  return {
+    zh: isMain
+      ? ['锁定轮廓', '棚拍光影', '高级反射']
+      : ['生活场景', '自然光', '主体不变'],
+    en: isMain
+      ? ['Silhouette lock', 'Studio light', 'Premium reflection']
+      : ['Lifestyle scene', 'Natural light', 'Shape preserved'],
+    ja: isMain
+      ? ['輪郭固定', 'スタジオ光', '高級反射']
+      : ['ライフスタイル', '自然光', '形状維持'],
+    ko: isMain
+      ? ['윤곽 고정', '스튜디오 조명', '프리미엄 반사']
+      : ['라이프스타일', '자연광', '형태 유지'],
+    es: isMain
+      ? ['Silueta fija', 'Luz de estudio', 'Reflejo premium']
+      : ['Escena lifestyle', 'Luz natural', 'Forma preservada'],
+  }[locale];
 }
 
 /**

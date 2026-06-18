@@ -4,6 +4,7 @@ import {
   IconChevronDown,
   IconChevronUp,
   IconDownload,
+  IconHistory,
   IconLoader2,
   IconPhoto,
   IconPlus,
@@ -13,9 +14,17 @@ import {
   IconWand,
 } from '@tabler/icons-react';
 import { draftProductImagePrompt } from '@/api/ai';
+import { createGenerationBatch } from '@/api/generation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { estimateTaskCreditCost } from '@/lib/product-generation';
+import {
+  ProductLanguageSelect,
+  PRODUCT_LOCALE_META,
+  type ProductLocale,
+  useProductLocale,
+} from '@/components/product/product-locale';
 import {
   Select,
   SelectContent,
@@ -28,7 +37,14 @@ import { downloadFile } from '@/lib/download';
 import { cn } from '@/lib/utils';
 
 type TaskKind = 'main' | 'detail';
-type TaskStatus = 'idle' | 'drafting' | 'ready' | 'rendering' | 'done';
+type TaskStatus =
+  | 'idle'
+  | 'drafting'
+  | 'ready'
+  | 'queued'
+  | 'rendering'
+  | 'done'
+  | 'failed';
 
 type WorkbenchTask = {
   id: string;
@@ -46,7 +62,7 @@ type WorkbenchTask = {
   expanded: boolean;
 };
 
-type Locale = 'zh' | 'en';
+type Locale = ProductLocale;
 
 const MAIN_STYLES = [
   'Pure Studio Key Light',
@@ -85,6 +101,14 @@ const WORKBENCH_COPY = {
     noFile: '未上传',
     description: '商品基础描述',
     generateAll: '生成',
+    batch: '批次',
+    batchReady: (credits: number, count: number) =>
+      `已创建批次，${count} 个单图任务并发执行，预扣 ${credits} 点。`,
+    insufficientCredits: (required: number, available: number) =>
+      `点数不足：需要 ${required} 点，当前剩余 ${available} 点。`,
+    history: '历史',
+    historyTitle: '最近批次',
+    emptyHistory: '生成后会在这里看到批次、任务数和扣点记录。',
     queueTitle: '渲染任务队列',
     queueSubtitle: '主图与详情图可以并行规划、独立生成、分别追溯',
     summary: (main: number, detail: number) =>
@@ -119,8 +143,10 @@ const WORKBENCH_COPY = {
       idle: '待配置',
       drafting: '撰写中',
       ready: '可渲染',
+      queued: '排队中',
       rendering: '渲染中',
       done: '已完成',
+      failed: '失败',
     },
   },
   en: {
@@ -134,6 +160,14 @@ const WORKBENCH_COPY = {
     noFile: 'Not uploaded',
     description: 'Base product description',
     generateAll: 'Generate',
+    batch: 'Batch',
+    batchReady: (credits: number, count: number) =>
+      `Batch created. ${count} single-image tasks are running in parallel, reserving ${credits} credits.`,
+    insufficientCredits: (required: number, available: number) =>
+      `Insufficient credits: ${required} required, ${available} available.`,
+    history: 'History',
+    historyTitle: 'Recent batches',
+    emptyHistory: 'Batches, task counts, and credit usage will appear here.',
     queueTitle: 'Render Task Queue',
     queueSubtitle:
       'Plan hero and detail assets in parallel, then inspect each output',
@@ -169,20 +203,211 @@ const WORKBENCH_COPY = {
       idle: 'Draft',
       drafting: 'Drafting',
       ready: 'Ready',
+      queued: 'Queued',
       rendering: 'Rendering',
       done: 'Done',
+      failed: 'Failed',
+    },
+  },
+  ja: {
+    subtitle: '商品画像生成ワークベンチ',
+    credits: 'クレジット',
+    language: '言語',
+    globalTitle: 'グローバル設定',
+    globalSubtitle: '全タスクで共有する商品情報',
+    upload: '商品素材画像をアップロード',
+    file: '素材ファイル',
+    noFile: '未アップロード',
+    description: '商品説明',
+    generateAll: '生成',
+    batch: 'バッチ',
+    batchReady: (credits: number, count: number) =>
+      `バッチを作成しました。${count} 件の単画像タスクを並列実行し、${credits} クレジットを予約します。`,
+    insufficientCredits: (required: number, available: number) =>
+      `クレジット不足：必要 ${required}、残高 ${available}。`,
+    history: '履歴',
+    historyTitle: '最近のバッチ',
+    emptyHistory: '生成後、バッチ、タスク数、クレジット消費が表示されます。',
+    queueTitle: 'レンダリングタスクキュー',
+    queueSubtitle: '主画像と詳細画像を並列で設計し、それぞれ確認できます',
+    summary: (main: number, detail: number) =>
+      `現在のパック：主画像 ${main} 件、詳細画像 ${detail} 件`,
+    addMain: '主画像',
+    addDetail: '詳細画像',
+    main: '主画像',
+    detail: '詳細画像',
+    style: 'スタイル',
+    ratio: '比率',
+    resolution: '解像度',
+    prompt: '英語 Prompt',
+    draft: 'AI 下書き',
+    reference: '参照画像',
+    useGlobal: '通常は共通の商品画像を使用',
+    changeReference: '参照画像を変更',
+    promptPlaceholder:
+      'スタイルに基づく Prompt を自動生成できます。AI 下書き後に手動編集も可能です。',
+    render: 'レンダリング開始',
+    rerender: '再レンダリング',
+    inspector: 'ライブギャラリーと素材インスペクター',
+    currentTask: '現在のタスク',
+    waiting: '生成待ち',
+    rendering: 'レンダリング中',
+    download: '元画像をダウンロード',
+    details: 'タスク詳細',
+    type: '種類',
+    status: '状態',
+    reasoning: 'AI デザイン意図',
+    selectTask: 'タスクを選択して詳細を表示',
+    statuses: {
+      idle: '下書き',
+      drafting: '作成中',
+      ready: '準備完了',
+      queued: '待機中',
+      rendering: 'レンダリング中',
+      done: '完了',
+      failed: '失敗',
+    },
+  },
+  ko: {
+    subtitle: '상품 이미지 생성 워크벤치',
+    credits: '크레딧',
+    language: '언어',
+    globalTitle: '전역 컨텍스트',
+    globalSubtitle: '모든 작업이 공유하는 상품 기준 정보',
+    upload: '상품 소재 이미지 업로드',
+    file: '소재 파일',
+    noFile: '업로드 안 됨',
+    description: '상품 기본 설명',
+    generateAll: '생성',
+    batch: '배치',
+    batchReady: (credits: number, count: number) =>
+      `배치가 생성되었습니다. ${count}개의 단일 이미지 작업을 병렬 실행하고 ${credits} 크레딧을 예약합니다.`,
+    insufficientCredits: (required: number, available: number) =>
+      `크레딧 부족: ${required} 필요, 현재 ${available}.`,
+    history: '기록',
+    historyTitle: '최근 배치',
+    emptyHistory: '생성 후 배치, 작업 수, 크레딧 사용량이 여기에 표시됩니다.',
+    queueTitle: '렌더링 작업 큐',
+    queueSubtitle:
+      '메인 이미지와 상세 이미지를 병렬로 설계하고 각각 확인합니다',
+    summary: (main: number, detail: number) =>
+      `현재 팩: 메인 ${main}개, 상세 ${detail}개`,
+    addMain: '메인',
+    addDetail: '상세',
+    main: '메인',
+    detail: '상세',
+    style: '스타일 프리셋',
+    ratio: '화면 비율',
+    resolution: '해상도',
+    prompt: '영문 Prompt',
+    draft: 'AI 작성',
+    reference: '참조 이미지',
+    useGlobal: '기본적으로 전역 상품 이미지 사용',
+    changeReference: '참조 변경',
+    promptPlaceholder:
+      '스타일 기반 Prompt가 자동으로 채워집니다. AI 작성 후 직접 수정할 수 있습니다.',
+    render: '렌더링 시작',
+    rerender: '다시 렌더링',
+    inspector: '실시간 갤러리 및 에셋 검사기',
+    currentTask: '현재 작업',
+    waiting: '생성 대기',
+    rendering: '렌더링 중',
+    download: '원본 다운로드',
+    details: '작업 상세',
+    type: '유형',
+    status: '상태',
+    reasoning: 'AI 디자인 의도',
+    selectTask: '작업을 선택해 에셋 상세 보기',
+    statuses: {
+      idle: '초안',
+      drafting: '작성 중',
+      ready: '준비됨',
+      queued: '대기 중',
+      rendering: '렌더링 중',
+      done: '완료',
+      failed: '실패',
+    },
+  },
+  es: {
+    subtitle: 'Workbench de generación de imágenes de producto',
+    credits: 'Créditos',
+    language: 'Idioma',
+    globalTitle: 'Contexto global',
+    globalSubtitle: 'Ancla de producto compartida por todas las tareas',
+    upload: 'Subir imagen de producto',
+    file: 'Archivo fuente',
+    noFile: 'Sin subir',
+    description: 'Descripción base del producto',
+    generateAll: 'Generar',
+    batch: 'Lote',
+    batchReady: (credits: number, count: number) =>
+      `Lote creado. ${count} tareas de imagen se ejecutan en paralelo y reservan ${credits} créditos.`,
+    insufficientCredits: (required: number, available: number) =>
+      `Créditos insuficientes: se necesitan ${required}, tienes ${available}.`,
+    history: 'Historial',
+    historyTitle: 'Lotes recientes',
+    emptyHistory: 'Aquí aparecerán lotes, tareas y consumo de créditos.',
+    queueTitle: 'Cola de tareas de render',
+    queueSubtitle:
+      'Planifica imágenes principales y de detalle en paralelo, luego revisa cada resultado',
+    summary: (main: number, detail: number) =>
+      `Paquete actual: ${main} principales, ${detail} detalles`,
+    addMain: 'Principal',
+    addDetail: 'Detalle',
+    main: 'Principal',
+    detail: 'Detalle',
+    style: 'Preset de estilo',
+    ratio: 'Proporción',
+    resolution: 'Resolución',
+    prompt: 'Prompt en inglés',
+    draft: 'Redactar con IA',
+    reference: 'Imagen de referencia',
+    useGlobal: 'Usa la imagen global por defecto',
+    changeReference: 'Cambiar referencia',
+    promptPlaceholder:
+      'Se completa un Prompt según el estilo. Puedes redactarlo con IA o editarlo manualmente.',
+    render: 'Renderizar',
+    rerender: 'Renderizar de nuevo',
+    inspector: 'Galería en vivo e inspector de assets',
+    currentTask: 'Tarea actual',
+    waiting: 'Esperando generación',
+    rendering: 'Renderizando',
+    download: 'Descargar original',
+    details: 'Detalles de tarea',
+    type: 'Tipo',
+    status: 'Estado',
+    reasoning: 'Intención de diseño IA',
+    selectTask: 'Selecciona una tarea para revisar el asset',
+    statuses: {
+      idle: 'Borrador',
+      drafting: 'Redactando',
+      ready: 'Lista',
+      queued: 'En cola',
+      rendering: 'Renderizando',
+      done: 'Completada',
+      failed: 'Fallida',
     },
   },
 } as const;
 
 export function SuiteWorkbench() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [locale, setLocale] = useState<Locale>(() => getInitialLocale());
+  const { locale, setLocale } = useProductLocale();
   const [sourceImage, setSourceImage] = useState<string>();
   const [sourceName, setSourceName] = useState('');
   const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
   const [credits, setCredits] = useState(45);
   const [selectedTaskId, setSelectedTaskId] = useState('task-main');
+  const [batchNotice, setBatchNotice] = useState('');
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [batchHistory, setBatchHistory] = useState<
+    Array<{
+      batchId: string;
+      taskCount: number;
+      creditCost: number;
+      createdAt: string;
+    }>
+  >([]);
   const [tasks, setTasks] = useState<WorkbenchTask[]>(() =>
     createInitialTasks(DEFAULT_DESCRIPTION, locale)
   );
@@ -199,12 +424,6 @@ export function SuiteWorkbench() {
     }),
     [tasks]
   );
-
-  function changeLocale(next: Locale) {
-    setLocale(next);
-    window.localStorage.setItem('suite-workbench-locale', next);
-    document.documentElement.lang = next === 'zh' ? 'zh-CN' : 'en';
-  }
 
   function updateTask(id: string, patch: Partial<WorkbenchTask>) {
     setTasks((current) =>
@@ -301,6 +520,11 @@ export function SuiteWorkbench() {
   async function renderTask(task: WorkbenchTask) {
     const referenceImage = task.referenceImage ?? sourceImage;
     if (!referenceImage) return;
+    const cost = estimateTaskCreditCost(task);
+    if (credits < cost) {
+      setBatchNotice(t.insufficientCredits(cost, credits));
+      return;
+    }
     const promptPatch = task.prompt.trim()
       ? {}
       : createClientPrompt(task, description, locale);
@@ -323,48 +547,94 @@ export function SuiteWorkbench() {
           ? task.keywords
           : createClientPrompt(task, description, locale).keywords,
     });
-    setCredits((value) => Math.max(0, value - 2));
+    setCredits((value) => Math.max(0, value - cost));
   }
 
   async function generateAll() {
     const runnable = tasks.filter((task) => task.referenceImage ?? sourceImage);
     if (runnable.length === 0) return;
+    const plannedTasks = runnable.map((task) => ({
+      id: task.id,
+      kind: task.kind,
+      style: task.style,
+      aspectRatio: task.aspectRatio,
+      resolution: task.resolution,
+      prompt:
+        task.prompt.trim() ||
+        createClientPrompt(task, description, locale).prompt,
+      referenceName: task.referenceName ?? sourceName,
+    }));
+    const batch = await createGenerationBatch({
+      data: {
+        projectId: 'local-workbench-project',
+        userId: 'local-preview-user',
+        locale,
+        productDescription: description,
+        availableCredits: credits,
+        tasks: plannedTasks,
+      },
+    });
+
+    if (!batch.ok) {
+      setBatchNotice(
+        t.insufficientCredits(batch.requiredCredits, batch.availableCredits)
+      );
+      return;
+    }
+
+    setBatchNotice(t.batchReady(batch.totalCreditCost, batch.tasks.length));
+    setBatchHistory((current) => [
+      {
+        batchId: batch.batchId,
+        taskCount: batch.tasks.length,
+        creditCost: batch.totalCreditCost,
+        createdAt: new Date().toLocaleString(
+          PRODUCT_LOCALE_META[locale].dateLocale
+        ),
+      },
+      ...current,
+    ]);
 
     setTasks((current) =>
       current.map((task) =>
         runnable.some((item) => item.id === task.id)
-          ? { ...task, status: 'rendering' }
+          ? { ...task, status: 'queued' }
           : task
       )
     );
+    setCredits((value) => Math.max(0, value - batch.totalCreditCost));
 
-    for (const task of runnable) {
-      const promptPatch = task.prompt.trim()
-        ? {}
-        : createClientPrompt(task, description, locale);
-      const imageUrl = await composePreviewImage(
-        task.referenceImage ?? sourceImage!,
-        {
-          ...task,
+    await Promise.allSettled(
+      runnable.map(async (task, index) => {
+        const plannedTask = batch.tasks.find((item) => item.id === task.id);
+        await wait(160 + index * 120);
+        updateTask(task.id, { status: 'rendering' });
+        setSelectedTaskId(task.id);
+        const promptPatch = task.prompt.trim()
+          ? {}
+          : createClientPrompt(task, description, locale);
+        const imageUrl = await composePreviewImage(
+          task.referenceImage ?? sourceImage!,
+          {
+            ...task,
+            ...promptPatch,
+          }
+        );
+        updateTask(task.id, {
           ...promptPatch,
-        }
-      );
-      updateTask(task.id, {
-        ...promptPatch,
-        imageUrl,
-        status: 'done',
-        reasoning:
-          task.reasoning ||
-          createClientPrompt(task, description, locale).reasoning,
-        keywords:
-          task.keywords.length > 0
-            ? task.keywords
-            : createClientPrompt(task, description, locale).keywords,
-      });
-      setSelectedTaskId(task.id);
-      await wait(200);
-    }
-    setCredits((value) => Math.max(0, value - runnable.length * 2));
+          prompt: plannedTask?.prompt ?? promptPatch.prompt ?? task.prompt,
+          imageUrl,
+          status: 'done',
+          reasoning:
+            task.reasoning ||
+            createClientPrompt(task, description, locale).reasoning,
+          keywords:
+            task.keywords.length > 0
+              ? task.keywords
+              : createClientPrompt(task, description, locale).keywords,
+        });
+      })
+    );
   }
 
   return (
@@ -381,20 +651,20 @@ export function SuiteWorkbench() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Select
-              value={locale}
-              onValueChange={(value) => changeLocale(value as Locale)}
+            <ProductLanguageSelect
+              locale={locale}
+              onLocaleChange={setLocale}
+              compact
+            />
+            <Button
+              type="button"
+              variant="outline"
+              className="bg-white"
+              onClick={() => setHistoryOpen((value) => !value)}
             >
-              <SelectTrigger className="w-28 bg-white">
-                <SelectValue>
-                  {locale === 'zh' ? '中文' : 'English'}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="zh">中文</SelectItem>
-                <SelectItem value="en">English</SelectItem>
-              </SelectContent>
-            </Select>
+              <IconHistory className="size-4" />
+              {t.history}
+            </Button>
             <div className="flex items-center gap-2 rounded-lg border border-[#dfe3d8] bg-white px-3 py-2 text-sm shadow-sm">
               <IconBolt className="size-4 text-[#c9822f]" />
               <span className="text-[#74796d]">{t.credits}</span>
@@ -491,6 +761,9 @@ export function SuiteWorkbench() {
               <p className="mt-1 font-medium text-[#2f5f4f] text-sm">
                 {t.summary(taskSummary.main, taskSummary.detail)}
               </p>
+              {batchNotice ? (
+                <p className="mt-1 text-[#72511f] text-sm">{batchNotice}</p>
+              ) : null}
             </div>
             <div className="flex gap-2">
               <Button
@@ -531,6 +804,30 @@ export function SuiteWorkbench() {
               />
             ))}
           </div>
+          {historyOpen ? (
+            <div className="mt-5 rounded-lg border border-[#dfe3d8] bg-white p-4 shadow-sm">
+              <p className="mb-3 flex items-center gap-2 font-semibold text-sm">
+                <IconHistory className="size-4 text-[#2f5f4f]" />
+                {t.historyTitle}
+              </p>
+              {batchHistory.length === 0 ? (
+                <p className="text-[#74796d] text-sm">{t.emptyHistory}</p>
+              ) : (
+                <div className="space-y-2">
+                  {batchHistory.map((batch) => (
+                    <div
+                      key={batch.batchId}
+                      className="grid gap-2 rounded-lg border border-[#edf0e8] p-3 text-sm md:grid-cols-[1fr_auto_auto]"
+                    >
+                      <span className="truncate">{batch.batchId}</span>
+                      <span>{batch.taskCount} tasks</span>
+                      <span>{batch.creditCost} credits</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : null}
         </section>
 
         <aside className="border-[#dfe3d8] border-t bg-[#fbfcf7] p-4 lg:border-t-0 lg:border-l">
@@ -889,22 +1186,8 @@ function createClientPrompt(
       'Preserve exact product shape, silhouette, material, color, labels, and geometry.',
       'Change only background, lighting, shadow, reflection, and atmosphere.',
     ].join(' '),
-    reasoning:
-      locale === 'zh'
-        ? isMain
-          ? '用纯净构图和高级布光突出商品轮廓，让主图更适合投放和货架展示。'
-          : '用具体场景补足商品使用氛围，同时保持主体不被 AI 改形。'
-        : isMain
-          ? 'A clean composition and premium lighting make the product suitable for marketplace hero placement.'
-          : 'A concrete lifestyle scene adds buying context while preserving the uploaded product shape.',
-    keywords:
-      locale === 'zh'
-        ? isMain
-          ? ['主图', '锁边', '棚拍']
-          : ['详情图', '场景', '氛围']
-        : isMain
-          ? ['Main image', 'Shape lock', 'Studio']
-          : ['Detail image', 'Scene', 'Mood'],
+    reasoning: getClientReasoning(locale, isMain),
+    keywords: getClientKeywords(locale, isMain),
   };
 }
 
@@ -943,11 +1226,42 @@ function createInitialTasks(
   ];
 }
 
-function getInitialLocale(): Locale {
-  if (typeof window === 'undefined') return 'zh';
-  const stored = window.localStorage.getItem('suite-workbench-locale');
-  if (stored === 'zh' || stored === 'en') return stored;
-  return window.navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+function getClientReasoning(locale: Locale, isMain: boolean) {
+  const copy = {
+    zh: isMain
+      ? '用纯净构图和高级布光突出商品轮廓，让主图更适合投放和货架展示。'
+      : '用具体场景补足商品使用氛围，同时保持主体不被 AI 改形。',
+    en: isMain
+      ? 'A clean composition and premium lighting make the product suitable for marketplace hero placement.'
+      : 'A concrete lifestyle scene adds buying context while preserving the uploaded product shape.',
+    ja: isMain
+      ? 'クリーンな構図と上質な照明で商品輪郭を強調し、EC の主画像に適した見え方にします。'
+      : '具体的な利用シーンを加えながら、アップロード商品の形状は維持します。',
+    ko: isMain
+      ? '깔끔한 구도와 고급 조명으로 상품 윤곽을 강조해 마켓플레이스 메인 이미지에 적합하게 만듭니다.'
+      : '구체적인 사용 장면을 더하면서 업로드된 상품 형태는 유지합니다.',
+    es: isMain
+      ? 'Una composición limpia y luz premium hacen que el producto funcione como imagen principal de marketplace.'
+      : 'Una escena lifestyle añade contexto de compra sin alterar la forma del producto subido.',
+  };
+  return copy[locale];
+}
+
+function getClientKeywords(locale: Locale, isMain: boolean) {
+  const copy = {
+    zh: isMain ? ['主图', '锁边', '棚拍'] : ['详情图', '场景', '氛围'],
+    en: isMain
+      ? ['Main image', 'Shape lock', 'Studio']
+      : ['Detail image', 'Scene', 'Mood'],
+    ja: isMain
+      ? ['主画像', '形状維持', 'スタジオ']
+      : ['詳細画像', 'シーン', '雰囲気'],
+    ko: isMain ? ['메인', '형태 유지', '스튜디오'] : ['상세', '장면', '무드'],
+    es: isMain
+      ? ['Principal', 'Forma preservada', 'Estudio']
+      : ['Detalle', 'Escena', 'Ambiente'],
+  };
+  return copy[locale];
 }
 
 function readFileAsDataUrl(file: File) {

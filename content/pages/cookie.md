@@ -1,58 +1,40 @@
 ---
 title: Cookie Policy
-description: How we use cookies and similar technologies on our website
-date: 2026-02-15
+description: How SuiteWorkbench uses cookies and similar technologies for login, language settings, analytics, payments, and product workflows.
+date: 2026-06-18
 ---
 
-## Introduction
+## Overview
 
-This Cookie Policy explains how we use cookies and similar technologies on our website. By using our website, you consent to the use of cookies as described in this policy.
+SuiteWorkbench uses cookies and similar technologies to keep the website working, remember preferences, understand product usage, and support secure account and payment flows.
 
-## What Are Cookies
+## What Cookies Are
 
-Cookies are small text files that are stored on your device when you visit a website. They are widely used to make websites work more efficiently and provide information to the website owners.
+Cookies are small files stored on your device by a website. Similar technologies can include local storage, session storage, pixels, and SDK identifiers.
 
 ## How We Use Cookies
 
-We use cookies for the following purposes:
+- **Essential cookies**: keep you signed in, protect sessions, prevent abuse, and support secure checkout or customer portal flows.
+- **Preference cookies**: remember settings such as language, theme, and product workspace preferences.
+- **Analytics cookies**: help us understand traffic, page performance, feature usage, and errors so we can improve the product.
+- **Payment and support cookies**: allow payment providers, customer support tools, or embedded widgets to function correctly.
 
-- **Essential Cookies**: These cookies are necessary for the website to function properly and cannot be switched off in our systems.
-- **Performance Cookies**: These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site.
-- **Functional Cookies**: These cookies enable the website to provide enhanced functionality and personalization.
-- **Targeting Cookies**: These cookies may be set through our site by our advertising partners to build a profile of your interests.
+## Product Preferences
 
-## Types of Cookies We Use
+The generator may remember language, prompt settings, draft product descriptions, selected styles, and local interface preferences so the workspace feels consistent when you return.
 
-### Essential Cookies
-- Session cookies for maintaining user sessions
-- Security cookies for protecting against fraud and abuse
+## Third-Party Cookies
 
-### Performance Cookies
-- Analytics cookies to understand how visitors interact with our website
-- Load balancing cookies to distribute traffic to servers
-
-### Functional Cookies
-- Preference cookies to remember your settings and choices
-- Language cookies to remember your language preference
-
-### Targeting Cookies
-- Advertising cookies to deliver relevant advertisements
-- Social media cookies to enable sharing content on social platforms
+Some cookies may be set by providers that help with authentication, analytics, payments, customer support, hosting, or future AI generation integrations. Their use is governed by their own policies.
 
 ## Managing Cookies
 
-Most web browsers allow you to control cookies through their settings. You can:
+Most browsers let you block, delete, or limit cookies. If you disable essential cookies, login, billing, generation history, language settings, or dashboard features may not work correctly.
 
-- Delete cookies from your device
-- Block cookies by activating the setting on your browser that allows you to refuse all or some cookies
-- Set your browser to notify you when you receive a cookie
+## Changes
 
-Please note that if you choose to block or delete cookies, you may not be able to access certain areas or features of our website.
+We may update this Cookie Policy when we add or change analytics, payment, support, or generation providers.
 
-## Changes to This Cookie Policy
+## Contact
 
-We may update our Cookie Policy from time to time. We will notify you of any changes by posting the new Cookie Policy on this page.
-
-## Contact Us
-
-If you have any questions about this Cookie Policy, please [contact us](/contact).
+Questions about cookies can be sent through the [contact page](/contact).

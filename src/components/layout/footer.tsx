@@ -1,4 +1,8 @@
-import { getFooterLinks } from '@/config/footer-config';
+import {
+  getFooterLinks,
+  getFooterRights,
+  getFooterTagline,
+} from '@/config/footer-config';
 import { getSocialLinks } from '@/config/social-config';
 import { isLinkActive } from '@/lib/urls';
 import { cn } from '@/lib/utils';
@@ -7,11 +11,12 @@ import { Logo } from '@/components/shared/logo';
 import BuiltWithButton from '@/components/shared/built-with-button';
 import { Link, useLocation } from '@tanstack/react-router';
 import { websiteConfig } from '@/config/website';
-import { messages } from '@/messages';
+import { useProductLocale } from '@/components/product/product-locale';
 
 export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
   const pathname = useLocation().pathname;
-  const footerLinks = getFooterLinks();
+  const { locale } = useProductLocale();
+  const footerLinks = getFooterLinks(locale);
   const socialLinks = getSocialLinks();
 
   return (
@@ -26,7 +31,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
               </span>
             </div>
             <p className="text-muted-foreground text-base py-2 md:pr-12">
-              {messages.footer.tagline}
+              {getFooterTagline(locale)}
             </p>
             <nav
               aria-label="Social links"
@@ -100,7 +105,7 @@ export function Footer({ className }: React.HTMLAttributes<HTMLElement>) {
         <Container className="px-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
           <span className="text-muted-foreground text-sm">
             &copy; {new Date().getFullYear()} {websiteConfig.metadata?.name}.{' '}
-            {messages.footer.rightsReserved}
+            {getFooterRights(locale)}
           </span>
           <BuiltWithButton />
         </Container>

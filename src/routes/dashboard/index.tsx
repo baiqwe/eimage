@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import {
   ProductLanguageSelect,
+  type ProductLocale,
   useProductLocale,
 } from '@/components/product/product-locale';
 import { Routes } from '@/lib/routes';
@@ -19,7 +20,18 @@ export const Route = createFileRoute('/dashboard/')({
   component: DashboardPage,
 });
 
-const DASHBOARD_COPY = {
+const DASHBOARD_COPY: Record<
+  ProductLocale,
+  {
+    title: string;
+    description: string;
+    openGenerator: string;
+    cards: Array<{ label: string; value: string; hint: string }>;
+    historyTitle: string;
+    empty: string;
+    rows: string[][];
+  }
+> = {
   zh: {
     title: '商品图控制台',
     description: '查看订阅、点数、近期生成历史，并继续创建新的视觉资产。',
@@ -64,7 +76,90 @@ const DASHBOARD_COPY = {
       ['Premium dark detail', 'Detail', 'Premium Dark Editorial', 'Queued'],
     ],
   },
-} as const;
+  ja: {
+    title: '商品画像ダッシュボード',
+    description:
+      'サブスク、クレジット、最近の生成履歴を確認し、新しい素材を作成します。',
+    openGenerator: '生成ツールを開く',
+    cards: [
+      { label: '残クレジット', value: '45', hint: '今月利用可能' },
+      { label: '生成タスク', value: '18', hint: '過去 30 日' },
+      { label: '保存済み素材', value: '42', hint: '主画像と詳細画像' },
+      { label: '契約状態', value: 'Pro', hint: '自動更新中' },
+    ],
+    historyTitle: '生成履歴',
+    empty:
+      '実際の画像生成 API 接続後、元画像、Prompt、結果、クレジット記録が表示されます。',
+    rows: [
+      ['陶器カップ主画像', '主画像', 'Pure Studio Key Light', '完了'],
+      ['朝の窓辺詳細画像', '詳細', 'Morning Window Lifestyle', '完了'],
+      ['暗調プレミアム詳細画像', '詳細', 'Premium Dark Editorial', '待機中'],
+    ],
+  },
+  ko: {
+    title: '상품 이미지 대시보드',
+    description:
+      '구독, 크레딧, 최근 생성 기록을 확인하고 새 비주얼 에셋을 만듭니다.',
+    openGenerator: '생성기 열기',
+    cards: [
+      { label: '남은 크레딧', value: '45', hint: '이번 달 사용 가능' },
+      { label: '생성 작업', value: '18', hint: '최근 30일' },
+      { label: '저장된 에셋', value: '42', hint: '메인 및 상세 이미지' },
+      { label: '구독 상태', value: 'Pro', hint: '자동 갱신 중' },
+    ],
+    historyTitle: '생성 기록',
+    empty:
+      '실제 이미지 생성 API 연결 후 원본 이미지, Prompt, 결과, 크레딧 기록이 표시됩니다.',
+    rows: [
+      ['세라믹 컵 메인', '메인', 'Pure Studio Key Light', '완료'],
+      ['아침 창가 상세', '상세', 'Morning Window Lifestyle', '완료'],
+      ['프리미엄 다크 상세', '상세', 'Premium Dark Editorial', '대기 중'],
+    ],
+  },
+  es: {
+    title: 'Panel de imágenes de producto',
+    description:
+      'Consulta suscripción, créditos, historial reciente y continúa creando assets visuales.',
+    openGenerator: 'Abrir generador',
+    cards: [
+      {
+        label: 'Créditos restantes',
+        value: '45',
+        hint: 'Disponibles este mes',
+      },
+      { label: 'Tareas generadas', value: '18', hint: 'Últimos 30 días' },
+      {
+        label: 'Assets guardados',
+        value: '42',
+        hint: 'Principales y detalles',
+      },
+      { label: 'Suscripción', value: 'Pro', hint: 'Renovación automática' },
+    ],
+    historyTitle: 'Historial de generación',
+    empty:
+      'Cuando se conecte la API real, aquí aparecerán imagen fuente, Prompt, resultado y créditos.',
+    rows: [
+      [
+        'Hero de taza cerámica',
+        'Principal',
+        'Pure Studio Key Light',
+        'Completado',
+      ],
+      [
+        'Detalle de ventana matutina',
+        'Detalle',
+        'Morning Window Lifestyle',
+        'Completado',
+      ],
+      [
+        'Detalle oscuro premium',
+        'Detalle',
+        'Premium Dark Editorial',
+        'En cola',
+      ],
+    ],
+  },
+};
 
 function DashboardPage() {
   const { locale, setLocale } = useProductLocale();

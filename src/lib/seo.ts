@@ -1,6 +1,9 @@
 import { websiteConfig } from '@/config/website';
 import { getCanonicalUrl, getOgImage, twitterHandleFromUrl } from '@/lib/urls';
 
+export const SEO_LOCALES = ['en', 'zh'] as const;
+export type SeoLocale = (typeof SEO_LOCALES)[number];
+
 /**
  * Build metadata + canonical link for a page
  * @param path - The path of the page
@@ -15,14 +18,104 @@ export function seo(
     keywords?: string;
     image?: string;
     type?: 'website' | 'article';
+    locale?: SeoLocale;
+    alternates?: Partial<Record<SeoLocale | 'x-default', string>>;
+    robots?: string;
   }
 ) {
   const url = getCanonicalUrl(path);
   const image = options.image ?? getOgImage();
   return {
-    meta: metadata({ ...options, url, image, type: options.type ?? 'website' }),
-    links: [{ rel: 'canonical', href: url }],
+    meta: metadata({
+      ...options,
+      url,
+      image,
+      type: options.type ?? 'website',
+      robots: options.robots ?? 'index,follow',
+    }),
+    links: [
+      { rel: 'canonical', href: url },
+      ...alternateLinks(options.alternates),
+    ],
   };
+}
+
+export function localizedAlternates(pathByLocale: Record<SeoLocale, string>) {
+  return {
+    ...pathByLocale,
+    'x-default': pathByLocale.en,
+  };
+}
+
+export function softwareApplicationJsonLd({
+  name,
+  description,
+  path,
+  locale = 'en',
+}: {
+  name: string;
+  description: string;
+  path: string;
+  locale?: SeoLocale;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name,
+    description,
+    url: getCanonicalUrl(path),
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    inLanguage: locale === 'zh' ? 'zh-CN' : 'en-US',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: locale === 'zh' ? 'CNY' : 'USD',
+    },
+  };
+}
+
+export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: getCanonicalUrl(item.path),
+    })),
+  };
+}
+
+export function organizationJsonLd({
+  name,
+  description,
+  path = '/',
+}: {
+  name: string;
+  description: string;
+  path?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name,
+    description,
+    url: getCanonicalUrl(path),
+    logo: getCanonicalUrl('/logo.png'),
+  };
+}
+
+function alternateLinks(
+  alternates?: Partial<Record<SeoLocale | 'x-default', string>>
+) {
+  if (!alternates) return [];
+  return Object.entries(alternates).map(([hrefLang, path]) => ({
+    rel: 'alternate',
+    hrefLang,
+    href: getCanonicalUrl(path),
+  }));
 }
 
 export const metadata = ({
@@ -32,6 +125,7 @@ export const metadata = ({
   image,
   url,
   type = 'website',
+  robots = 'index,follow',
 }: {
   title: string;
   description?: string;
@@ -39,6 +133,7 @@ export const metadata = ({
   url?: string;
   keywords?: string;
   type?: 'website' | 'article';
+  robots?: string;
 }) => {
   const twitterSite = websiteConfig.social?.twitter
     ? twitterHandleFromUrl(websiteConfig.social.twitter)
@@ -50,6 +145,7 @@ export const metadata = ({
     content?: string;
   }> = [
     { title },
+    { name: 'robots', content: robots },
     ...(description ? [{ name: 'description', content: description }] : []),
     ...(keywords ? [{ name: 'keywords', content: keywords }] : []),
     // OG metadata

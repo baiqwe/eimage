@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { IconLanguage } from '@tabler/icons-react';
 import {
   Select,
   SelectContent,
@@ -7,29 +8,110 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export type ProductLocale = 'zh' | 'en';
+export const PRODUCT_LOCALES = ['zh', 'en', 'ja', 'ko', 'es'] as const;
+export type ProductLocale = (typeof PRODUCT_LOCALES)[number];
 
 export const PRODUCT_LOCALE_KEY = 'suite-workbench-locale';
+export const PRODUCT_LOCALE_EVENT = 'suite-workbench-locale-change';
 
-export function useProductLocale() {
-  const [locale, setLocaleState] = useState<ProductLocale>('zh');
+export const PRODUCT_LOCALE_META: Record<
+  ProductLocale,
+  { label: string; shortLabel: string; htmlLang: string; dateLocale: string }
+> = {
+  zh: {
+    label: '中文',
+    shortLabel: '中',
+    htmlLang: 'zh-CN',
+    dateLocale: 'zh-CN',
+  },
+  en: {
+    label: 'English',
+    shortLabel: 'EN',
+    htmlLang: 'en',
+    dateLocale: 'en',
+  },
+  ja: {
+    label: '日本語',
+    shortLabel: '日',
+    htmlLang: 'ja',
+    dateLocale: 'ja-JP',
+  },
+  ko: {
+    label: '한국어',
+    shortLabel: '한',
+    htmlLang: 'ko',
+    dateLocale: 'ko-KR',
+  },
+  es: {
+    label: 'Español',
+    shortLabel: 'ES',
+    htmlLang: 'es',
+    dateLocale: 'es-ES',
+  },
+};
+
+export function normalizeProductLocale(value?: string | null): ProductLocale {
+  if (value && PRODUCT_LOCALES.includes(value as ProductLocale)) {
+    return value as ProductLocale;
+  }
+  const language =
+    typeof window === 'undefined'
+      ? ''
+      : window.navigator.language.toLowerCase();
+  if (language.startsWith('zh')) return 'zh';
+  if (language.startsWith('ja')) return 'ja';
+  if (language.startsWith('ko')) return 'ko';
+  if (language.startsWith('es')) return 'es';
+  return 'en';
+}
+
+export function setGlobalProductLocale(next: ProductLocale) {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(PRODUCT_LOCALE_KEY, next);
+  document.documentElement.lang = PRODUCT_LOCALE_META[next].htmlLang;
+  window.dispatchEvent(
+    new CustomEvent(PRODUCT_LOCALE_EVENT, { detail: { locale: next } })
+  );
+}
+
+export function useProductLocale(initialLocale?: ProductLocale) {
+  const [locale, setLocaleState] = useState<ProductLocale>(
+    initialLocale ?? 'zh'
+  );
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(PRODUCT_LOCALE_KEY);
-    const next =
-      stored === 'zh' || stored === 'en'
-        ? stored
-        : window.navigator.language.toLowerCase().startsWith('zh')
-          ? 'zh'
-          : 'en';
+    const next = initialLocale
+      ? initialLocale
+      : normalizeProductLocale(
+          typeof window === 'undefined'
+            ? undefined
+            : window.localStorage.getItem(PRODUCT_LOCALE_KEY)
+        );
     setLocaleState(next);
-    document.documentElement.lang = next === 'zh' ? 'zh-CN' : 'en';
-  }, []);
+    setGlobalProductLocale(next);
+
+    function onLocaleChange(event: Event) {
+      const customEvent = event as CustomEvent<{ locale?: ProductLocale }>;
+      setLocaleState(normalizeProductLocale(customEvent.detail?.locale));
+    }
+
+    function onStorage(event: StorageEvent) {
+      if (event.key === PRODUCT_LOCALE_KEY) {
+        setLocaleState(normalizeProductLocale(event.newValue));
+      }
+    }
+
+    window.addEventListener(PRODUCT_LOCALE_EVENT, onLocaleChange);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener(PRODUCT_LOCALE_EVENT, onLocaleChange);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, [initialLocale]);
 
   function setLocale(next: ProductLocale) {
     setLocaleState(next);
-    window.localStorage.setItem(PRODUCT_LOCALE_KEY, next);
-    document.documentElement.lang = next === 'zh' ? 'zh-CN' : 'en';
+    setGlobalProductLocale(next);
   }
 
   return { locale, setLocale };
@@ -38,21 +120,29 @@ export function useProductLocale() {
 export function ProductLanguageSelect({
   locale,
   onLocaleChange,
+  compact = false,
 }: {
   locale: ProductLocale;
   onLocaleChange: (locale: ProductLocale) => void;
+  compact?: boolean;
 }) {
   return (
     <Select
       value={locale}
       onValueChange={(value) => onLocaleChange(value as ProductLocale)}
     >
-      <SelectTrigger className="w-32 bg-background">
-        <SelectValue>{locale === 'zh' ? '中文' : 'English'}</SelectValue>
+      <SelectTrigger
+        className={compact ? 'w-24 bg-background' : 'w-36 bg-background'}
+      >
+        <IconLanguage className="size-4" />
+        <SelectValue>{PRODUCT_LOCALE_META[locale].label}</SelectValue>
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="zh">中文</SelectItem>
-        <SelectItem value="en">English</SelectItem>
+        {PRODUCT_LOCALES.map((item) => (
+          <SelectItem key={item} value={item}>
+            {PRODUCT_LOCALE_META[item].label}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

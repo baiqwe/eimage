@@ -13,28 +13,36 @@ export const Route = createFileRoute('/manifest.json')({
       GET: async () => {
         const metadata = websiteConfig.metadata;
         const body = {
-          name: metadata?.name,
-          short_name: metadata?.name,
-          description: metadata?.description,
+          name: metadata?.name ?? 'SuiteWorkbench',
+          short_name: 'SuiteWorkbench',
+          description:
+            metadata?.description ??
+            'AI product image generator for ecommerce teams.',
           start_url: '/',
           scope: '/',
           display: 'standalone',
           // Keep in sync with <meta name="theme-color"> in src/routes/__root.tsx
-          background_color: '#09090b',
-          theme_color: '#09090b',
+          background_color: '#f7f8f4',
+          theme_color: '#20231e',
           icons: [
             { src: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' },
+            {
+              src: '/favicon.svg',
+              sizes: 'any',
+              type: 'image/svg+xml',
+              purpose: 'any',
+            },
             {
               src: '/android-chrome-192x192.png',
               sizes: '192x192',
               type: 'image/png',
-              purpose: 'maskable',
+              purpose: 'any maskable',
             },
             {
               src: '/android-chrome-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'maskable',
+              purpose: 'any maskable',
             },
           ],
         };

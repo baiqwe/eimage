@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mkfast-template",
+  "name": "eimage",
   "compatibility_date": "2025-09-02",
   "compatibility_flags": [
     // Enable Node.js API
@@ -24,7 +24,7 @@
   "main": "./src/server.ts",
 
   // Enables Workers Trace Events Logpush for a Worker
-  "logpush": true,
+  "logpush": false,
 
   // Whether Wrangler should keep variables configured in the dashboard on deploy
   "keep_vars": true,
@@ -44,12 +44,7 @@
 
   // Custom domains
   // https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
-  "routes": [
-    {
-      "pattern": "demo.tanstarter.dev",
-      "custom_domain": true
-    }
-  ],
+  "routes": [],
 
   /**
    * Bindings
@@ -58,22 +53,22 @@
    * https://developers.cloudflare.com/workers/runtime-apis/bindings/
    */
   /**
-   * D1: create database with `npx wrangler d1 create mkfast-template`
+   * D1: create database with `npx wrangler d1 create eimage`
    */
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "mkfast-template",
-      "database_id": "dc34f04a-3445-4b5c-bf61-c4ec2328e239",
+      "database_name": "eimage",
+      "database_id": "82fd23ee-adfd-46e2-a788-f4eb6f00d656",
       "migrations_dir": "./src/db/migrations"
     }
   ],
   /**
-   * R2: create bucket with `npx wrangler r2 bucket create mkfast-template`
+   * R2: create bucket with `npx wrangler r2 bucket create eimage`
    */
   "r2_buckets": [
     {
-      "bucket_name": "mkfast-template",
+      "bucket_name": "eimage",
       "binding": "BUCKET"
     }
   ]

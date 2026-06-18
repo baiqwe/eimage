@@ -26,6 +26,10 @@ import { Link, useLocation } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { websiteConfig } from '@/config/website';
 import { messages } from '@/messages';
+import {
+  ProductLanguageSelect,
+  useProductLocale,
+} from '@/components/product/product-locale';
 
 interface NavbarProps {
   scroll?: boolean;
@@ -34,7 +38,8 @@ interface NavbarProps {
 export function Navbar({ scroll = true }: NavbarProps) {
   const pathname = useLocation().pathname;
   const scrolled = useScroll(50);
-  const menuLinks = getNavbarLinks();
+  const { locale, setLocale } = useProductLocale();
+  const menuLinks = getNavbarLinks(locale);
   const [mounted, setMounted] = useState(false);
   const [menuValue, setMenuValue] = useState<string | null>(null);
   const { data: session, isPending } = authClient.useSession();
@@ -164,6 +169,11 @@ export function Navbar({ scroll = true }: NavbarProps) {
             </NavigationMenu>
 
             <div className="flex items-center gap-4 shrink-0">
+              <ProductLanguageSelect
+                locale={locale}
+                onLocaleChange={setLocale}
+                compact
+              />
               <ModeSwitcher />
               {websiteConfig.auth?.enable &&
                 (!mounted || isPending ? (

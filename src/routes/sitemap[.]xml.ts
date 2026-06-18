@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { getBaseUrl } from '@/lib/urls';
 import { getSortedPosts } from '@/lib/blog';
+import { PRODUCT_TOOLS } from '@/lib/product-tools';
+import { getBaseUrl } from '@/lib/urls';
 import { websiteConfig } from '@/config/website';
 
 /**
@@ -18,21 +19,43 @@ export const Route = createFileRoute('/sitemap.xml')({
           priority?: string;
         }[] = [
           { path: '/', changefreq: 'daily', priority: '1.0' },
-          { path: '/about', changefreq: 'monthly' },
-          { path: '/changelog', changefreq: 'weekly' },
-          { path: '/roadmap', changefreq: 'monthly' },
-          { path: '/contact', changefreq: 'monthly' },
-          { path: '/waitlist', changefreq: 'monthly' },
+          { path: '/en', changefreq: 'daily', priority: '0.95' },
+          { path: '/zh', changefreq: 'daily', priority: '0.95' },
+          { path: '/generator', changefreq: 'weekly', priority: '0.9' },
+          { path: '/gallery', changefreq: 'weekly', priority: '0.85' },
+          { path: '/about', changefreq: 'monthly', priority: '0.7' },
+          { path: '/contact', changefreq: 'monthly', priority: '0.6' },
           { path: '/terms', changefreq: 'monthly' },
           { path: '/privacy', changefreq: 'monthly' },
           { path: '/cookie', changefreq: 'monthly' },
         ];
 
         if (websiteConfig.blog?.enable) {
-          staticUrls.push({ path: '/blog', changefreq: 'weekly' });
+          staticUrls.push({
+            path: '/blog',
+            changefreq: 'weekly',
+            priority: '0.7',
+          });
         }
         if (websiteConfig.payment?.enable) {
-          staticUrls.push({ path: '/pricing', changefreq: 'weekly' });
+          staticUrls.push({
+            path: '/pricing',
+            changefreq: 'weekly',
+            priority: '0.8',
+          });
+        }
+
+        for (const tool of PRODUCT_TOOLS) {
+          staticUrls.push({
+            path: `/tools/${tool.slug}`,
+            changefreq: 'weekly',
+            priority: '0.82',
+          });
+          staticUrls.push({
+            path: `/zh/tools/${tool.slug}`,
+            changefreq: 'weekly',
+            priority: '0.8',
+          });
         }
 
         const urlEntry = (
