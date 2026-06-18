@@ -1,5 +1,6 @@
 export const Routes = {
   Root: '/',
+  Generator: '/generator',
 
   // Marketing routes
   Features: '/#features',

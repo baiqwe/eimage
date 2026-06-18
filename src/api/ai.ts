@@ -166,6 +166,16 @@ const captionSchema = z.object({
     .max(300, 'Prompt is too long, please keep it under 300 characters.'),
 });
 
+const workbenchPromptSchema = z.object({
+  description: z
+    .string()
+    .min(4, 'Please describe the product first.')
+    .max(800, 'Description is too long, please keep it under 800 characters.'),
+  imageType: z.enum(['main', 'detail']),
+  style: z.string().min(2).max(120),
+  locale: z.enum(['zh', 'en']).default('zh'),
+});
+
 /**
  * Helper: invoke the Cloudflare Workers AI REST endpoint for a given model.
  * Returns the parsed `result` object on success, throws on any error.
@@ -551,6 +561,117 @@ export const captionImage = createServerFn({ method: 'POST' })
 
     return { description: result.description.trim() };
   });
+
+export const draftProductImagePrompt = createServerFn({ method: 'POST' })
+  .inputValidator(workbenchPromptSchema)
+  .handler(async ({ data }) => {
+    const systemPrompt =
+      'You are a senior ecommerce visual director. Return strict JSON only.';
+    const reasoningLanguage =
+      data.locale === 'zh' ? 'Simplified Chinese' : 'English';
+    const userPrompt = `Product base description: ${data.description}
+Image type: ${data.imageType === 'main' ? 'main hero image' : 'lifestyle detail image'}
+Style preset: ${data.style}
+User interface language: ${data.locale}
+
+Write a diffusion prompt that preserves the product silhouette, proportions,
+materials, logos, and front-facing structure from the source photo. The prompt
+may redesign only background, lighting, surface, reflection, atmosphere, and
+scene props. Do not invent another angle or alter the product geometry.
+
+Return JSON:
+{
+  "prompt": "long English image prompt",
+  "reasoning": "one clear ${reasoningLanguage} sentence explaining the scene logic",
+  "keywords": ["3-4 short display keywords in ${reasoningLanguage}"]
+}`;
+
+    const accountId = serverEnv.CLOUDFLARE_ACCOUNT_ID;
+    const apiKey = serverEnv.CLOUDFLARE_API_TOKEN;
+
+    if (accountId && apiKey) {
+      try {
+        const result = await runWorkersAi<{ response?: string }>(
+          '@cf/meta/llama-3.1-8b-instruct',
+          {
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: userPrompt },
+            ],
+            max_tokens: 700,
+            temperature: 0.72,
+          }
+        );
+
+        const parsed = parseJsonObject(result.response ?? '');
+        if (
+          typeof parsed.prompt === 'string' &&
+          typeof parsed.reasoning === 'string' &&
+          Array.isArray(parsed.keywords)
+        ) {
+          return {
+            prompt: parsed.prompt,
+            reasoning: parsed.reasoning,
+            keywords: parsed.keywords
+              .filter(
+                (keyword): keyword is string => typeof keyword === 'string'
+              )
+              .slice(0, 4),
+            source: 'workers-ai' as const,
+          };
+        }
+      } catch {
+        // Fall through to a deterministic local draft so the workbench stays
+        // usable in local environments without AI secrets.
+      }
+    }
+
+    return {
+      ...createLocalProductPrompt(data),
+      source: 'local-template' as const,
+    };
+  });
+
+function parseJsonObject(text: string): Record<string, unknown> {
+  const trimmed = text.trim();
+  const json = trimmed.match(/\{[\s\S]*\}/)?.[0] ?? trimmed;
+  return JSON.parse(json) as Record<string, unknown>;
+}
+
+function createLocalProductPrompt(data: z.infer<typeof workbenchPromptSchema>) {
+  const isMain = data.imageType === 'main';
+  const prompt = [
+    'Professional ecommerce product photography based on the provided source image.',
+    `Product description: ${data.description}.`,
+    `Visual direction: ${data.style}.`,
+    isMain
+      ? 'Keep the original product centered, full silhouette visible, clean premium commercial composition, refined studio surface, controlled reflections, soft contact shadow.'
+      : 'Keep the original product unchanged inside a believable lifestyle environment, use scene context only around the product, natural depth, subtle supporting props, editorial detail-page composition.',
+    'Preserve exact product shape, proportions, material finish, color, label placement, logos, and front-facing structure from the source image.',
+    'Do not change the product angle, do not add duplicate products, do not deform edges, no extra handles, no invented parts, no text artifacts.',
+    'High-end lighting, realistic shadow integration, 85mm commercial lens look, sharp product edges, premium retouching, photorealistic.',
+  ].join(' ');
+
+  return {
+    prompt,
+    reasoning:
+      data.locale === 'zh'
+        ? isMain
+          ? '通过干净背景和受控反射突出商品轮廓，同时避免改变原图里的主体结构。'
+          : '用环境光和生活化道具制造场景感，但让商品仍保持原始形貌作为视觉锚点。'
+        : isMain
+          ? 'A clean background and controlled reflections emphasize the product silhouette without changing its source structure.'
+          : 'Environmental light and lifestyle props add context while keeping the uploaded product as the fixed visual anchor.',
+    keywords:
+      data.locale === 'zh'
+        ? isMain
+          ? ['锁定轮廓', '棚拍光影', '高级反射']
+          : ['生活场景', '自然光', '主体不变']
+        : isMain
+          ? ['Silhouette lock', 'Studio light', 'Premium reflection']
+          : ['Lifestyle scene', 'Natural light', 'Shape preserved'],
+  };
+}
 
 /**
  * Decode a base64 string into a Uint8Array. Mirrors the `arrayBufferToBase64`

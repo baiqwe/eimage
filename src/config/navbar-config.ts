@@ -28,11 +28,9 @@ const m = messages.nav;
  */
 export function getNavbarLinks(): MenuItemConfig[] {
   const links: MenuItemConfig[] = [
-    { title: m.features, href: Routes.Features, external: false },
+    { title: 'Generator', href: Routes.Generator, external: false },
   ];
-  if (websiteConfig.payment?.enable) {
-    links.push({ title: m.pricing, href: Routes.Pricing, external: false });
-  }
+  links.push({ title: m.pricing, href: Routes.Pricing, external: false });
   if (websiteConfig.blog?.enable) {
     links.push({ title: m.blog, href: Routes.Blog, external: false });
   }

@@ -7,6 +7,7 @@ import {
   IconLock,
   IconSettings2,
   IconShieldCheck,
+  IconSparkles,
   IconUserCircle,
   IconUsers,
 } from '@tabler/icons-react';
@@ -27,6 +28,12 @@ export function getSidebarLinks(): MenuItemConfig[] {
       title: m.dashboard,
       icon: IconLayoutDashboard,
       href: Routes.Dashboard,
+      external: false,
+    },
+    {
+      title: 'Generator',
+      icon: IconSparkles,
+      href: Routes.Generator,
       external: false,
     },
     {

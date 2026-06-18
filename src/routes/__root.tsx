@@ -98,11 +98,12 @@ function RootComponent() {
     pathname.startsWith(Routes.Admin) ||
     pathname.startsWith(Routes.Dashboard) ||
     pathname.startsWith(Routes.Settings);
+  const isAppWorkbench = pathname === Routes.Generator;
   // When no child route matches (e.g. /hello), only root is in matches; use minimal layout
   const isNotFound =
     pathname !== Routes.Root && pathname !== '' && matches.length <= 1;
 
-  if (isAuthPages || isProtectedPages || isNotFound) {
+  if (isAuthPages || isProtectedPages || isAppWorkbench || isNotFound) {
     return (
       <div className="flex min-h-screen flex-col">
         <main id="main-content" className="flex-1">
