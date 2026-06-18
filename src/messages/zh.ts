@@ -554,9 +554,9 @@ export const messages = {
   about: {
     title: '关于我们',
     description: '了解更多关于我们的使命以及我们如何帮助您',
-    bio: '助您更快构建 SaaS',
+    bio: '帮助电商团队更快生成商品套图',
     introduction:
-      '👋 你好！这是 TanStarter，完整的 TanStack Start SaaS 模板，集成 AI、认证、数据库、存储、博客、邮件、邮件列表、支付、仪表盘、SEO 等，全栈部署于 Cloudflare Workers。如有问题欢迎免费联系我们。',
+      'ProdList AI 帮助电商卖家基于一张商品素材图生成平台主图、详情页场景图和广告素材方向，同时尽量保留商品原本形貌。',
     followUs: '在 X 上关注我们',
     contactUs: '联系我们',
   },

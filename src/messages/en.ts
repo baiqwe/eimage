@@ -564,9 +564,9 @@ export const messages = {
   about: {
     title: 'About',
     description: 'Learn more about our mission and how we can help you',
-    bio: 'We help you build SaaS faster',
+    bio: 'We help ecommerce teams create product image sets faster',
     introduction:
-      '👋 Hi there! This is TanStarter, the complete TanStack Start boilerplate for building profitable SaaS, packed with AI, auth, database, storage, blog, email, newsletter, payments, dashboard, SEO, and more, fully deployed on Cloudflare Workers. If you have any questions, please welcome to contact us for free.',
+      'ProdList AI helps ecommerce sellers generate marketplace main images, detail-page scenes, and ad creative directions from one product source photo while preserving the original product shape.',
     followUs: 'Follow us on X',
     contactUs: 'Contact us',
   },

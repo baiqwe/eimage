@@ -64,7 +64,7 @@ const COPY = {
       '上传商品素材',
       '生成并保存历史',
     ],
-    linksTitle: '继续探索 SuiteWorkbench',
+    linksTitle: '继续探索 ProdList AI',
     links: [
       {
         title: '查看生成画廊',
@@ -138,7 +138,7 @@ const COPY = {
       'Upload product source',
       'Generate and save history',
     ],
-    linksTitle: 'Keep exploring SuiteWorkbench',
+    linksTitle: 'Keep exploring ProdList AI',
     links: [
       {
         title: 'Browse the gallery',
@@ -211,7 +211,7 @@ const COPY = {
       '商品素材をアップロード',
       '生成して履歴保存',
     ],
-    linksTitle: 'SuiteWorkbench をさらに見る',
+    linksTitle: 'ProdList AI をさらに見る',
     links: [
       {
         title: 'ギャラリーを見る',
@@ -284,7 +284,7 @@ const COPY = {
       '상품 소재 업로드',
       '생성 후 기록 저장',
     ],
-    linksTitle: 'SuiteWorkbench 더 살펴보기',
+    linksTitle: 'ProdList AI 더 살펴보기',
     links: [
       {
         title: '갤러리 보기',
@@ -358,7 +358,7 @@ const COPY = {
       'Subir producto',
       'Generar y guardar historial',
     ],
-    linksTitle: 'Explora más SuiteWorkbench',
+    linksTitle: 'Explora más ProdList AI',
     links: [
       {
         title: 'Ver la galería',
