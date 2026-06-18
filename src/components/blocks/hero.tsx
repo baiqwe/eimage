@@ -6,10 +6,10 @@ import { IconArrowRight } from '@tabler/icons-react';
 import { Routes } from '@/lib/routes';
 
 const m = {
-  title: 'Ship Faster with TanStack, Cost Less with Cloudflare',
+  title: 'AI ecommerce product photo sets from one upload',
   description:
-    'The complete TanStack Start boilerplate for building profitable SaaS, packed with AI, auth, database, storage, blog, email, newsletter, payments, dashboard, SEO, and more, fully deployed on Cloudflare Workers',
-  introduction: 'Introducing TanStarter',
+    'ProdList AI helps ecommerce teams generate marketplace main images, lifestyle scenes, and ad creatives without rebuilding every image by hand.',
+  introduction: 'Introducing ProdList AI',
   primary: 'Get Started',
   secondary: 'View Pricing',
 };

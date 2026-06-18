@@ -18,25 +18,26 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { messages } from '@/messages';
+import type { ProductLocale } from '@/components/product/product-locale';
+import { PUBLIC_PAGE_COPY } from '@/lib/product-i18n';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-const m = messages.waitlist;
+type FormValues = {
+  email: string;
+};
 
-const schema = z.object({
-  email: z.string().email(m.emailInvalid),
-});
-
-type FormValues = z.infer<typeof schema>;
-
-export function WaitlistFormCard() {
+export function WaitlistFormCard({ locale }: { locale: ProductLocale }) {
   if (!websiteConfig.newsletter?.enable) return null;
 
+  const m = PUBLIC_PAGE_COPY[locale].waitlist;
   const [error, setError] = useState<string | undefined>();
   const subscribeMutation = useSubscribeNewsletter();
+  const schema = z.object({
+    email: z.string().email(m.emailInvalid),
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),

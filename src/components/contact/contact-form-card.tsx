@@ -18,25 +18,28 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { messages } from '@/messages';
+import type { ProductLocale } from '@/components/product/product-locale';
+import { PUBLIC_PAGE_COPY } from '@/lib/product-i18n';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-const m = messages.contact;
+type FormValues = {
+  name: string;
+  email: string;
+  message: string;
+};
 
-const schema = z.object({
-  name: z.string().min(3, m.nameMin).max(30, m.nameMax),
-  email: z.email(m.emailInvalid),
-  message: z.string().min(10, m.messageMin).max(500, m.messageMax),
-});
-
-type FormValues = z.infer<typeof schema>;
-
-export function ContactFormCard() {
+export function ContactFormCard({ locale }: { locale: ProductLocale }) {
+  const m = PUBLIC_PAGE_COPY[locale].contact;
   const [error, setError] = useState<string | undefined>();
+  const schema = z.object({
+    name: z.string().min(3, m.nameMin).max(30, m.nameMax),
+    email: z.email(m.emailInvalid),
+    message: z.string().min(10, m.messageMin).max(500, m.messageMax),
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),

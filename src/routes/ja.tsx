@@ -3,20 +3,19 @@ import { websiteConfig } from '@/config/website';
 import { localizedAlternates, seo, softwareApplicationJsonLd } from '@/lib/seo';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/en')({
+export const Route = createFileRoute('/ja')({
   head: () => {
-    const title =
-      'AI Ecommerce Product Photo Generator | Create Product Photo Sets';
+    const title = 'EC 向け AI 商品フォト生成ツール | 商品画像セットを作成';
     const description =
-      'Upload one product photo and generate a complete ecommerce photo set with AI, including hero images, white-background photos, lifestyle scenes, and ad creatives.';
-    const metadata = seo('/en', {
+      '1 枚の商品写真から、EC の主画像、白背景画像、ライフスタイル詳細シーン、広告素材を AI でまとめて生成します。';
+    const metadata = seo('/ja', {
       title,
       description,
-      locale: 'en',
+      locale: 'ja',
       keywords:
-        'AI ecommerce product photo generator, ecommerce product photo generator, product photo set generator, batch product photo generator',
+        'AI EC 商品フォト生成, 商品画像セット生成, EC 商品画像生成, AI 商品撮影',
       alternates: localizedAlternates({
-        en: '/en',
+        en: '/',
         zh: '/zh',
         ja: '/ja',
         ko: '/ko',
@@ -32,13 +31,13 @@ export const Route = createFileRoute('/en')({
             softwareApplicationJsonLd({
               name: websiteConfig.metadata?.name ?? 'SuiteWorkbench',
               description,
-              path: '/en',
-              locale: 'en',
+              path: '/ja',
+              locale: 'ja',
             })
           ),
         },
       ],
     };
   },
-  component: () => <ProductHome locale="en" />,
+  component: () => <ProductHome locale="ja" />,
 });

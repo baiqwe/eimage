@@ -44,7 +44,21 @@
 
   // Custom domains
   // https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
-  "routes": [],
+  "routes": [
+    {
+      "pattern": "prodlistai.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.prodlistai.com",
+      "custom_domain": true
+    }
+  ],
+
+  // Public production URL used by sitemap, canonical links, and social metadata
+  "vars": {
+    "VITE_BASE_URL": "https://prodlistai.com"
+  },
 
   /**
    * Bindings

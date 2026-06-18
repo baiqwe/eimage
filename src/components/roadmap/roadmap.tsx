@@ -1,8 +1,7 @@
 import { Badge } from '@/components/ui/badge';
+import type { ProductLocale } from '@/components/product/product-locale';
+import { PUBLIC_PAGE_COPY } from '@/lib/product-i18n';
 import { cn } from '@/lib/utils';
-import { messages } from '@/messages';
-
-const m = messages.roadmap;
 
 interface Task {
   id: string;
@@ -13,76 +12,45 @@ interface Task {
   dueDate?: string;
 }
 
-const DEFAULT_COLUMNS: Record<string, Task[]> = {
-  backlog: [
-    {
-      id: '1',
-      title: 'Add authentication',
-      priority: 'high',
-      assignee: 'John Doe',
-      dueDate: '2026-04-01',
-    },
-    {
-      id: '2',
-      title: 'Create API endpoints',
-      priority: 'medium',
-      assignee: 'Jane Smith',
-      dueDate: '2026-04-05',
-    },
-    {
-      id: '3',
-      title: 'Write documentation',
-      priority: 'low',
-      assignee: 'Bob Johnson',
-      dueDate: '2026-04-10',
-    },
-  ],
-  inProgress: [
-    {
-      id: '4',
-      title: 'Design system updates',
-      priority: 'high',
-      assignee: 'Alice Brown',
-      dueDate: '2026-03-28',
-    },
-    {
-      id: '5',
-      title: 'Implement dark mode',
-      priority: 'medium',
-      assignee: 'Charlie Wilson',
-      dueDate: '2026-04-02',
-    },
-  ],
-  done: [
-    {
-      id: '7',
-      title: 'Setup project',
-      priority: 'high',
-      assignee: 'Eve Davis',
-      dueDate: '2026-03-25',
-    },
-    {
-      id: '8',
-      title: 'Initial commit',
-      priority: 'low',
-      assignee: 'Frank White',
-      dueDate: '2026-03-24',
-    },
-  ],
+const TASK_PRIORITY: Record<string, Array<Task['priority']>> = {
+  backlog: ['high', 'medium', 'low'],
+  inProgress: ['high', 'medium'],
+  done: ['high', 'medium'],
 };
 
-export function Roadmap() {
-  const columnTitles = m.columns;
+export function Roadmap({ locale }: { locale: ProductLocale }) {
+  const copy = PUBLIC_PAGE_COPY[locale].roadmap;
+  const columns = {
+    backlog: copy.tasks.backlog.map((title, index) => ({
+      id: `backlog-${index}`,
+      title,
+      priority: TASK_PRIORITY.backlog[index] ?? 'medium',
+      dueDate: '2026 Q3',
+    })),
+    inProgress: copy.tasks.inProgress.map((title, index) => ({
+      id: `in-progress-${index}`,
+      title,
+      priority: TASK_PRIORITY.inProgress[index] ?? 'medium',
+      dueDate: '2026 Q2',
+    })),
+    done: copy.tasks.done.map((title, index) => ({
+      id: `done-${index}`,
+      title,
+      priority: TASK_PRIORITY.done[index] ?? 'low',
+      dueDate: '2026 Q2',
+    })),
+  } satisfies Record<string, Task[]>;
 
   return (
     <div className="grid w-full auto-rows-auto grid-cols-1 gap-4 md:grid-cols-2 md:auto-rows-fr lg:grid-cols-3">
-      {Object.entries(DEFAULT_COLUMNS).map(([columnValue, tasks]) => (
+      {Object.entries(columns).map(([columnValue, tasks]) => (
         <TaskColumn
           key={columnValue}
           value={columnValue}
           tasks={tasks}
+          locale={locale}
           title={
-            columnTitles[columnValue as keyof typeof columnTitles] ??
+            copy.columns[columnValue as keyof typeof copy.columns] ??
             columnValue
           }
         />
@@ -93,9 +61,12 @@ export function Roadmap() {
 
 interface TaskCardProps {
   task: Task;
+  locale: ProductLocale;
 }
 
-function TaskCard({ task }: TaskCardProps) {
+function TaskCard({ task, locale }: TaskCardProps) {
+  const priorities = PUBLIC_PAGE_COPY[locale].roadmap.priorities;
+
   return (
     <div className="rounded-md border bg-card p-3 shadow-sm">
       <div className="flex flex-col gap-2">
@@ -112,7 +83,7 @@ function TaskCard({ task }: TaskCardProps) {
                   : 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
             )}
           >
-            {task.priority}
+            {priorities[task.priority]}
           </Badge>
         </div>
         <div className="flex items-center justify-between text-muted-foreground text-xs">
@@ -135,9 +106,10 @@ interface TaskColumnProps {
   value: string;
   tasks: Task[];
   title: string;
+  locale: ProductLocale;
 }
 
-function TaskColumn({ value, tasks, title }: TaskColumnProps) {
+function TaskColumn({ value, tasks, title, locale }: TaskColumnProps) {
   return (
     <div key={value} className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
@@ -150,7 +122,7 @@ function TaskColumn({ value, tasks, title }: TaskColumnProps) {
       </div>
       <div className="flex flex-col gap-2 p-0.5">
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} task={task} locale={locale} />
         ))}
       </div>
     </div>

@@ -144,7 +144,15 @@ function RootComponent() {
  */
 function RootDocument({ children }: { children: React.ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname }) ?? '';
-  const lang = pathname.startsWith('/zh') ? 'zh-CN' : 'en';
+  const lang = pathname.startsWith('/zh')
+    ? 'zh-CN'
+    : pathname.startsWith('/ja')
+      ? 'ja'
+      : pathname.startsWith('/ko')
+        ? 'ko'
+        : pathname.startsWith('/es')
+          ? 'es'
+          : 'en';
 
   return (
     <html lang={lang} suppressHydrationWarning>

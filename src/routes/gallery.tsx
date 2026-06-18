@@ -6,6 +6,7 @@ import {
   useProductLocale,
 } from '@/components/product/product-locale';
 import { PublicBreadcrumb } from '@/components/seo/public-breadcrumb';
+import { PUBLIC_LABELS } from '@/lib/product-i18n';
 import {
   breadcrumbJsonLd,
   localizedAlternates,
@@ -16,7 +17,7 @@ import type { ProductLocale } from '@/components/product/product-locale';
 
 export const Route = createFileRoute('/gallery')({
   head: () => {
-    const title = 'SuiteWorkbench Gallery - AI Ecommerce Product Images';
+    const title = 'ProdList AI Gallery - AI Ecommerce Product Images';
     const description =
       'Browse AI generated ecommerce product image examples for marketplace main images, detail-page scenes, and ad creatives.';
     const metadata = seo('/gallery', {
@@ -53,13 +54,14 @@ export const Route = createFileRoute('/gallery')({
 function GalleryPage() {
   const { locale, setLocale } = useProductLocale();
   const copy = GALLERY_PAGE_COPY[locale];
+  const labels = PUBLIC_LABELS[locale];
 
   return (
     <div className="bg-[#f7f8f4] text-[#20231e]">
       <Container className="px-4 pt-16">
         <div className="mx-auto max-w-6xl">
           <PublicBreadcrumb
-            items={[{ label: 'Home', href: '/' }, { label: copy.title }]}
+            items={[{ label: labels.home, href: '/' }, { label: copy.title }]}
           />
           <div className="mb-5">
             <ProductLanguageSelect locale={locale} onLocaleChange={setLocale} />

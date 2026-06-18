@@ -48,10 +48,10 @@ export const websiteConfig: WebsiteConfig = {
     },
   },
   social: {
-    github: 'https://github.com/MkFastHQ',
-    discord: 'https://mksaas.link/discord',
-    twitter: 'https://x.com/TanStarter',
-    youtube: 'https://www.youtube.com/@TanStarter',
+    github: 'https://github.com/baiqwe/eimage',
+    discord: '',
+    twitter: '',
+    youtube: '',
   },
   auth: {
     enable: true,
@@ -70,8 +70,8 @@ export const websiteConfig: WebsiteConfig = {
   mail: {
     enable: true,
     provider: 'cloudflare',
-    fromEmail: 'TanStarter <support@tanstarter.dev>',
-    supportEmail: 'TanStarter <support@tanstarter.dev>',
+    fromEmail: 'ProdList AI <support@prodlistai.com>',
+    supportEmail: 'support@prodlistai.com',
   },
   newsletter: {
     enable: true,

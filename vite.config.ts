@@ -14,7 +14,7 @@ import contentCollections from '@content-collections/vite';
  */
 const config = defineConfig({
   server: {
-    allowedHosts: ['.trycloudflare.com', '.tanstarter.dev'],
+    allowedHosts: ['.trycloudflare.com', '.prodlistai.com'],
   },
   resolve: {
     alias: {

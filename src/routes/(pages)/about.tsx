@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { websiteConfig } from '@/config/website';
+import { PUBLIC_LABELS } from '@/lib/product-i18n';
 import { Routes } from '@/lib/routes';
 import { breadcrumbJsonLd, organizationJsonLd, seo } from '@/lib/seo';
 
@@ -163,13 +164,14 @@ const ABOUT_COPY = {
 function AboutPage() {
   const { locale, setLocale } = useProductLocale();
   const copy = ABOUT_COPY[locale];
+  const labels = PUBLIC_LABELS[locale];
   const icons = [IconPhotoScan, IconSparkles, IconShieldCheck];
 
   return (
     <Container className="px-4 py-16">
       <div className="mx-auto max-w-6xl">
         <PublicBreadcrumb
-          items={[{ label: 'Home', href: '/' }, { label: copy.badge }]}
+          items={[{ label: labels.home, href: '/' }, { label: copy.badge }]}
         />
         <div className="mb-5">
           <ProductLanguageSelect locale={locale} onLocaleChange={setLocale} />

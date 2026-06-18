@@ -8,6 +8,7 @@ import {
 import { PublicBreadcrumb } from '@/components/seo/public-breadcrumb';
 import { Button } from '@/components/ui/button';
 import { websiteConfig } from '@/config/website';
+import { PUBLIC_LABELS } from '@/lib/product-i18n';
 import { Routes } from '@/lib/routes';
 import { breadcrumbJsonLd, seo, softwareApplicationJsonLd } from '@/lib/seo';
 import { Link, createFileRoute } from '@tanstack/react-router';
@@ -313,12 +314,13 @@ export const Route = createFileRoute('/(pages)/pricing')({
 function PricingPage() {
   const { locale, setLocale } = useProductLocale();
   const copy = PRICING_COPY[locale];
+  const labels = PUBLIC_LABELS[locale];
 
   return (
     <Container className="py-16 px-4">
       <div className="mx-auto max-w-6xl space-y-8">
         <PublicBreadcrumb
-          items={[{ label: 'Home', href: '/' }, { label: copy.title }]}
+          items={[{ label: labels.home, href: '/' }, { label: copy.title }]}
         />
         <div className="space-y-4 text-center">
           <div className="flex justify-center">
@@ -372,7 +374,7 @@ function PricingPage() {
             </div>
           ))}
         </div>
-        <FaqSection />
+        <FaqSection locale={locale} />
       </div>
     </Container>
   );

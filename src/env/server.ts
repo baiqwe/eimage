@@ -7,7 +7,7 @@ import * as z from 'zod';
 export const serverEnv = createEnv({
   server: {
     // Defaults so CLI (e.g. auth:schema:generate via pnpm dlx) can run without loading .env.local
-    VITE_BASE_URL: z.url().default('http://localhost:3000'),
+    VITE_BASE_URL: z.url().default('https://prodlistai.com'),
 
     // Auth (Better Auth)
     BETTER_AUTH_SECRET: z.string().default('better-auth-secret'),

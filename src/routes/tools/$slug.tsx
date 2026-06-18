@@ -5,10 +5,14 @@ import {
   IconSparkles,
 } from '@tabler/icons-react';
 import Container from '@/components/layout/container';
+import {
+  ProductLanguageSelect,
+  useProductLocale,
+} from '@/components/product/product-locale';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PublicBreadcrumb } from '@/components/seo/public-breadcrumb';
-import { getProductTool } from '@/lib/product-tools';
+import { getProductTool, getProductToolCopy } from '@/lib/product-tools';
 import {
   breadcrumbJsonLd,
   localizedAlternates,
@@ -62,36 +66,41 @@ export const Route = createFileRoute('/tools/$slug')({
 
 function ToolPage() {
   const { tool } = Route.useLoaderData();
+  const { locale, setLocale } = useProductLocale();
+  const copy = getProductToolCopy(tool, locale);
 
   return (
     <Container className="px-4 py-16">
       <div className="mx-auto max-w-6xl">
         <PublicBreadcrumb
           items={[
-            { label: 'Home', href: '/' },
-            { label: 'Tools', href: Routes.Tools },
-            { label: tool.title },
+            { label: copy.home, href: '/' },
+            { label: copy.tools, href: Routes.Tools },
+            { label: copy.title },
           ]}
         />
       </div>
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
         <div>
+          <div className="mb-5">
+            <ProductLanguageSelect locale={locale} onLocaleChange={setLocale} />
+          </div>
           <Badge variant="outline" className="mb-5">
-            {tool.category}
+            {copy.category}
           </Badge>
           <h1 className="max-w-3xl text-balance font-bold text-4xl tracking-tight md:text-6xl">
-            {tool.h1}
+            {copy.h1}
           </h1>
           <p className="mt-6 max-w-2xl text-muted-foreground text-lg leading-8">
-            {tool.description}
+            {copy.description}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button render={<Link to={Routes.Generator} />}>
               <IconSparkles className="size-4" />
-              Open generator
+              {copy.openGenerator}
             </Button>
             <Button variant="outline" render={<Link to={Routes.Pricing} />}>
-              View pricing
+              {copy.viewPricing}
               <IconArrowRight className="size-4" />
             </Button>
           </div>
@@ -100,7 +109,7 @@ function ToolPage() {
         <div className="rounded-lg border bg-card p-4 shadow-sm">
           <div
             role="img"
-            aria-label={tool.imageAlt}
+            aria-label={copy.imageAlt}
             className="grid aspect-[4/3] gap-3 rounded-lg bg-[#20231e] p-4"
           >
             <div className="rounded-lg bg-[#eef1e8]" />
@@ -110,23 +119,23 @@ function ToolPage() {
               <div className="rounded-lg bg-[#dfe3d8]" />
             </div>
           </div>
-          <p className="mt-3 text-muted-foreground text-sm">{tool.imageAlt}</p>
+          <p className="mt-3 text-muted-foreground text-sm">{copy.imageAlt}</p>
         </div>
       </div>
 
       <div className="mx-auto mt-14 grid max-w-6xl gap-5 md:grid-cols-2">
         <section className="rounded-lg border bg-card p-5">
           <IconPhotoScan className="mb-4 size-6 text-primary" />
-          <h2 className="font-semibold text-xl">Best for</h2>
+          <h2 className="font-semibold text-xl">{copy.bestFor}</h2>
           <ul className="mt-4 space-y-3 text-muted-foreground text-sm">
-            {tool.useCases.map((item) => (
+            {copy.useCases.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
         </section>
         <section className="rounded-lg border bg-card p-5">
           <IconSparkles className="mb-4 size-6 text-primary" />
-          <h2 className="font-semibold text-xl">Recommended styles</h2>
+          <h2 className="font-semibold text-xl">{copy.styles}</h2>
           <div className="mt-4 flex flex-wrap gap-2">
             {tool.styles.map((style) => (
               <Badge key={style} variant="secondary">

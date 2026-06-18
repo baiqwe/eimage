@@ -148,6 +148,8 @@ const WORKBENCH_COPY = {
       done: '已完成',
       failed: '失败',
     },
+    globalBadge: '全局',
+    sourceAlt: '商品素材图',
   },
   en: {
     subtitle: 'Product image generation workbench',
@@ -208,6 +210,8 @@ const WORKBENCH_COPY = {
       done: 'Done',
       failed: 'Failed',
     },
+    globalBadge: 'Global',
+    sourceAlt: 'Source product image',
   },
   ja: {
     subtitle: '商品画像生成ワークベンチ',
@@ -267,6 +271,8 @@ const WORKBENCH_COPY = {
       done: '完了',
       failed: '失敗',
     },
+    globalBadge: '共通',
+    sourceAlt: '商品素材画像',
   },
   ko: {
     subtitle: '상품 이미지 생성 워크벤치',
@@ -327,6 +333,8 @@ const WORKBENCH_COPY = {
       done: '완료',
       failed: '실패',
     },
+    globalBadge: '전역',
+    sourceAlt: '상품 소재 이미지',
   },
   es: {
     subtitle: 'Workbench de generación de imágenes de producto',
@@ -387,6 +395,8 @@ const WORKBENCH_COPY = {
       done: 'Completada',
       failed: 'Fallida',
     },
+    globalBadge: 'Global',
+    sourceAlt: 'Imagen fuente del producto',
   },
 } as const;
 
@@ -681,7 +691,7 @@ export function SuiteWorkbench() {
               <p className="font-semibold text-sm">{t.globalTitle}</p>
               <p className="text-[#74796d] text-xs">{t.globalSubtitle}</p>
             </div>
-            <Badge variant="outline">Global</Badge>
+            <Badge variant="outline">{t.globalBadge}</Badge>
           </div>
 
           <button
@@ -701,7 +711,7 @@ export function SuiteWorkbench() {
             {sourceImage ? (
               <img
                 src={sourceImage}
-                alt="Source product"
+                alt={t.sourceAlt}
                 className="h-full w-full object-contain p-4"
               />
             ) : (

@@ -1,6 +1,9 @@
 import type { BlogPost } from '@/lib/blog';
 import { Link } from '@tanstack/react-router';
-import { formatDate } from '@/lib/formatter';
+import {
+  PRODUCT_LOCALE_META,
+  type ProductLocale,
+} from '@/components/product/product-locale';
 import {
   Card,
   CardContent,
@@ -9,8 +12,18 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-export function BlogCard({ post }: { post: BlogPost }) {
+export function BlogCard({
+  post,
+  locale,
+}: {
+  post: BlogPost;
+  locale: ProductLocale;
+}) {
   const { slug } = post;
+  const formattedDate = new Intl.DateTimeFormat(
+    PRODUCT_LOCALE_META[locale].dateLocale,
+    { dateStyle: 'medium' }
+  ).format(new Date(post.date));
 
   return (
     <Link to="/blog/$slug" params={{ slug }} className="h-full">
@@ -32,9 +45,7 @@ export function BlogCard({ post }: { post: BlogPost }) {
           <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground capitalize">
             {post.category}
           </span>
-          <span className="text-xs text-muted-foreground">
-            {formatDate(new Date(post.date))}
-          </span>
+          <span className="text-xs text-muted-foreground">{formattedDate}</span>
         </CardHeader>
         <CardContent className="pb-4">
           <CardTitle className="line-clamp-2 text-lg">{post.title}</CardTitle>

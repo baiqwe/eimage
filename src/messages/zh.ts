@@ -3,10 +3,10 @@
  */
 export const messages = {
   site: {
-    name: 'TanStarter Demo',
-    title: 'TanStarter - 用 TanStack 更快交付，用 Cloudflare 更省成本',
+    name: 'ProdList AI',
+    title: 'AI 电商商品套图生成器 | ProdList AI',
     description:
-      'TanStarter 是完整的 TanStack Start SaaS 模板，集成 AI、认证、数据库、存储、博客、邮件、邮件列表、支付、仪表盘、SEO 等，全栈部署于 Cloudflare Workers',
+      '上传一张商品图，批量生成适配平台、独立站、广告和详情页的电商商品套图。',
   },
 
   nav: {

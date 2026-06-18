@@ -1,20 +1,13 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
-import { MarkdownPage } from '@/components/page/markdown-page';
-import { PublicBreadcrumb } from '@/components/seo/public-breadcrumb';
-import { getPageBySlug } from '@/lib/pages';
+import { LegalPage } from '@/components/page/legal-page';
 import { websiteConfig } from '@/config/website';
+import { LEGAL_PAGE_COPY } from '@/lib/product-i18n';
 import { breadcrumbJsonLd, seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/(legals)/privacy')({
-  loader: () => {
-    const page = getPageBySlug('privacy');
-    if (!page) throw notFound();
-    return { page };
-  },
-  head: ({ loaderData }) => {
-    const p = loaderData?.page;
-    if (!p) return {};
+  head: () => {
+    const p = LEGAL_PAGE_COPY.en.privacy;
     const metadata = seo('/privacy', {
       title: `${p.title} | ${websiteConfig.metadata?.name}`,
       description: p.description,
@@ -38,14 +31,9 @@ export const Route = createFileRoute('/(legals)/privacy')({
 });
 
 function PrivacyPage() {
-  const { page } = Route.useLoaderData();
-  if (!page) throw notFound();
   return (
     <Container className="py-16 px-4">
-      <PublicBreadcrumb
-        items={[{ label: 'Home', href: '/' }, { label: page.title }]}
-      />
-      <MarkdownPage page={page} />
+      <LegalPage page="privacy" />
     </Container>
   );
 }

@@ -5,14 +5,22 @@ import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/zh')({
   head: () => {
-    const title = 'SuiteWorkbench - 商品图智能生成工作台';
+    const title = 'AI 电商商品图生成器 | 一张图生成商品套图';
     const description =
-      '为电商卖家批量生成保留商品形貌的主图与详情页场景套图。';
+      '上传一张商品图，用 AI 批量生成电商主图、白底图、详情页场景图和广告素材，尽量保留商品原始形貌。';
     const metadata = seo('/zh', {
       title,
       description,
       locale: 'zh',
-      alternates: localizedAlternates({ en: '/en', zh: '/zh' }),
+      keywords:
+        'AI 电商商品图生成器, 商品套图生成器, 电商主图生成器, 批量商品图生成',
+      alternates: localizedAlternates({
+        en: '/',
+        zh: '/zh',
+        ja: '/ja',
+        ko: '/ko',
+        es: '/es',
+      }),
     });
     return {
       ...metadata,

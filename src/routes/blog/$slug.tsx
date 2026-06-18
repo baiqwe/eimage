@@ -1,13 +1,17 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { Markdown } from '@/components/markdown/markdown';
+import {
+  PRODUCT_LOCALE_META,
+  useProductLocale,
+} from '@/components/product/product-locale';
+import { PublicBreadcrumb } from '@/components/seo/public-breadcrumb';
 import { getPostBySlug } from '@/lib/blog';
 import { websiteConfig } from '@/config/website';
-import { messages } from '@/messages';
+import { PUBLIC_LABELS } from '@/lib/product-i18n';
 import { getCanonicalUrl, getImageUrl } from '@/lib/urls';
-import { seo } from '@/lib/seo';
+import { breadcrumbJsonLd, seo } from '@/lib/seo';
 import { IconArrowLeft } from '@tabler/icons-react';
-import { formatDate } from '@/lib/formatter';
 
 export const Route = createFileRoute('/blog/$slug')({
   loader: async ({ params }) => {
@@ -52,7 +56,14 @@ export const Route = createFileRoute('/blog/$slug')({
       scripts: [
         {
           type: 'application/ld+json',
-          children: JSON.stringify(articleJsonLd),
+          children: JSON.stringify([
+            articleJsonLd,
+            breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
+              { name: 'Blog', path: '/blog' },
+              { name: post.title, path },
+            ]),
+          ]),
         },
       ],
     };
@@ -62,18 +73,31 @@ export const Route = createFileRoute('/blog/$slug')({
 
 function BlogPostPage() {
   const post = Route.useLoaderData();
+  const { locale } = useProductLocale();
+  const labels = PUBLIC_LABELS[locale];
+  const formattedDate = new Intl.DateTimeFormat(
+    PRODUCT_LOCALE_META[locale].dateLocale,
+    { dateStyle: 'medium' }
+  ).format(new Date(post.date));
   if (!post || !websiteConfig.blog?.enable) throw notFound();
 
   return (
     <Container className="py-16 px-4">
       <div className="mx-auto max-w-4xl">
+        <PublicBreadcrumb
+          items={[
+            { label: labels.home, href: '/' },
+            { label: labels.blog, href: '/blog' },
+            { label: post.title },
+          ]}
+        />
         <Link
           to="/blog"
           search={{ page: 1 }}
           className="mb-6 inline-flex items-center gap-2 text-muted-foreground text-sm hover:text-foreground"
         >
           <IconArrowLeft className="size-4" />
-          {messages.blog.allPosts}
+          {labels.allPosts}
         </Link>
 
         <article>
@@ -81,7 +105,7 @@ function BlogPostPage() {
             <span className="rounded-full bg-muted px-2.5 py-0.5 font-medium capitalize">
               {post.category}
             </span>
-            <span>{formatDate(new Date(post.date))}</span>
+            <span>{formattedDate}</span>
           </div>
 
           <h1 className="text-3xl font-bold tracking-tight">{post.title}</h1>
@@ -106,7 +130,7 @@ function BlogPostPage() {
               className="inline-flex items-center gap-2 text-muted-foreground text-sm hover:text-foreground"
             >
               <IconArrowLeft className="size-4" />
-              {messages.blog.allPosts}
+              {labels.allPosts}
             </Link>
           </div>
         </article>

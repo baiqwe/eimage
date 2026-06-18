@@ -13,8 +13,8 @@ export const Route = createFileRoute('/manifest.json')({
       GET: async () => {
         const metadata = websiteConfig.metadata;
         const body = {
-          name: metadata?.name ?? 'SuiteWorkbench',
-          short_name: 'SuiteWorkbench',
+          name: metadata?.name ?? 'ProdList AI',
+          short_name: 'ProdList AI',
           description:
             metadata?.description ??
             'AI product image generator for ecommerce teams.',

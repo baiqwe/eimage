@@ -7,9 +7,10 @@ import { createFileRoute } from '@tanstack/react-router';
 export const Route = createFileRoute('/')({
   head: () => {
     const name = websiteConfig.metadata?.name ?? '';
-    const title = 'SuiteWorkbench - 商品图智能生成工作台';
+    const title =
+      'AI Ecommerce Product Photo Generator | Create Product Photo Sets';
     const description =
-      '为电商卖家批量生成保留商品形貌的主图与详情页场景套图。';
+      'Upload one product photo and generate a complete ecommerce photo set with AI, including hero images, white-background photos, lifestyle scenes, and ad creatives.';
     const url = getCanonicalUrl('/');
     const webSiteJsonLd = {
       '@context': 'https://schema.org',
@@ -22,13 +23,21 @@ export const Route = createFileRoute('/')({
       name,
       description,
       path: '/',
-      locale: 'zh',
+      locale: 'en',
     });
     const metadata = seo('/', {
       title,
       description,
-      locale: 'zh',
-      alternates: localizedAlternates({ en: '/en', zh: '/zh' }),
+      locale: 'en',
+      keywords:
+        'AI ecommerce product photo generator, ecommerce product photo generator, product photo set generator, batch product photo generator',
+      alternates: localizedAlternates({
+        en: '/',
+        zh: '/zh',
+        ja: '/ja',
+        ko: '/ko',
+        es: '/es',
+      }),
     });
     return {
       ...metadata,
@@ -40,5 +49,5 @@ export const Route = createFileRoute('/')({
       ],
     };
   },
-  component: ProductHome,
+  component: () => <ProductHome locale="en" />,
 });

@@ -2,10 +2,15 @@ import { createFileRoute, notFound } from '@tanstack/react-router';
 import Container from '@/components/layout/container';
 import { BlogGrid } from '@/components/blog/blog-grid';
 import { BlogPagination } from '@/components/blog/blog-pagination';
+import {
+  ProductLanguageSelect,
+  useProductLocale,
+} from '@/components/product/product-locale';
+import { PublicBreadcrumb } from '@/components/seo/public-breadcrumb';
 import { getPaginatedPosts } from '@/lib/blog';
 import { websiteConfig } from '@/config/website';
-import { messages } from '@/messages';
-import { seo } from '@/lib/seo';
+import { PUBLIC_LABELS, PUBLIC_PAGE_COPY } from '@/lib/product-i18n';
+import { breadcrumbJsonLd, seo } from '@/lib/seo';
 import { getCanonicalUrl } from '@/lib/urls';
 
 export const Route = createFileRoute('/blog/')({
@@ -25,10 +30,11 @@ export const Route = createFileRoute('/blog/')({
     const path = '/blog';
     const currentPage = loaderData?.currentPage ?? 1;
     const totalPages = loaderData?.totalPages ?? 1;
+    const copy = PUBLIC_PAGE_COPY.en.blog;
     const pageSuffix = currentPage > 1 ? ` - Page ${currentPage}` : '';
     const metadata = seo(path, {
-      title: `${messages.blog.title}${pageSuffix} | ${websiteConfig.metadata?.name}`,
-      description: messages.blog.description,
+      title: `${copy.title}${pageSuffix} | ${websiteConfig.metadata?.name}`,
+      description: copy.description,
     });
 
     // Canonicalize each paginated page to itself so Google can index them
@@ -61,8 +67,8 @@ export const Route = createFileRoute('/blog/')({
     const blogJsonLd = {
       '@context': 'https://schema.org',
       '@type': 'Blog',
-      name: messages.blog.title,
-      description: messages.blog.description,
+      name: copy.title,
+      description: copy.description,
       url: getCanonicalUrl(path),
     };
     return {
@@ -71,7 +77,13 @@ export const Route = createFileRoute('/blog/')({
       scripts: [
         {
           type: 'application/ld+json',
-          children: JSON.stringify(blogJsonLd),
+          children: JSON.stringify([
+            blogJsonLd,
+            breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
+              { name: copy.title, path: '/blog' },
+            ]),
+          ]),
         },
       ],
     };
@@ -81,6 +93,9 @@ export const Route = createFileRoute('/blog/')({
 
 function BlogListPage() {
   const { posts, totalPages, currentPage } = Route.useLoaderData();
+  const { locale, setLocale } = useProductLocale();
+  const labels = PUBLIC_LABELS[locale];
+  const copy = PUBLIC_PAGE_COPY[locale].blog;
   if (!websiteConfig.blog?.enable) {
     throw notFound();
   }
@@ -88,16 +103,22 @@ function BlogListPage() {
   return (
     <Container className="py-16 px-4">
       <div className="mx-auto space-y-8">
+        <PublicBreadcrumb
+          items={[{ label: labels.home, href: '/' }, { label: labels.blog }]}
+        />
         <div className="space-y-4 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {messages.blog.title}
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            {messages.blog.description}
-          </p>
+          <div className="flex justify-center">
+            <ProductLanguageSelect locale={locale} onLocaleChange={setLocale} />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">{copy.title}</h1>
+          <p className="text-muted-foreground text-lg">{copy.description}</p>
         </div>
-        <BlogGrid posts={posts} />
-        <BlogPagination currentPage={currentPage} totalPages={totalPages} />
+        <BlogGrid posts={posts} locale={locale} />
+        <BlogPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          locale={locale}
+        />
       </div>
     </Container>
   );

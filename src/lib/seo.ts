@@ -1,7 +1,7 @@
 import { websiteConfig } from '@/config/website';
 import { getCanonicalUrl, getOgImage, twitterHandleFromUrl } from '@/lib/urls';
 
-export const SEO_LOCALES = ['en', 'zh'] as const;
+export const SEO_LOCALES = ['en', 'zh', 'ja', 'ko', 'es'] as const;
 export type SeoLocale = (typeof SEO_LOCALES)[number];
 
 /**
@@ -40,7 +40,9 @@ export function seo(
   };
 }
 
-export function localizedAlternates(pathByLocale: Record<SeoLocale, string>) {
+export function localizedAlternates(
+  pathByLocale: Partial<Record<SeoLocale, string>> & { en: string }
+) {
   return {
     ...pathByLocale,
     'x-default': pathByLocale.en,
@@ -66,11 +68,20 @@ export function softwareApplicationJsonLd({
     url: getCanonicalUrl(path),
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
-    inLanguage: locale === 'zh' ? 'zh-CN' : 'en-US',
+    inLanguage:
+      locale === 'zh'
+        ? 'zh-CN'
+        : locale === 'ja'
+          ? 'ja-JP'
+          : locale === 'ko'
+            ? 'ko-KR'
+            : locale === 'es'
+              ? 'es-ES'
+              : 'en-US',
     offers: {
       '@type': 'Offer',
       price: '0',
-      priceCurrency: locale === 'zh' ? 'CNY' : 'USD',
+      priceCurrency: locale === 'zh' ? 'CNY' : locale === 'ja' ? 'JPY' : 'USD',
     },
   };
 }

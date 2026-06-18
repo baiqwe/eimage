@@ -2,9 +2,11 @@ import {
   IconArrowRight,
   IconBolt,
   IconCameraSpark,
+  IconChecklist,
   IconHistory,
   IconPhotoScan,
   IconShieldCheck,
+  IconShoppingBag,
   IconWand,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
@@ -19,30 +21,40 @@ import { Routes } from '@/lib/routes';
 
 const COPY = {
   zh: {
-    badge: '专为电商卖家的 AI 商品摄影工作台',
-    title: '一张商品图，生成一整套高质感视觉资产',
+    badge: 'AI Ecommerce Product Photo Generator',
+    title: '面向电商卖家的 AI 商品套图生成器',
     description:
-      'SuiteWorkbench 帮你保留商品原始形貌，批量生成主图、详情页场景图和可追溯的 Prompt，让独立站、Amazon、Shopify 卖家更快完成上新。',
+      '上传一张商品图，批量生成平台主图、白底图、详情页场景图和广告素材。SuiteWorkbench 会尽量保留商品原始形貌，把背景、光影和场景重新设计成可上架的电商视觉资产。',
     start: '进入生成器',
     pricing: '查看定价',
-    trust: '支持登录、订阅、点数扣费、生成历史与资产复用',
-    previewTitle: '从素材到套图',
+    trust: '为 Amazon、Shopify、Etsy、独立站和高频上新团队设计',
+    previewTitle: '一张图生成一套电商图',
     source: '原始商品图',
-    output: '生成资产包',
+    output: '电商套图',
     previewText:
-      '上传商品图与基础描述，系统自动规划风格、Prompt、光影和场景，后续可接入真实生图 API。',
+      '首页专注承接 AI Ecommerce Product Photo Generator 这个核心意图：不是单张玩具图，而是可用于电商上新的完整商品图资产包。',
+    metrics: [
+      ['1 张', '商品素材输入'],
+      ['4 类', '主图、白底、场景、广告'],
+      ['并发', '多任务套图生成'],
+    ],
+    setTitle: '为什么是电商套图，而不是单张图片',
+    setBadge: '电商商品套图',
+    setDescription:
+      '电商上新需要的不只是一张漂亮图，而是一组用途明确、风格统一、能覆盖平台主图、详情页和投放素材的视觉资产。',
+    setTypes: ['平台主图', '白底商品图', '生活方式详情图', '广告创意图'],
     sections: [
       {
-        title: '锁定商品结构',
-        text: '围绕原始商品图做背景和光影重制，避免 AI 乱改角度、形状和品牌细节。',
+        title: '为电商平台生成',
+        text: '围绕 Amazon、Shopify、Etsy、独立站等平台的商品页场景设计图片用途和比例。',
       },
       {
-        title: '多任务资产包',
-        text: '一次配置多张主图和详情图，按风格、比例、分辨率独立生成。',
+        title: '批量生成商品套图',
+        text: '一个商品素材可以同时规划多张主图、详情图和广告图，按单图任务并发执行。',
       },
       {
-        title: '生成历史可复用',
-        text: '保留原图、Prompt、风格、结果图和扣点记录，方便复用与迭代。',
+        title: '尽量保留商品形貌',
+        text: '生成逻辑围绕原图主体重制背景和光影，减少商品结构、颜色、标签被 AI 改乱的风险。',
       },
     ],
     workflowTitle: '真实 SaaS 流程已就位',
@@ -77,31 +89,46 @@ const COPY = {
     ],
   },
   en: {
-    badge: 'AI product photography workbench for commerce teams',
-    title: 'Turn one product photo into a complete visual asset suite',
+    badge: 'AI Ecommerce Product Photo Generator',
+    title: 'AI Ecommerce Product Photo Generator',
     description:
-      'SuiteWorkbench preserves the original product shape while generating main images, detail-page scenes, traceable prompts, and reusable creative history for Shopify, Amazon, and DTC sellers.',
+      'Upload one product photo and generate a complete ecommerce photo set with AI: marketplace hero images, white-background product photos, lifestyle detail scenes, and ad creatives while preserving the original product shape.',
     start: 'Open generator',
     pricing: 'View pricing',
     trust:
-      'Built for login, subscriptions, credits, generation history, and asset reuse',
-    previewTitle: 'From source image to asset pack',
+      'Built for Amazon, Shopify, Etsy, DTC stores, and high-frequency ecommerce launches',
+    previewTitle: 'One product photo to a full ecommerce set',
     source: 'Source photo',
-    output: 'Generated pack',
+    output: 'Ecommerce photo set',
     previewText:
-      'Upload a product image and base description. The system plans styles, prompts, lighting, and scenes, ready for a real image-generation API.',
+      'This homepage focuses on one search intent: an AI ecommerce product photo generator that creates practical product photo sets, not one-off experimental images.',
+    metrics: [
+      ['1 input', 'Source product photo'],
+      ['4 outputs', 'Hero, white background, lifestyle, ads'],
+      ['Parallel', 'Batch photo-set generation'],
+    ],
+    setTitle: 'Built for ecommerce photo sets, not single images',
+    setBadge: 'Ecommerce photo sets',
+    setDescription:
+      'A real product launch needs a consistent set of visuals for listings, product detail pages, campaigns, and store merchandising.',
+    setTypes: [
+      'Marketplace hero images',
+      'White-background product photos',
+      'Lifestyle detail scenes',
+      'Ad creative crops',
+    ],
     sections: [
       {
+        title: 'Made for ecommerce platforms',
+        text: 'Plan product visuals around Amazon, Shopify, Etsy, and DTC listing needs instead of generic image generation.',
+      },
+      {
+        title: 'Batch product photo sets',
+        text: 'Turn one source image into multiple single-image tasks that can run in parallel with separate styles, ratios, and prompts.',
+      },
+      {
         title: 'Preserve product structure',
-        text: 'Redesign backgrounds and lighting around the source image without inventing new angles, shapes, or brand details.',
-      },
-      {
-        title: 'Multi-task asset packs',
-        text: 'Configure several main and detail images with independent styles, ratios, and resolutions.',
-      },
-      {
-        title: 'Reusable generation history',
-        text: 'Keep source images, prompts, styles, results, and credit records for iteration.',
+        text: 'Redesign background, lighting, and scene mood around the uploaded product without randomly changing shape, color, labels, or silhouette.',
       },
     ],
     workflowTitle: 'SaaS-ready product flow',
@@ -136,30 +163,45 @@ const COPY = {
     ],
   },
   ja: {
-    badge: 'EC チーム向け AI 商品撮影ワークベンチ',
-    title: '1 枚の商品写真から、高品質なビジュアル一式を生成',
+    badge: 'AI Ecommerce Product Photo Generator',
+    title: 'EC 向け AI 商品フォト生成ツール',
     description:
-      'SuiteWorkbench は商品の形状を保ちながら、主画像、詳細ページ用シーン、追跡可能な Prompt、再利用できる制作履歴を生成します。',
+      '1 枚の商品写真から、EC の主画像、白背景画像、ライフスタイル詳細シーン、広告素材をまとめて生成します。商品の形状を保ちながら、背景と光を再設計します。',
     start: '生成ツールを開く',
     pricing: '料金を見る',
-    trust: 'ログイン、サブスク、クレジット、生成履歴、素材再利用に対応',
-    previewTitle: '素材から画像セットへ',
+    trust: 'Amazon、Shopify、Etsy、DTC ストア、高頻度の商品投入向け',
+    previewTitle: '1 枚の商品写真から EC 画像セットへ',
     source: '元の商品写真',
-    output: '生成された素材セット',
+    output: 'EC 画像セット',
     previewText:
-      '商品画像と説明をアップロードすると、スタイル、Prompt、照明、シーンを自動で設計します。',
+      '単発の画像生成ではなく、商品ページと広告に使える一貫した EC 商品画像セットを作ることに特化しています。',
+    metrics: [
+      ['1 枚', '商品素材'],
+      ['4 種類', '主画像、白背景、詳細、広告'],
+      ['並列', '複数タスク生成'],
+    ],
+    setTitle: '単画像ではなく、EC 商品画像セットを生成',
+    setBadge: 'EC 商品画像セット',
+    setDescription:
+      '商品投入には、リスティング、詳細ページ、広告、ストア表示に使える統一感のある画像セットが必要です。',
+    setTypes: [
+      'マーケットプレイス主画像',
+      '白背景商品画像',
+      'ライフスタイル詳細シーン',
+      '広告クリエイティブ',
+    ],
     sections: [
       {
+        title: 'EC プラットフォーム向け',
+        text: 'Amazon、Shopify、Etsy、DTC の商品ページ用途に合わせて構図と比率を設計します。',
+      },
+      {
+        title: '商品画像セットを一括生成',
+        text: '1 つの素材から複数の単画像タスクを作成し、スタイル、比率、Prompt ごとに並列実行できます。',
+      },
+      {
         title: '商品構造を維持',
-        text: '元画像の形状やブランド細部を変えずに、背景と光だけを作り直します。',
-      },
-      {
-        title: '複数タスクの素材パック',
-        text: '主画像と詳細画像を、スタイル、比率、解像度ごとに個別生成できます。',
-      },
-      {
-        title: '生成履歴を再利用',
-        text: '元画像、Prompt、スタイル、結果画像、クレジット記録を保存します。',
+        text: '背景、照明、シーンを再設計しながら、形状、色、ラベル、シルエットの変化を抑えます。',
       },
     ],
     workflowTitle: 'SaaS の基本フローに対応',
@@ -194,30 +236,45 @@ const COPY = {
     ],
   },
   ko: {
-    badge: '이커머스 팀을 위한 AI 상품 촬영 워크벤치',
-    title: '상품 사진 한 장으로 고품질 비주얼 세트를 생성',
+    badge: 'AI Ecommerce Product Photo Generator',
+    title: '이커머스용 AI 상품 사진 생성기',
     description:
-      'SuiteWorkbench는 상품 형태를 유지하면서 메인 이미지, 상세 페이지 장면, 추적 가능한 Prompt, 재사용 가능한 제작 기록을 생성합니다.',
+      '상품 사진 한 장으로 마켓플레이스 메인 이미지, 흰 배경 상품 사진, 라이프스타일 상세 장면, 광고 소재를 한 번에 생성합니다. 상품 형태를 유지하면서 배경과 조명을 재설계합니다.',
     start: '생성기 열기',
     pricing: '요금 보기',
-    trust: '로그인, 구독, 크레딧, 생성 기록, 에셋 재사용 지원',
-    previewTitle: '소스 이미지에서 에셋 팩까지',
+    trust: 'Amazon, Shopify, Etsy, DTC 스토어와 빠른 상품 출시 팀을 위해 설계',
+    previewTitle: '상품 사진 한 장에서 이커머스 이미지 세트로',
     source: '원본 상품 사진',
-    output: '생성된 에셋 팩',
+    output: '이커머스 사진 세트',
     previewText:
-      '상품 이미지와 기본 설명을 업로드하면 스타일, Prompt, 조명, 장면을 자동으로 설계합니다.',
+      '단일 실험 이미지가 아니라 상품 페이지와 광고에 쓸 수 있는 일관된 이커머스 상품 사진 세트를 만드는 데 집중합니다.',
+    metrics: [
+      ['1장', '상품 원본'],
+      ['4종', '메인, 흰 배경, 상세, 광고'],
+      ['병렬', '배치 사진 세트 생성'],
+    ],
+    setTitle: '단일 이미지가 아닌 이커머스 사진 세트',
+    setBadge: '이커머스 사진 세트',
+    setDescription:
+      '상품 출시는 리스팅, 상세 페이지, 캠페인, 스토어 머천다이징에 맞는 일관된 이미지 세트를 필요로 합니다.',
+    setTypes: [
+      '마켓플레이스 메인 이미지',
+      '흰 배경 상품 사진',
+      '라이프스타일 상세 장면',
+      '광고 소재 크롭',
+    ],
     sections: [
       {
+        title: '이커머스 플랫폼용',
+        text: 'Amazon, Shopify, Etsy, DTC 상품 페이지 요구에 맞춰 상품 이미지를 설계합니다.',
+      },
+      {
+        title: '상품 사진 세트 일괄 생성',
+        text: '하나의 소스 이미지에서 여러 단일 이미지 작업을 만들고 스타일, 비율, Prompt별로 병렬 실행합니다.',
+      },
+      {
         title: '상품 구조 유지',
-        text: '원본 상품의 형태, 각도, 브랜드 디테일을 유지하며 배경과 조명을 재구성합니다.',
-      },
-      {
-        title: '멀티태스크 에셋 팩',
-        text: '메인 이미지와 상세 이미지를 스타일, 비율, 해상도별로 독립 생성합니다.',
-      },
-      {
-        title: '생성 기록 재사용',
-        text: '원본 이미지, Prompt, 스타일, 결과 이미지, 크레딧 기록을 저장합니다.',
+        text: '배경, 조명, 장면 분위기를 재설계하면서 형태, 색상, 라벨, 실루엣 변경을 줄입니다.',
       },
     ],
     workflowTitle: 'SaaS 흐름 준비 완료',
@@ -252,31 +309,46 @@ const COPY = {
     ],
   },
   es: {
-    badge: 'Mesa de fotografía IA para equipos ecommerce',
-    title: 'Convierte una foto de producto en un paquete visual completo',
+    badge: 'AI Ecommerce Product Photo Generator',
+    title: 'Generador IA de fotos de producto para ecommerce',
     description:
-      'SuiteWorkbench conserva la forma original del producto y genera imágenes principales, escenas de detalle, Prompts trazables e historial creativo reutilizable.',
+      'Sube una foto de producto y genera un set completo para ecommerce: imágenes principales, fondo blanco, escenas lifestyle y creatividades publicitarias, manteniendo la forma original del producto.',
     start: 'Abrir generador',
     pricing: 'Ver precios',
     trust:
-      'Compatible con login, suscripciones, créditos, historial y reutilización de assets',
-    previewTitle: 'De imagen fuente a paquete visual',
+      'Diseñado para Amazon, Shopify, Etsy, tiendas DTC y equipos con lanzamientos frecuentes',
+    previewTitle: 'De una foto a un set ecommerce completo',
     source: 'Foto original',
-    output: 'Paquete generado',
+    output: 'Set de fotos ecommerce',
     previewText:
-      'Sube una imagen y una descripción; el sistema planifica estilos, Prompt, iluminación y escenas.',
+      'La página se centra en una intención: un generador IA de fotos de producto para ecommerce que crea sets útiles, no imágenes sueltas.',
+    metrics: [
+      ['1 entrada', 'Foto de producto'],
+      ['4 salidas', 'Hero, fondo blanco, lifestyle, anuncios'],
+      ['Paralelo', 'Generación por lote'],
+    ],
+    setTitle: 'Pensado para sets ecommerce, no imágenes sueltas',
+    setBadge: 'Sets de fotos ecommerce',
+    setDescription:
+      'Un lanzamiento real necesita imágenes consistentes para listings, páginas de detalle, campañas y merchandising.',
+    setTypes: [
+      'Imágenes principales',
+      'Fotos con fondo blanco',
+      'Escenas lifestyle',
+      'Recortes para anuncios',
+    ],
     sections: [
       {
+        title: 'Para plataformas ecommerce',
+        text: 'Planifica imágenes para Amazon, Shopify, Etsy y tiendas DTC en lugar de generar imágenes genéricas.',
+      },
+      {
+        title: 'Sets de producto por lote',
+        text: 'Convierte una imagen fuente en varias tareas independientes con estilos, proporciones y Prompts específicos.',
+      },
+      {
         title: 'Conserva la estructura',
-        text: 'Rediseña fondo e iluminación sin inventar nuevos ángulos, formas ni detalles de marca.',
-      },
-      {
-        title: 'Paquetes multitarea',
-        text: 'Configura imágenes principales y de detalle con estilos, proporciones y resoluciones independientes.',
-      },
-      {
-        title: 'Historial reutilizable',
-        text: 'Guarda imagen fuente, Prompt, estilo, resultado y consumo de créditos para iterar.',
+        text: 'Rediseña fondo, luz y escena sin cambiar aleatoriamente forma, color, etiquetas o silueta.',
       },
     ],
     workflowTitle: 'Flujo SaaS listo',
@@ -363,6 +435,19 @@ export function ProductHome({
               <IconShieldCheck className="size-4 text-[#2f5f4f]" />
               {t.trust}
             </p>
+            <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
+              {t.metrics.map(([value, label]) => (
+                <div
+                  key={label}
+                  className="rounded-lg border border-[#dfe3d8] bg-white px-4 py-3 shadow-sm"
+                >
+                  <p className="font-bold text-[#20231e] text-xl">{value}</p>
+                  <p className="mt-1 text-[#74796d] text-xs leading-5">
+                    {label}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="rounded-lg border border-[#dfe3d8] bg-white p-4 shadow-sm">
@@ -405,6 +490,39 @@ export function ProductHome({
             <p className="mt-4 text-[#5f6759] text-sm leading-6">
               {t.previewText}
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-[#dfe3d8] border-t bg-[#fbfcf7] px-4 py-16">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-lg border border-[#dfe3d8] bg-white px-3 py-1.5 font-medium text-[#2f5f4f] text-sm shadow-sm">
+              <IconShoppingBag className="size-4" />
+              {t.setBadge}
+            </div>
+            <h2 className="max-w-2xl text-balance font-bold text-3xl tracking-tight md:text-4xl">
+              {t.setTitle}
+            </h2>
+            <p className="mt-4 max-w-2xl text-[#5f6759] leading-7">
+              {t.setDescription}
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {t.setTypes.map((item, index) => (
+              <div
+                key={item}
+                className="rounded-lg border border-[#dfe3d8] bg-white p-5 shadow-sm"
+              >
+                <div className="mb-4 flex size-9 items-center justify-center rounded-lg bg-[#eef6f0] text-[#2f5f4f]">
+                  <IconChecklist className="size-5" />
+                </div>
+                <p className="font-semibold">{item}</p>
+                <p className="mt-2 text-[#74796d] text-sm">
+                  0{index + 1} / {t.output}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

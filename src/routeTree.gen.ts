@@ -14,8 +14,11 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ManifestDotjsonRouteImport } from './routes/manifest[.]json'
+import { Route as KoRouteImport } from './routes/ko'
+import { Route as JaRouteImport } from './routes/ja'
 import { Route as GeneratorRouteImport } from './routes/generator'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as EsRouteImport } from './routes/es'
 import { Route as EnRouteImport } from './routes/en'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -84,6 +87,16 @@ const ManifestDotjsonRoute = ManifestDotjsonRouteImport.update({
   path: '/manifest.json',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KoRoute = KoRouteImport.update({
+  id: '/ko',
+  path: '/ko',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JaRoute = JaRouteImport.update({
+  id: '/ja',
+  path: '/ja',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GeneratorRoute = GeneratorRouteImport.update({
   id: '/generator',
   path: '/generator',
@@ -92,6 +105,11 @@ const GeneratorRoute = GeneratorRouteImport.update({
 const GalleryRoute = GalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EsRoute = EsRouteImport.update({
+  id: '/es',
+  path: '/es',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnRoute = EnRouteImport.update({
@@ -311,8 +329,11 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
   '/en': typeof EnRoute
+  '/es': typeof EsRoute
   '/gallery': typeof GalleryRoute
   '/generator': typeof GeneratorRoute
+  '/ja': typeof JaRoute
+  '/ko': typeof KoRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
@@ -360,8 +381,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
   '/en': typeof EnRoute
+  '/es': typeof EsRoute
   '/gallery': typeof GalleryRoute
   '/generator': typeof GeneratorRoute
+  '/ja': typeof JaRoute
+  '/ko': typeof KoRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -411,8 +435,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRouteWithChildren
   '/dashboard': typeof DashboardRouteWithChildren
   '/en': typeof EnRoute
+  '/es': typeof EsRoute
   '/gallery': typeof GalleryRoute
   '/generator': typeof GeneratorRoute
+  '/ja': typeof JaRoute
+  '/ko': typeof KoRoute
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
@@ -464,8 +491,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/en'
+    | '/es'
     | '/gallery'
     | '/generator'
+    | '/ja'
+    | '/ko'
     | '/manifest.json'
     | '/robots.txt'
     | '/settings'
@@ -513,8 +543,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/en'
+    | '/es'
     | '/gallery'
     | '/generator'
+    | '/ja'
+    | '/ko'
     | '/manifest.json'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -563,8 +596,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/en'
+    | '/es'
     | '/gallery'
     | '/generator'
+    | '/ja'
+    | '/ko'
     | '/manifest.json'
     | '/robots.txt'
     | '/settings'
@@ -615,8 +651,11 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   DashboardRoute: typeof DashboardRouteWithChildren
   EnRoute: typeof EnRoute
+  EsRoute: typeof EsRoute
   GalleryRoute: typeof GalleryRoute
   GeneratorRoute: typeof GeneratorRoute
+  JaRoute: typeof JaRoute
+  KoRoute: typeof KoRoute
   ManifestDotjsonRoute: typeof ManifestDotjsonRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SettingsRoute: typeof SettingsRouteWithChildren
@@ -681,6 +720,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ManifestDotjsonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ko': {
+      id: '/ko'
+      path: '/ko'
+      fullPath: '/ko'
+      preLoaderRoute: typeof KoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ja': {
+      id: '/ja'
+      path: '/ja'
+      fullPath: '/ja'
+      preLoaderRoute: typeof JaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/generator': {
       id: '/generator'
       path: '/generator'
@@ -693,6 +746,13 @@ declare module '@tanstack/react-router' {
       path: '/gallery'
       fullPath: '/gallery'
       preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/es': {
+      id: '/es'
+      path: '/es'
+      fullPath: '/es'
+      preLoaderRoute: typeof EsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en': {
@@ -1076,8 +1136,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   DashboardRoute: DashboardRouteWithChildren,
   EnRoute: EnRoute,
+  EsRoute: EsRoute,
   GalleryRoute: GalleryRoute,
   GeneratorRoute: GeneratorRoute,
+  JaRoute: JaRoute,
+  KoRoute: KoRoute,
   ManifestDotjsonRoute: ManifestDotjsonRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SettingsRoute: SettingsRouteWithChildren,

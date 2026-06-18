@@ -4,10 +4,10 @@
  */
 export const messages = {
   site: {
-    name: 'TanStarter Demo',
-    title: 'TanStarter - Ship Faster with TanStack, Cost Less with Cloudflare',
+    name: 'ProdList AI',
+    title: 'AI Ecommerce Product Photo Generator | ProdList AI',
     description:
-      'TanStarter is the complete TanStack Start boilerplate for building profitable SaaS, packed with AI, auth, database, storage, blog, email, newsletter, payments, dashboard, SEO, and more, fully deployed on Cloudflare Workers',
+      'Upload one product photo and generate complete ecommerce image sets for marketplaces, Shopify, ads, and product detail pages.',
   },
 
   nav: {
@@ -107,7 +107,7 @@ export const messages = {
   },
 
   footer: {
-    tagline: 'Ship Faster with TanStack, Cost Less with Cloudflare',
+    tagline: 'Generate ecommerce product photo sets from one upload',
     rightsReserved: 'All Rights Reserved',
   },
 

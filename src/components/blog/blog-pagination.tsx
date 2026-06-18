@@ -1,15 +1,19 @@
 import { Link } from '@tanstack/react-router';
-import { messages } from '@/messages';
+import type { ProductLocale } from '@/components/product/product-locale';
+import { PUBLIC_PAGE_COPY } from '@/lib/product-i18n';
 
 export function BlogPagination({
   currentPage,
   totalPages,
+  locale,
 }: {
   currentPage: number;
   totalPages: number;
+  locale: ProductLocale;
 }) {
   if (totalPages <= 1) return null;
 
+  const copy = PUBLIC_PAGE_COPY[locale].blog;
   const prevPage = currentPage - 1;
   const nextPage = currentPage + 1;
 
@@ -24,15 +28,15 @@ export function BlogPagination({
           search={prevPage <= 1 ? { page: undefined } : { page: prevPage }}
           className="inline-flex items-center rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
         >
-          {messages.blog.previous}
+          {copy.previous}
         </Link>
       ) : (
         <span className="inline-flex cursor-not-allowed items-center rounded-lg border border-border px-4 py-2 text-muted-foreground text-sm">
-          {messages.blog.previous}
+          {copy.previous}
         </span>
       )}
       <span className="px-2 text-muted-foreground text-sm">
-        {messages.blog.page} {currentPage} {messages.blog.of} {totalPages}
+        {copy.page} {currentPage} {copy.of} {totalPages}
       </span>
       {currentPage < totalPages ? (
         <Link
@@ -40,11 +44,11 @@ export function BlogPagination({
           search={{ page: nextPage }}
           className="inline-flex items-center rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-muted"
         >
-          {messages.blog.next}
+          {copy.next}
         </Link>
       ) : (
         <span className="inline-flex cursor-not-allowed items-center rounded-lg border border-border px-4 py-2 text-muted-foreground text-sm">
-          {messages.blog.next}
+          {copy.next}
         </span>
       )}
     </nav>

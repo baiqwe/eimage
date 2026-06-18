@@ -3,15 +3,23 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Markdown } from '@/components/markdown/markdown';
 import { formatDate } from '@/lib/formatter';
+import {
+  PRODUCT_LOCALE_META,
+  type ProductLocale,
+} from '@/components/product/product-locale';
 import type { ChangelogRelease } from '@/lib/changelog';
 import { IconCalendar, IconTag } from '@tabler/icons-react';
 
 interface ReleaseCardProps {
   release: ChangelogRelease;
+  locale?: ProductLocale;
 }
 
-export function ReleaseCard({ release }: ReleaseCardProps) {
-  const formattedDate = formatDate(new Date(release.date));
+export function ReleaseCard({ release, locale = 'en' }: ReleaseCardProps) {
+  const formattedDate = new Intl.DateTimeFormat(
+    PRODUCT_LOCALE_META[locale].dateLocale,
+    { dateStyle: 'medium' }
+  ).format(new Date(release.date));
 
   return (
     <Card className="mb-8">

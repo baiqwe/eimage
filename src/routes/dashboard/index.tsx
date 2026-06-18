@@ -13,7 +13,6 @@ import {
   useProductLocale,
 } from '@/components/product/product-locale';
 import { Routes } from '@/lib/routes';
-import { messages } from '@/messages';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/dashboard/')({
@@ -166,7 +165,7 @@ function DashboardPage() {
   const t = DASHBOARD_COPY[locale];
   const breadcrumbs = [
     {
-      label: messages.dashboard.title,
+      label: t.title,
       isCurrentPage: true,
     },
   ];
