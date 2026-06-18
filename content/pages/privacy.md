@@ -1,12 +1,12 @@
 ---
 title: Privacy Policy
-description: How SuiteWorkbench handles account data, uploaded product images, prompts, generation history, and billing records.
+description: How ProdList AI handles account data, uploaded product images, prompts, generation history, and billing records.
 date: 2026-06-18
 ---
 
 ## Overview
 
-SuiteWorkbench is an AI product image workspace for ecommerce teams. This policy explains what we collect when you use the website, generator, dashboard, subscriptions, credits, and image history features.
+ProdList AI is an AI product image workspace for ecommerce teams. This policy explains what we collect when you use the website, generator, dashboard, subscriptions, credits, and image history features.
 
 ## Information We Collect
 
@@ -39,7 +39,7 @@ We may store source images, generated assets, prompts, and task records so your 
 
 ## Third-Party Providers
 
-We may use third-party providers for authentication, hosting, analytics, payments, storage, email, customer support, and AI generation. These providers process data only as needed to provide their services to SuiteWorkbench.
+We may use third-party providers for authentication, hosting, analytics, payments, storage, email, customer support, and AI generation. These providers process data only as needed to provide their services to ProdList AI.
 
 ## Security
 
@@ -51,7 +51,7 @@ You can update account details, manage subscriptions, review generation history,
 
 ## International Users
 
-SuiteWorkbench may be accessed globally. By using the service, you understand that your information may be processed in countries where our service providers operate.
+ProdList AI may be accessed globally. By using the service, you understand that your information may be processed in countries where our service providers operate.
 
 ## Changes
 

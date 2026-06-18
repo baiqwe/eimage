@@ -10,7 +10,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { Link, useLocation } from '@tanstack/react-router';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { IconChevronRight, IconMenu2, IconX } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -35,12 +35,20 @@ interface NavbarMobileProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
   const pathname = useLocation().pathname;
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
   const { locale, setLocale } = useProductLocale();
   const menuLinks = getNavbarLinks(locale);
+  const handleLocaleChange = (next: typeof locale) => {
+    setLocale(next);
+    const nextPath = getLocalizedPublicPath(pathname, next);
+    if (nextPath !== pathname) {
+      navigate({ to: nextPath });
+    }
+  };
 
   // Sync mount (avoid hydration mismatch) and close drawer on route change
   useEffect(() => {
@@ -150,26 +158,32 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
                           <ul className="mt-2 space-y-2">
                             {item.items.map((sub) => (
                               <li key={sub.title}>
-                                <Link
-                                  to={sub.href ?? '#'}
-                                  target={sub.external ? '_blank' : undefined}
-                                  rel={
-                                    sub.external
-                                      ? 'noopener noreferrer'
-                                      : undefined
-                                  }
-                                  onClick={() => setOpen(false)}
-                                  className={cn(
-                                    mobileSubLinkClass,
-                                    isLinkActive(sub.href, pathname) &&
-                                      mobileLinkActiveClass
-                                  )}
-                                >
-                                  {sub.icon ? (
-                                    <sub.icon className="size-4 shrink-0" />
-                                  ) : null}
-                                  {sub.title}
-                                </Link>
+                                {sub.groupLabel ? (
+                                  <div className="px-2 pt-3 pb-1 font-semibold text-[11px] text-muted-foreground uppercase tracking-wide">
+                                    {sub.title}
+                                  </div>
+                                ) : (
+                                  <Link
+                                    to={sub.href ?? '#'}
+                                    target={sub.external ? '_blank' : undefined}
+                                    rel={
+                                      sub.external
+                                        ? 'noopener noreferrer'
+                                        : undefined
+                                    }
+                                    onClick={() => setOpen(false)}
+                                    className={cn(
+                                      mobileSubLinkClass,
+                                      isLinkActive(sub.href, pathname) &&
+                                        mobileLinkActiveClass
+                                    )}
+                                  >
+                                    {sub.icon ? (
+                                      <sub.icon className="size-4 shrink-0" />
+                                    ) : null}
+                                    {sub.title}
+                                  </Link>
+                                )}
                               </li>
                             ))}
                           </ul>
@@ -197,7 +211,7 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
             <div className="mt-auto flex w-full items-center justify-between border-border/50 border-t p-4">
               <ProductLanguageSelect
                 locale={locale}
-                onLocaleChange={setLocale}
+                onLocaleChange={handleLocaleChange}
                 compact
               />
               <ModeSwitcherHorizontal />
@@ -207,4 +221,23 @@ export function NavbarMobile({ className, ...props }: NavbarMobileProps) {
       )}
     </>
   );
+}
+
+function getLocalizedPublicPath(pathname: string, locale: string) {
+  const slug = pathname.match(/^\/(?:zh\/)?tools\/([^/]+)\/?$/)?.[1];
+  if (locale === 'zh') {
+    if (slug) return `/zh/tools/${slug}`;
+    if (pathname === '/tools' || pathname === '/tools/') return '/zh/tools';
+    if (pathname === '/gallery') return '/zh/gallery';
+    if (['/', '/en', '/ja', '/ko', '/es'].includes(pathname)) return '/zh';
+    return pathname;
+  }
+
+  if (slug) return `/tools/${slug}`;
+  if (pathname === '/zh/tools' || pathname === '/zh/tools/') return '/tools';
+  if (pathname === '/zh/gallery') return '/gallery';
+  if (['/zh', '/en', '/ja', '/ko', '/es', '/'].includes(pathname)) {
+    return locale === 'en' ? '/' : `/${locale}`;
+  }
+  return pathname;
 }

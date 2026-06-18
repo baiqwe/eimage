@@ -22,7 +22,7 @@ import { NavbarMobile } from '@/components/layout/navbar-mobile';
 import { UserButton } from '@/components/shared/user-button';
 import { LoginWrapper } from '@/components/auth/login-wrapper';
 import { IconArrowUpRight } from '@tabler/icons-react';
-import { Link, useLocation } from '@tanstack/react-router';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { websiteConfig } from '@/config/website';
 import { messages } from '@/messages';
@@ -37,6 +37,7 @@ interface NavbarProps {
 
 export function Navbar({ scroll = true }: NavbarProps) {
   const pathname = useLocation().pathname;
+  const navigate = useNavigate();
   const scrolled = useScroll(50);
   const { locale, setLocale } = useProductLocale();
   const menuLinks = getNavbarLinks(locale);
@@ -45,6 +46,13 @@ export function Navbar({ scroll = true }: NavbarProps) {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
   const showBarBg = scroll && scrolled;
+  const handleLocaleChange = (next: typeof locale) => {
+    setLocale(next);
+    const nextPath = getLocalizedPublicPath(pathname, next);
+    if (nextPath !== pathname) {
+      navigate({ to: nextPath });
+    }
+  };
 
   // Sync mount (avoid auth hydration mismatch) and close menu on route change
   useEffect(() => {
@@ -104,46 +112,57 @@ export function Navbar({ scroll = true }: NavbarProps) {
                       <NavigationMenuContent>
                         <ul className="grid w-100 gap-3 p-3 md:w-125 md:grid-cols-2 lg:w-150">
                           {item.items.map((sub) => (
-                            <li key={sub.title}>
-                              <NavigationMenuLink
-                                closeOnClick
-                                className={cn(
-                                  'group flex select-none flex-row items-center gap-4 rounded-md',
-                                  'p-2 leading-none no-underline outline-hidden transition-colors',
-                                  'hover:bg-accent hover:text-accent-foreground',
-                                  'focus:bg-accent focus:text-accent-foreground',
-                                  isLinkActive(sub.href, pathname) &&
-                                    'bg-accent text-accent-foreground'
-                                )}
-                                render={
-                                  <Link
-                                    to={sub.href ?? '#'}
-                                    target={sub.external ? '_blank' : undefined}
-                                    rel={
-                                      sub.external
-                                        ? 'noopener noreferrer'
-                                        : undefined
-                                    }
-                                  />
-                                }
-                              >
-                                {sub.icon ? (
-                                  <sub.icon className="size-4 shrink-0" />
-                                ) : null}
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-sm font-medium">
-                                    {sub.title}
-                                  </div>
-                                  {sub.description ? (
-                                    <p className="text-xs text-muted-foreground">
-                                      {sub.description}
-                                    </p>
-                                  ) : null}
+                            <li
+                              className={sub.groupLabel ? 'col-span-full' : ''}
+                              key={sub.title}
+                            >
+                              {sub.groupLabel ? (
+                                <div className="px-2 pt-2 pb-1 font-semibold text-[11px] text-muted-foreground uppercase tracking-wide">
+                                  {sub.title}
                                 </div>
-                                {sub.external ? (
-                                  <IconArrowUpRight className="size-4 shrink-0" />
-                                ) : null}
-                              </NavigationMenuLink>
+                              ) : (
+                                <NavigationMenuLink
+                                  closeOnClick
+                                  className={cn(
+                                    'group flex select-none flex-row items-center gap-4 rounded-md',
+                                    'p-2 leading-none no-underline outline-hidden transition-colors',
+                                    'hover:bg-accent hover:text-accent-foreground',
+                                    'focus:bg-accent focus:text-accent-foreground',
+                                    isLinkActive(sub.href, pathname) &&
+                                      'bg-accent text-accent-foreground'
+                                  )}
+                                  render={
+                                    <Link
+                                      to={sub.href ?? '#'}
+                                      target={
+                                        sub.external ? '_blank' : undefined
+                                      }
+                                      rel={
+                                        sub.external
+                                          ? 'noopener noreferrer'
+                                          : undefined
+                                      }
+                                    />
+                                  }
+                                >
+                                  {sub.icon ? (
+                                    <sub.icon className="size-4 shrink-0" />
+                                  ) : null}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="text-sm font-medium">
+                                      {sub.title}
+                                    </div>
+                                    {sub.description ? (
+                                      <p className="text-xs text-muted-foreground">
+                                        {sub.description}
+                                      </p>
+                                    ) : null}
+                                  </div>
+                                  {sub.external ? (
+                                    <IconArrowUpRight className="size-4 shrink-0" />
+                                  ) : null}
+                                </NavigationMenuLink>
+                              )}
                             </li>
                           ))}
                         </ul>
@@ -171,7 +190,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
             <div className="flex items-center gap-4 shrink-0">
               <ProductLanguageSelect
                 locale={locale}
-                onLocaleChange={setLocale}
+                onLocaleChange={handleLocaleChange}
                 compact
               />
               <ModeSwitcher />
@@ -212,4 +231,23 @@ export function Navbar({ scroll = true }: NavbarProps) {
       </div>
     </header>
   );
+}
+
+function getLocalizedPublicPath(pathname: string, locale: string) {
+  const slug = pathname.match(/^\/(?:zh\/)?tools\/([^/]+)\/?$/)?.[1];
+  if (locale === 'zh') {
+    if (slug) return `/zh/tools/${slug}`;
+    if (pathname === '/tools' || pathname === '/tools/') return '/zh/tools';
+    if (pathname === '/gallery') return '/zh/gallery';
+    if (['/', '/en', '/ja', '/ko', '/es'].includes(pathname)) return '/zh';
+    return pathname;
+  }
+
+  if (slug) return `/tools/${slug}`;
+  if (pathname === '/zh/tools' || pathname === '/zh/tools/') return '/tools';
+  if (pathname === '/zh/gallery') return '/gallery';
+  if (['/zh', '/en', '/ja', '/ko', '/es', '/'].includes(pathname)) {
+    return locale === 'en' ? '/' : `/${locale}`;
+  }
+  return pathname;
 }

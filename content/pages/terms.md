@@ -1,16 +1,16 @@
 ---
 title: Terms of Service
-description: Terms for using SuiteWorkbench, including product uploads, AI generation, credits, subscriptions, and generated assets.
+description: Terms for using ProdList AI, including product uploads, AI generation, credits, subscriptions, and generated assets.
 date: 2026-06-18
 ---
 
 ## Agreement
 
-These Terms govern your use of SuiteWorkbench, including the website, generator, dashboard, subscriptions, credit packs, generation history, and related services. By using SuiteWorkbench, you agree to these Terms.
+These Terms govern your use of ProdList AI, including the website, generator, dashboard, subscriptions, credit packs, generation history, and related services. By using ProdList AI, you agree to these Terms.
 
 ## Product Use
 
-SuiteWorkbench helps ecommerce teams generate product image variations from uploaded source images and prompts. The service may include prompt planning, background generation, lighting redesign, generated output storage, download tools, and history management.
+ProdList AI helps ecommerce teams generate product image variations from uploaded source images and prompts. The service may include prompt planning, background generation, lighting redesign, generated output storage, download tools, and history management.
 
 ## Accounts
 
@@ -18,7 +18,7 @@ You are responsible for your account credentials and for activity under your acc
 
 ## Uploads and Rights
 
-You keep ownership of the product images, descriptions, prompts, and other content you upload. You grant SuiteWorkbench the rights needed to host, process, transform, transmit, display, and store that content solely to provide and improve the service. You must have the legal right to upload the source material and generate derivative assets from it.
+You keep ownership of the product images, descriptions, prompts, and other content you upload. You grant ProdList AI the rights needed to host, process, transform, transmit, display, and store that content solely to provide and improve the service. You must have the legal right to upload the source material and generate derivative assets from it.
 
 ## Generated Outputs
 
@@ -26,11 +26,11 @@ Subject to your compliance with these Terms and payment obligations, you may use
 
 ## Credits and Subscriptions
 
-Image generation consumes compute resources. SuiteWorkbench may use subscriptions, credit balances, one-time credit packs, usage limits, or a combination of these. Credits may be checked before a generation task starts. Failed, canceled, refunded, or abusive tasks may be handled according to the rules shown in the product or billing flow.
+Image generation consumes compute resources. ProdList AI may use subscriptions, credit balances, one-time credit packs, usage limits, or a combination of these. Credits may be checked before a generation task starts. Failed, canceled, refunded, or abusive tasks may be handled according to the rules shown in the product or billing flow.
 
 ## Prohibited Use
 
-You may not use SuiteWorkbench to:
+You may not use ProdList AI to:
 
 - upload content you do not have rights to use;
 - generate illegal, deceptive, infringing, harmful, or abusive content;
@@ -53,11 +53,11 @@ We may add, remove, or modify features, plans, supported languages, generation s
 
 ## Disclaimer
 
-SuiteWorkbench is provided on an "as is" and "as available" basis. We do not guarantee that generated images will satisfy every marketplace rule, brand guideline, or legal requirement. You should review outputs before using them commercially.
+ProdList AI is provided on an "as is" and "as available" basis. We do not guarantee that generated images will satisfy every marketplace rule, brand guideline, or legal requirement. You should review outputs before using them commercially.
 
 ## Limitation of Liability
 
-To the maximum extent permitted by law, SuiteWorkbench is not liable for indirect, incidental, special, consequential, or punitive damages, including lost revenue, lost data, failed listings, ad rejection, or business interruption.
+To the maximum extent permitted by law, ProdList AI is not liable for indirect, incidental, special, consequential, or punitive damages, including lost revenue, lost data, failed listings, ad rejection, or business interruption.
 
 ## Contact
 

@@ -41,7 +41,7 @@ export const Route = createFileRoute('/tools/$slug')({
     });
     const breadcrumb = breadcrumbJsonLd([
       { name: 'Home', path: '/' },
-      { name: 'Tools', path: '/tools/product-background-generator' },
+      { name: 'Tools', path: '/tools' },
       { name: tool.title, path: `/tools/${tool.slug}` },
     ]);
     const faq = {

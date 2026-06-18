@@ -23,7 +23,7 @@ export const Route = createFileRoute('/gallery')({
     const metadata = seo('/gallery', {
       title,
       description,
-      alternates: localizedAlternates({ en: '/gallery', zh: '/gallery' }),
+      alternates: localizedAlternates({ en: '/gallery', zh: '/zh/gallery' }),
     });
 
     const breadcrumb = breadcrumbJsonLd([

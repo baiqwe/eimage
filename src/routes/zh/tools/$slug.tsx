@@ -38,7 +38,7 @@ export const Route = createFileRoute('/zh/tools/$slug')({
     });
     const breadcrumb = breadcrumbJsonLd([
       { name: '首页', path: '/zh' },
-      { name: '工具', path: '/zh/tools/product-background-generator' },
+      { name: '工具', path: '/zh/tools' },
       { name: tool.titleZh, path: `/zh/tools/${tool.slug}` },
     ]);
     const faq = {
@@ -84,7 +84,7 @@ function ToolPage() {
         <PublicBreadcrumb
           items={[
             { label: '首页', href: '/zh' },
-            { label: '工具', href: '/zh/tools/product-background-generator' },
+            { label: '工具', href: '/zh/tools' },
             { label: tool.titleZh },
           ]}
         />

@@ -123,6 +123,7 @@ export interface MenuItemConfig {
   href?: string;                                    // The url to link to
   icon?: ComponentType<{ className?: string }>;     // The icon to display
   external?: boolean;                               // Whether the link is external
+  groupLabel?: boolean;                             // Whether the item is a non-clickable menu group label
   authorizeOnly?: string[];                         // The roles that are authorized to see the item
   items?: MenuItemConfig[];                         // Nested items for dropdown/group
 }

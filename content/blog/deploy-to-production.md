@@ -1,33 +1,58 @@
 ---
-title: Deploy to Production
-description: How to build and deploy your app to Cloudflare Workers.
+title: Product Image SEO Checklist for AI-Generated Ecommerce Photos
+description: A practical SEO checklist for publishing AI-generated ecommerce product images without creating thin pages or confusing search engines.
 date: 2026-02-13
-category: Guide
-image: https://cdn.mksaas.com/tanstarter/template/blog-deployment.jpeg
+category: SEO
+image: https://prodlistai.com/og.png
 ---
 
-Once your app is ready, you can deploy it with a single command.
+AI-generated product photos can improve conversion, but they should not create weak SEO pages. Search engines still need clear page purpose, useful text, crawlable links, descriptive image context, and trustworthy site information.
 
-## Build
+Use this checklist before publishing a new tool page, gallery page, or product image article.
 
-Create an optimized production build:
+## Match one page to one search intent
 
-```bash
-pnpm build
-```
+Do not make several pages compete for the same keyword. A page targeting "batch product photo generator" should explain batch workflows. A page targeting "white background product photo" should focus on clean listing images and marketplace-ready output.
 
-The output goes to `dist/` by default. For Cloudflare, the worker entry and assets live under `dist/server/` and `dist/client/`. The build uses the Cloudflare Vite plugin, so the bundle is ready for Workers.
+This is why ProdList AI separates:
 
-## Deploy to Cloudflare
+- [batch product photo generator](/tools/batch-product-photo-generator);
+- [product photo set generator](/tools/product-photo-set-generator);
+- [white background product photo](/tools/white-background-product-photo);
+- [jewelry product photography AI](/tools/jewelry-product-photography-ai).
 
-If you use the included Wrangler setup:
+The overlap is intentional at the product level, but each page has a distinct search intent.
 
-```bash
-pnpm deploy
-```
+## Add helpful context around the visual demo
 
-This runs `pnpm build` and then `wrangler deploy`. Configure your account and bindings in `wrangler.jsonc`, and set any required environment variables or secrets with `wrangler secret`.
+A pSEO page should not be only a title and a generated mockup. Add practical details such as:
 
-![img](https://cdn.mksaas.com/tanstarter/template/blog-deployment.jpeg)
+- who the workflow is for;
+- what image types it creates;
+- what problems it solves;
+- what outputs still need human review;
+- when the tool is not the right fit.
 
-Good luck with your launch.
+This helps users decide faster and reduces the risk of thin, template-like pages.
+
+## Use descriptive image alt text
+
+Image alt text should describe the product image example and its commercial context. Avoid generic alt text such as "image" or "AI result".
+
+Better:
+
+> AI jewelry product photography example with controlled reflections and ecommerce detail scene.
+
+That tells both users and search engines what the image represents.
+
+## Keep canonical and hreflang clean
+
+Every indexable page should have a canonical URL pointing to itself. If a page has localized versions, use accurate hreflang links. Do not point two languages to the same URL unless the content truly changes server-side for that URL.
+
+For example, the English gallery should reference `/gallery`, while the Chinese gallery should reference `/zh/gallery`.
+
+## Build internal links intentionally
+
+Internal links should guide a seller to the next useful workflow. A white-background page can link to the batch generator. A Shopify page can link to product photo sets. A category page can link back to the main tools index.
+
+This creates a clearer crawl path and helps users move from research to generation.

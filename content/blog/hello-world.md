@@ -1,35 +1,59 @@
 ---
-title: Hello World
-description: A simple introduction to the blog and what you can expect.
+title: How to Turn One Product Photo into a Complete Ecommerce Image Set
+description: A practical workflow for creating main images, white-background photos, lifestyle scenes, and ad crops from one source product photo.
 date: 2026-02-11
-category: General
-image: https://cdn.mksaas.com/tanstarter/template/blog-hello-world.jpeg
+category: Workflow
+image: https://prodlistai.com/og.png
 ---
 
-This is the first post on the blog. You can use **Markdown** here.
+Most ecommerce teams do not need one more isolated product image. They need a complete set: a clean main image, a white-background listing photo, a lifestyle scene, a detail-page visual, and a few ad crops. The hard part is making those outputs feel consistent while keeping the product shape, label, and material intact.
 
-## Paragraphs and headings
+ProdList AI is designed around that exact workflow. Instead of asking AI to invent a new product from scratch, start with one real product photo and use separate generation tasks for each output.
 
-Normal paragraphs are supported. So are lists:
+## Start with a clear source image
 
-- Item one
-- Item two
-- Item three
+Use the sharpest front-facing product photo you have. A simple phone photo can work, but the best source image usually has:
 
-The blog is powered by **content-collections**: each post is a Markdown file under `content/blog/` with frontmatter for `title`, `description`, `date`, `category`, and `image`. The template uses `@tailwindcss/typography` for readable prose and applies a dedicated heading font (Bricolage Grotesque) in `src/styles.css`.
+- a fully visible product silhouette;
+- readable packaging or label placement;
+- minimal blur around edges;
+- no heavy reflections covering important details;
+- enough margin around the product for cropping.
 
-## Images and links
+The goal is not to make the source image beautiful. The goal is to give the generator a stable product structure to preserve.
 
-You can add [links](https://example.com) and reference images. Keep the layout simple and readable.
+## Build the set as multiple single-image tasks
 
-![img](https://cdn.mksaas.com/tanstarter/template/blog-hello-world.jpeg)
+Batch generation should not be treated as one giant prompt. A stronger workflow is to create multiple single-image tasks that run in parallel:
 
-## Code
+- **Main image**: clean composition, centered product, restrained shadow.
+- **White background photo**: marketplace-ready framing with soft contact shadow.
+- **Lifestyle detail scene**: a contextual surface, window light, or category-specific environment.
+- **Ad crop**: wider spacing for text overlays, banners, or social ads.
 
-Inline `code` and blocks are supported. Code blocks use the mono font (Noto Sans Mono) and get a muted background in dark mode. No syntax highlighting by design in this minimal setup.
+Each task can use its own ratio, prompt, and scene direction while sharing the same product source.
 
-```bash
-pnpm dev
-```
+## Keep prompts specific but not overloaded
 
-Thanks for reading.
+Good ecommerce prompts describe the scene, light, surface, camera language, and product preservation rules. Avoid asking for too many competing ideas in one output.
+
+For example:
+
+> Professional ecommerce product photography based on the provided source image. Keep the original product shape, label placement, material finish, and front-facing structure. Place it on a clean warm stone surface with soft morning side light, realistic contact shadow, premium retouching, and no extra products.
+
+This type of prompt gives the model a useful visual direction while making the preservation requirement explicit.
+
+## Review the set as a product page, not as separate images
+
+When the outputs come back, judge the set in context:
+
+- Do the main image and detail image look like the same product?
+- Does the lifestyle scene explain a use case or just look decorative?
+- Are labels, logos, and handles still believable?
+- Can the ad crop support headline text without covering the product?
+
+The best product image set is not always the flashiest set. It is the set that helps a shopper understand the product faster.
+
+## Internal workflow to try
+
+Start with the [batch product photo generator](/tools/batch-product-photo-generator), then compare it with the [product photo set generator](/tools/product-photo-set-generator). If you only need a clean listing visual, use the [white background product photo tool](/tools/white-background-product-photo).

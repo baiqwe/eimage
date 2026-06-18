@@ -142,8 +142,16 @@ export function getFooterLinks(locale: ProductLocale = 'en'): MenuItemConfig[] {
   const productItems: MenuItemConfig[] = [
     { title: copy.home, href: Routes.Root, external: false },
     { title: copy.generator, href: Routes.Generator, external: false },
-    { title: copy.gallery, href: Routes.Gallery, external: false },
-    { title: copy.tools, href: Routes.Tools, external: false },
+    {
+      title: copy.gallery,
+      href: locale === 'zh' ? '/zh/gallery' : Routes.Gallery,
+      external: false,
+    },
+    {
+      title: copy.tools,
+      href: locale === 'zh' ? '/zh/tools' : Routes.Tools,
+      external: false,
+    },
   ];
   if (websiteConfig.payment?.enable) {
     productItems.push({

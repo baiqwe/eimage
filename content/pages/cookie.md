@@ -1,12 +1,12 @@
 ---
 title: Cookie Policy
-description: How SuiteWorkbench uses cookies and similar technologies for login, language settings, analytics, payments, and product workflows.
+description: How ProdList AI uses cookies and similar technologies for login, language settings, analytics, payments, and product workflows.
 date: 2026-06-18
 ---
 
 ## Overview
 
-SuiteWorkbench uses cookies and similar technologies to keep the website working, remember preferences, understand product usage, and support secure account and payment flows.
+ProdList AI uses cookies and similar technologies to keep the website working, remember preferences, understand product usage, and support secure account and payment flows.
 
 ## What Cookies Are
 

@@ -24,10 +24,13 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ZhIndexRouteImport } from './routes/zh/index'
+import { Route as ToolsIndexRouteImport } from './routes/tools/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as ZhGalleryRouteImport } from './routes/zh/gallery'
 import { Route as ToolsSlugRouteImport } from './routes/tools/$slug'
 import { Route as SettingsSecurityRouteImport } from './routes/settings/security'
 import { Route as SettingsProfileRouteImport } from './routes/settings/profile'
@@ -56,6 +59,7 @@ import { Route as pagesAboutRouteImport } from './routes/(pages)/about'
 import { Route as legalsTermsRouteImport } from './routes/(legals)/terms'
 import { Route as legalsPrivacyRouteImport } from './routes/(legals)/privacy'
 import { Route as legalsCookieRouteImport } from './routes/(legals)/cookie'
+import { Route as ZhToolsIndexRouteImport } from './routes/zh/tools/index'
 import { Route as ZhToolsSlugRouteImport } from './routes/zh/tools/$slug'
 import { Route as ApiWebhooksStripeRouteImport } from './routes/api/webhooks/stripe'
 import { Route as ApiWebhooksCreemRouteImport } from './routes/api/webhooks/creem'
@@ -137,6 +141,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ZhIndexRoute = ZhIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ZhRoute,
+} as any)
+const ToolsIndexRoute = ToolsIndexRouteImport.update({
+  id: '/tools/',
+  path: '/tools/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -156,6 +170,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const ZhGalleryRoute = ZhGalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => ZhRoute,
 } as any)
 const ToolsSlugRoute = ToolsSlugRouteImport.update({
   id: '/tools/$slug',
@@ -297,6 +316,11 @@ const legalsCookieRoute = legalsCookieRouteImport.update({
   path: '/cookie',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ZhToolsIndexRoute = ZhToolsIndexRouteImport.update({
+  id: '/tools/',
+  path: '/tools/',
+  getParentRoute: () => ZhRoute,
+} as any)
 const ZhToolsSlugRoute = ZhToolsSlugRouteImport.update({
   id: '/tools/$slug',
   path: '/tools/$slug',
@@ -367,15 +391,19 @@ export interface FileRoutesByFullPath {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/tools/$slug': typeof ToolsSlugRoute
+  '/zh/gallery': typeof ZhGalleryRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/tools/': typeof ToolsIndexRoute
+  '/zh/': typeof ZhIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/zh/tools/$slug': typeof ZhToolsSlugRoute
+  '/zh/tools/': typeof ZhToolsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -389,7 +417,6 @@ export interface FileRoutesByTo {
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/zh': typeof ZhRouteWithChildren
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
   '/terms': typeof legalsTermsRoute
@@ -418,15 +445,19 @@ export interface FileRoutesByTo {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/tools/$slug': typeof ToolsSlugRoute
+  '/zh/gallery': typeof ZhGalleryRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/tools': typeof ToolsIndexRoute
+  '/zh': typeof ZhIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/zh/tools/$slug': typeof ZhToolsSlugRoute
+  '/zh/tools': typeof ZhToolsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -473,15 +504,19 @@ export interface FileRoutesById {
   '/settings/profile': typeof SettingsProfileRoute
   '/settings/security': typeof SettingsSecurityRoute
   '/tools/$slug': typeof ToolsSlugRoute
+  '/zh/gallery': typeof ZhGalleryRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/tools/': typeof ToolsIndexRoute
+  '/zh/': typeof ZhIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/storage/file': typeof ApiStorageFileRoute
   '/api/webhooks/creem': typeof ApiWebhooksCreemRoute
   '/api/webhooks/stripe': typeof ApiWebhooksStripeRoute
   '/zh/tools/$slug': typeof ZhToolsSlugRoute
+  '/zh/tools/': typeof ZhToolsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -529,15 +564,19 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/tools/$slug'
+    | '/zh/gallery'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
     | '/settings/'
+    | '/tools/'
+    | '/zh/'
     | '/api/auth/$'
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
     | '/zh/tools/$slug'
+    | '/zh/tools/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -551,7 +590,6 @@ export interface FileRouteTypes {
     | '/manifest.json'
     | '/robots.txt'
     | '/sitemap.xml'
-    | '/zh'
     | '/cookie'
     | '/privacy'
     | '/terms'
@@ -580,15 +618,19 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/tools/$slug'
+    | '/zh/gallery'
     | '/admin'
     | '/blog'
     | '/dashboard'
     | '/settings'
+    | '/tools'
+    | '/zh'
     | '/api/auth/$'
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
     | '/zh/tools/$slug'
+    | '/zh/tools'
   id:
     | '__root__'
     | '/'
@@ -634,15 +676,19 @@ export interface FileRouteTypes {
     | '/settings/profile'
     | '/settings/security'
     | '/tools/$slug'
+    | '/zh/gallery'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
     | '/settings/'
+    | '/tools/'
+    | '/zh/'
     | '/api/auth/$'
     | '/api/storage/file'
     | '/api/webhooks/creem'
     | '/api/webhooks/stripe'
     | '/zh/tools/$slug'
+    | '/zh/tools/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -677,6 +723,7 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   ToolsSlugRoute: typeof ToolsSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ToolsIndexRoute: typeof ToolsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiStorageFileRoute: typeof ApiStorageFileRoute
   ApiWebhooksCreemRoute: typeof ApiWebhooksCreemRoute
@@ -790,6 +837,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/zh/': {
+      id: '/zh/'
+      path: '/'
+      fullPath: '/zh/'
+      preLoaderRoute: typeof ZhIndexRouteImport
+      parentRoute: typeof ZhRoute
+    }
+    '/tools/': {
+      id: '/tools/'
+      path: '/tools'
+      fullPath: '/tools/'
+      preLoaderRoute: typeof ToolsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings/': {
       id: '/settings/'
       path: '/'
@@ -817,6 +878,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/zh/gallery': {
+      id: '/zh/gallery'
+      path: '/gallery'
+      fullPath: '/zh/gallery'
+      preLoaderRoute: typeof ZhGalleryRouteImport
+      parentRoute: typeof ZhRoute
     }
     '/tools/$slug': {
       id: '/tools/$slug'
@@ -1014,6 +1082,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof legalsCookieRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/zh/tools/': {
+      id: '/zh/tools/'
+      path: '/tools'
+      fullPath: '/zh/tools/'
+      preLoaderRoute: typeof ZhToolsIndexRouteImport
+      parentRoute: typeof ZhRoute
+    }
     '/zh/tools/$slug': {
       id: '/zh/tools/$slug'
       path: '/tools/$slug'
@@ -1121,11 +1196,17 @@ const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
 )
 
 interface ZhRouteChildren {
+  ZhGalleryRoute: typeof ZhGalleryRoute
+  ZhIndexRoute: typeof ZhIndexRoute
   ZhToolsSlugRoute: typeof ZhToolsSlugRoute
+  ZhToolsIndexRoute: typeof ZhToolsIndexRoute
 }
 
 const ZhRouteChildren: ZhRouteChildren = {
+  ZhGalleryRoute: ZhGalleryRoute,
+  ZhIndexRoute: ZhIndexRoute,
   ZhToolsSlugRoute: ZhToolsSlugRoute,
+  ZhToolsIndexRoute: ZhToolsIndexRoute,
 }
 
 const ZhRouteWithChildren = ZhRoute._addFileChildren(ZhRouteChildren)
@@ -1162,6 +1243,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   ToolsSlugRoute: ToolsSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ToolsIndexRoute: ToolsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiStorageFileRoute: ApiStorageFileRoute,
   ApiWebhooksCreemRoute: ApiWebhooksCreemRoute,
