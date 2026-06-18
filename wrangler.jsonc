@@ -46,12 +46,12 @@
   // https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
   "routes": [
     {
-      "pattern": "prodlistai.com",
-      "custom_domain": true
+      "pattern": "prodlistai.com/*",
+      "zone_name": "prodlistai.com"
     },
     {
-      "pattern": "www.prodlistai.com",
-      "custom_domain": true
+      "pattern": "www.prodlistai.com/*",
+      "zone_name": "prodlistai.com"
     }
   ],
 
