@@ -10,6 +10,7 @@ import { serverEnv } from '@/env/server';
 import { websiteConfig } from '@/config/website';
 import { emailHarmony } from 'better-auth-harmony';
 import { admin, apiKey } from 'better-auth/plugins';
+import { grantSignupCredits } from '@/lib/credits';
 
 /**
  * Better Auth Configuration
@@ -40,7 +41,7 @@ export const auth = betterAuth({
     // https://discord.com/channels/1300839113142046730/1300839113594769431/1454280549060444393
     enabled: websiteConfig.auth?.enableCredentialLogin ?? false,
     // https://www.better-auth.com/docs/concepts/email#2-require-email-verification
-    requireEmailVerification: true,
+    requireEmailVerification: isEmailVerificationEnabled(),
     // https://www.better-auth.com/docs/authentication/email-password#forget-password
     sendResetPassword: async ({ user, url }) => {
       await sendEmail({
@@ -61,7 +62,7 @@ export const auth = betterAuth({
         context: { url, name: user.name ?? '' },
       });
     },
-    sendOnSignIn: true,
+    sendOnSignIn: isEmailVerificationEnabled(),
   },
   socialProviders: {
     // https://www.better-auth.com/docs/authentication/google
@@ -143,11 +144,18 @@ export const auth = betterAuth({
  * Runs after a new user is created. Auto-subscribes to newsletter when enabled.
  */
 async function onCreateUser(user: User) {
+  try {
+    await grantSignupCredits(user.id);
+  } catch (error) {
+    console.error('onCreateUser, signup credit grant error:', error);
+  }
+
   const newsletterConfig = websiteConfig.newsletter;
   if (
     !user.email ||
     !newsletterConfig?.enable ||
-    !newsletterConfig.autoSubscribeAfterSignUp
+    !newsletterConfig.autoSubscribeAfterSignUp ||
+    !isNewsletterConfigured()
   ) {
     return;
   }
@@ -162,4 +170,34 @@ async function onCreateUser(user: User) {
   } catch (error) {
     console.error('onCreateUser, newsletter subscription error:', error);
   }
+}
+
+export function isEmailVerificationEnabled() {
+  return Boolean(websiteConfig.mail?.enable && isMailDeliveryConfigured());
+}
+
+function isMailDeliveryConfigured() {
+  const provider = websiteConfig.mail?.provider;
+  if (provider === 'cloudflare') {
+    return Boolean(
+      serverEnv.CLOUDFLARE_ACCOUNT_ID && serverEnv.CLOUDFLARE_API_TOKEN
+    );
+  }
+  if (provider === 'resend') {
+    return Boolean(serverEnv.RESEND_API_KEY);
+  }
+  return false;
+}
+
+function isNewsletterConfigured() {
+  const provider = websiteConfig.newsletter?.provider;
+  if (provider === 'resend') {
+    return Boolean(serverEnv.RESEND_API_KEY);
+  }
+  if (provider === 'beehiiv') {
+    return Boolean(
+      serverEnv.BEEHIIV_API_KEY && serverEnv.BEEHIIV_PUBLICATION_ID
+    );
+  }
+  return false;
 }

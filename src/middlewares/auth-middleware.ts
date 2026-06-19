@@ -1,4 +1,4 @@
-import { auth } from '@/auth/auth';
+import { auth, isEmailVerificationEnabled } from '@/auth/auth';
 import { redirect } from '@tanstack/react-router';
 import { createMiddleware } from '@tanstack/react-start';
 import { getRequestHeaders } from '@tanstack/react-start/server';
@@ -17,13 +17,13 @@ export const authRouteMiddleware = createMiddleware().server(
     }
 
     const headers = getRequestHeaders();
-    const session = await auth.api.getSession({ headers });
+    const session = await getSessionSafely(headers);
 
     if (!session?.user) {
       throw redirect({ to: Routes.Login });
     }
 
-    if (!session.user.emailVerified) {
+    if (isEmailVerificationEnabled() && !session.user.emailVerified) {
       throw redirect({
         to: Routes.Login,
         search: { error: 'email_not_verified' },
@@ -40,7 +40,7 @@ export const authRouteMiddleware = createMiddleware().server(
  */
 export const authApiMiddleware = createMiddleware().server(async ({ next }) => {
   const headers = getRequestHeaders();
-  const session = await auth.api.getSession({ headers });
+  const session = await getSessionSafely(headers);
 
   if (!session?.user) {
     return Response.json(
@@ -49,7 +49,7 @@ export const authApiMiddleware = createMiddleware().server(async ({ next }) => {
     );
   }
 
-  if (!session.user.emailVerified) {
+  if (isEmailVerificationEnabled() && !session.user.emailVerified) {
     return Response.json(
       { error: 'Email not verified', code: 'email_not_verified' },
       { status: 403, headers: { 'Content-Type': 'application/json' } }
@@ -58,3 +58,12 @@ export const authApiMiddleware = createMiddleware().server(async ({ next }) => {
 
   return await next({ context: { userId: session.user.id } });
 });
+
+async function getSessionSafely(headers: Headers) {
+  try {
+    return await auth.api.getSession({ headers });
+  } catch (error) {
+    console.error('authMiddleware, getSession error:', error);
+    return null;
+  }
+}

@@ -25,8 +25,7 @@ export function parseWranglerConfig(): WranglerConfig {
   const wranglerPath = path.join(__dirname, '..', 'wrangler.jsonc');
   const wranglerContent = fs.readFileSync(wranglerPath, 'utf8');
 
-  // Remove comments from the JSONC content
-  const jsonContent = wranglerContent.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+  const jsonContent = stripJsoncComments(wranglerContent);
 
   // Fix trailing commas in objects and arrays (which are valid in JSONC but not in JSON)
   const fixedJsonContent = jsonContent.replace(/,\s*([}\]])/g, '$1'); // Replace trailing commas before closing brackets
@@ -37,6 +36,64 @@ export function parseWranglerConfig(): WranglerConfig {
     const errorMessage = error instanceof Error ? error.message : String(error);
     throw new Error(`Failed to parse wrangler.jsonc: ${errorMessage}`);
   }
+}
+
+function stripJsoncComments(input: string): string {
+  let output = '';
+  let inString = false;
+  let escaped = false;
+  let inLineComment = false;
+  let inBlockComment = false;
+
+  for (let i = 0; i < input.length; i++) {
+    const char = input[i];
+    const next = input[i + 1];
+
+    if (inLineComment) {
+      if (char === '\n' || char === '\r') {
+        inLineComment = false;
+        output += char;
+      }
+      continue;
+    }
+
+    if (inBlockComment) {
+      if (char === '*' && next === '/') {
+        inBlockComment = false;
+        i++;
+      } else if (char === '\n' || char === '\r') {
+        output += char;
+      }
+      continue;
+    }
+
+    if (inString) {
+      output += char;
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+      output += char;
+    } else if (char === '/' && next === '/') {
+      inLineComment = true;
+      i++;
+    } else if (char === '/' && next === '*') {
+      inBlockComment = true;
+      i++;
+    } else {
+      output += char;
+    }
+  }
+
+  return output;
 }
 
 /**

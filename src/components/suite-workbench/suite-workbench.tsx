@@ -1,5 +1,6 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  IconArrowLeft,
   IconBolt,
   IconChevronDown,
   IconChevronUp,
@@ -14,11 +15,18 @@ import {
   IconWand,
 } from '@tabler/icons-react';
 import { draftProductImagePrompt } from '@/api/ai';
-import { createGenerationBatch } from '@/api/generation';
+import {
+  createGenerationBatch,
+  getGenerationCredits,
+  getGenerationTaskStatuses,
+} from '@/api/generation';
+import { authClient } from '@/auth/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
+import { KIE_MODELS } from '@/lib/kie-models';
+import { Routes } from '@/lib/routes';
 import {
   ProductLanguageSelect,
   PRODUCT_LOCALE_META,
@@ -35,6 +43,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { downloadFile } from '@/lib/download';
 import { cn } from '@/lib/utils';
+import { Link } from '@tanstack/react-router';
 
 type TaskKind = 'main' | 'detail';
 type TaskStatus =
@@ -53,11 +62,14 @@ type WorkbenchTask = {
   aspectRatio: string;
   resolution: string;
   prompt: string;
+  model: string;
   reasoning: string;
   keywords: string[];
   referenceImage?: string;
   referenceName?: string;
   imageUrl?: string;
+  serverTaskId?: string;
+  providerTaskId?: string;
   status: TaskStatus;
   expanded: boolean;
 };
@@ -101,6 +113,13 @@ const WORKBENCH_COPY = {
     noFile: '未上传',
     description: '商品基础描述',
     generateAll: '生成',
+    back: '返回首页',
+    login: '登录 / 注册',
+    authRequired: '请先登录或注册，系统会自动赠送试用生图点数。',
+    refreshCredits: '刷新点数',
+    model: '生图模型',
+    polling: '任务已提交到 Kie，正在轮询生成结果。',
+    providerTask: 'Kie 任务',
     batch: '批次',
     batchReady: (credits: number, count: number) =>
       `已创建批次，${count} 个单图任务并发执行，预扣 ${credits} 点。`,
@@ -162,6 +181,14 @@ const WORKBENCH_COPY = {
     noFile: 'Not uploaded',
     description: 'Base product description',
     generateAll: 'Generate',
+    back: 'Back home',
+    login: 'Log in / Sign up',
+    authRequired:
+      'Please log in or create an account first. Trial credits are granted automatically.',
+    refreshCredits: 'Refresh credits',
+    model: 'Generation model',
+    polling: 'Task submitted to Kie. Polling for the generated asset.',
+    providerTask: 'Kie task',
     batch: 'Batch',
     batchReady: (credits: number, count: number) =>
       `Batch created. ${count} single-image tasks are running in parallel, reserving ${credits} credits.`,
@@ -224,6 +251,14 @@ const WORKBENCH_COPY = {
     noFile: '未アップロード',
     description: '商品説明',
     generateAll: '生成',
+    back: 'ホームへ戻る',
+    login: 'ログイン / 登録',
+    authRequired:
+      '先にログインまたは登録してください。試用クレジットは自動付与されます。',
+    refreshCredits: 'クレジット更新',
+    model: '生成モデル',
+    polling: 'Kie にタスクを送信しました。結果を確認しています。',
+    providerTask: 'Kie タスク',
     batch: 'バッチ',
     batchReady: (credits: number, count: number) =>
       `バッチを作成しました。${count} 件の単画像タスクを並列実行し、${credits} クレジットを予約します。`,
@@ -285,6 +320,14 @@ const WORKBENCH_COPY = {
     noFile: '업로드 안 됨',
     description: '상품 기본 설명',
     generateAll: '생성',
+    back: '홈으로',
+    login: '로그인 / 가입',
+    authRequired:
+      '먼저 로그인하거나 가입해 주세요. 체험 크레딧이 자동 지급됩니다.',
+    refreshCredits: '크레딧 새로고침',
+    model: '생성 모델',
+    polling: 'Kie에 작업을 제출했습니다. 생성 결과를 확인 중입니다.',
+    providerTask: 'Kie 작업',
     batch: '배치',
     batchReady: (credits: number, count: number) =>
       `배치가 생성되었습니다. ${count}개의 단일 이미지 작업을 병렬 실행하고 ${credits} 크레딧을 예약합니다.`,
@@ -347,6 +390,14 @@ const WORKBENCH_COPY = {
     noFile: 'Sin subir',
     description: 'Descripción base del producto',
     generateAll: 'Generar',
+    back: 'Volver al inicio',
+    login: 'Iniciar sesión / Registrarse',
+    authRequired:
+      'Inicia sesión o crea una cuenta primero. Los créditos de prueba se conceden automáticamente.',
+    refreshCredits: 'Actualizar créditos',
+    model: 'Modelo de generación',
+    polling: 'Tarea enviada a Kie. Consultando el resultado generado.',
+    providerTask: 'Tarea Kie',
     batch: 'Lote',
     batchReady: (credits: number, count: number) =>
       `Lote creado. ${count} tareas de imagen se ejecutan en paralelo y reservan ${credits} créditos.`,
@@ -403,10 +454,12 @@ const WORKBENCH_COPY = {
 export function SuiteWorkbench() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { locale, setLocale } = useProductLocale();
+  const { data: session, isPending: sessionPending } = authClient.useSession();
   const [sourceImage, setSourceImage] = useState<string>();
   const [sourceName, setSourceName] = useState('');
   const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
-  const [credits, setCredits] = useState(45);
+  const [credits, setCredits] = useState(0);
+  const [creditsLoading, setCreditsLoading] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState('task-main');
   const [batchNotice, setBatchNotice] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -422,6 +475,15 @@ export function SuiteWorkbench() {
     createInitialTasks(DEFAULT_DESCRIPTION, locale)
   );
   const t = WORKBENCH_COPY[locale];
+  const signedIn = Boolean(session?.user);
+
+  useEffect(() => {
+    if (!signedIn) {
+      setCredits(0);
+      return;
+    }
+    void refreshCredits();
+  }, [signedIn]);
 
   const selectedTask = useMemo(
     () => tasks.find((task) => task.id === selectedTaskId) ?? tasks[0],
@@ -441,12 +503,25 @@ export function SuiteWorkbench() {
     );
   }
 
+  async function refreshCredits() {
+    setCreditsLoading(true);
+    try {
+      const result = await getGenerationCredits();
+      setCredits(result.balance);
+    } catch {
+      setBatchNotice(t.authRequired);
+    } finally {
+      setCreditsLoading(false);
+    }
+  }
+
   function addTask(kind: TaskKind) {
     const id = `task-${kind}-${Date.now()}`;
     const task: WorkbenchTask = {
       id,
       kind,
       style: kind === 'main' ? MAIN_STYLES[0] : DETAIL_STYLES[0],
+      model: KIE_MODELS[0].id,
       aspectRatio: kind === 'main' ? '1:1' : '3:4',
       resolution: kind === 'main' ? '1024x1024' : '1024x1536',
       ...createClientPrompt(
@@ -456,6 +531,7 @@ export function SuiteWorkbench() {
           style: kind === 'main' ? MAIN_STYLES[0] : DETAIL_STYLES[0],
           aspectRatio: kind === 'main' ? '1:1' : '3:4',
           resolution: kind === 'main' ? '1024x1024' : '1024x1536',
+          model: KIE_MODELS[0].id,
           prompt: '',
           reasoning: '',
           keywords: [],
@@ -530,6 +606,10 @@ export function SuiteWorkbench() {
   async function renderTask(task: WorkbenchTask) {
     const referenceImage = task.referenceImage ?? sourceImage;
     if (!referenceImage) return;
+    if (!signedIn) {
+      setBatchNotice(t.authRequired);
+      return;
+    }
     const cost = estimateTaskCreditCost(task);
     if (credits < cost) {
       setBatchNotice(t.insufficientCredits(cost, credits));
@@ -538,113 +618,155 @@ export function SuiteWorkbench() {
     const promptPatch = task.prompt.trim()
       ? {}
       : createClientPrompt(task, description, locale);
-    updateTask(task.id, { status: 'rendering' });
-    setSelectedTaskId(task.id);
-    await wait(900);
-    const imageUrl = await composePreviewImage(referenceImage, {
-      ...task,
-      ...promptPatch,
-    });
-    updateTask(task.id, {
-      ...promptPatch,
-      imageUrl,
-      status: 'done',
-      reasoning:
-        task.reasoning ||
-        createClientPrompt(task, description, locale).reasoning,
-      keywords:
-        task.keywords.length > 0
-          ? task.keywords
-          : createClientPrompt(task, description, locale).keywords,
-    });
-    setCredits((value) => Math.max(0, value - cost));
+    await startGeneration([task], promptPatch);
   }
 
   async function generateAll() {
     const runnable = tasks.filter((task) => task.referenceImage ?? sourceImage);
     if (runnable.length === 0) return;
+    if (!signedIn) {
+      setBatchNotice(t.authRequired);
+      return;
+    }
+    await startGeneration(runnable);
+  }
+
+  async function startGeneration(
+    runnable: WorkbenchTask[],
+    singlePromptPatch?: Partial<WorkbenchTask>
+  ) {
     const plannedTasks = runnable.map((task) => ({
       id: task.id,
       kind: task.kind,
       style: task.style,
       aspectRatio: task.aspectRatio,
       resolution: task.resolution,
+      model: task.model,
       prompt:
+        singlePromptPatch?.prompt ||
         task.prompt.trim() ||
         createClientPrompt(task, description, locale).prompt,
+      referenceImageDataUrl: task.referenceImage,
       referenceName: task.referenceName ?? sourceName,
     }));
-    const batch = await createGenerationBatch({
-      data: {
-        projectId: 'local-workbench-project',
-        userId: 'local-preview-user',
-        locale,
-        productDescription: description,
-        availableCredits: credits,
-        tasks: plannedTasks,
-      },
-    });
-
-    if (!batch.ok) {
-      setBatchNotice(
-        t.insufficientCredits(batch.requiredCredits, batch.availableCredits)
+    try {
+      setBatchNotice('');
+      setTasks((current) =>
+        current.map((task) =>
+          runnable.some((item) => item.id === task.id)
+            ? { ...task, ...singlePromptPatch, status: 'queued' }
+            : task
+        )
       );
-      return;
-    }
 
-    setBatchNotice(t.batchReady(batch.totalCreditCost, batch.tasks.length));
-    setBatchHistory((current) => [
-      {
-        batchId: batch.batchId,
-        taskCount: batch.tasks.length,
-        creditCost: batch.totalCreditCost,
-        createdAt: new Date().toLocaleString(
-          PRODUCT_LOCALE_META[locale].dateLocale
-        ),
-      },
-      ...current,
-    ]);
+      const batch = await createGenerationBatch({
+        data: {
+          locale,
+          productDescription: description,
+          sourceImageDataUrl: sourceImage!,
+          sourceName: sourceName || 'source-product.png',
+          tasks: plannedTasks,
+        },
+      });
 
-    setTasks((current) =>
-      current.map((task) =>
-        runnable.some((item) => item.id === task.id)
-          ? { ...task, status: 'queued' }
-          : task
-      )
-    );
-    setCredits((value) => Math.max(0, value - batch.totalCreditCost));
+      if (!batch.ok) {
+        setBatchNotice(
+          t.insufficientCredits(batch.requiredCredits, batch.availableCredits)
+        );
+        setCredits(batch.availableCredits);
+        setTasks((current) =>
+          current.map((task) =>
+            runnable.some((item) => item.id === task.id)
+              ? { ...task, status: 'ready' }
+              : task
+          )
+        );
+        return;
+      }
 
-    await Promise.allSettled(
-      runnable.map(async (task, index) => {
-        const plannedTask = batch.tasks.find((item) => item.id === task.id);
-        await wait(160 + index * 120);
-        updateTask(task.id, { status: 'rendering' });
-        setSelectedTaskId(task.id);
-        const promptPatch = task.prompt.trim()
-          ? {}
-          : createClientPrompt(task, description, locale);
-        const imageUrl = await composePreviewImage(
-          task.referenceImage ?? sourceImage!,
-          {
+      setCredits(batch.balance);
+      setBatchNotice(
+        `${t.batchReady(batch.totalCreditCost, batch.tasks.length)} ${t.polling}`
+      );
+      setBatchHistory((current) => [
+        {
+          batchId: batch.batchId,
+          taskCount: batch.tasks.length,
+          creditCost: batch.totalCreditCost,
+          createdAt: new Date().toLocaleString(
+            PRODUCT_LOCALE_META[locale].dateLocale
+          ),
+        },
+        ...current,
+      ]);
+
+      setTasks((current) =>
+        current.map((task) => {
+          const submitted = batch.tasks.find((item) => item.id === task.id);
+          if (!submitted) return task;
+          const promptPatch = task.prompt.trim()
+            ? {}
+            : createClientPrompt(task, description, locale);
+          return {
             ...task,
             ...promptPatch,
-          }
-        );
-        updateTask(task.id, {
-          ...promptPatch,
-          prompt: plannedTask?.prompt ?? promptPatch.prompt ?? task.prompt,
-          imageUrl,
-          status: 'done',
-          reasoning:
-            task.reasoning ||
-            createClientPrompt(task, description, locale).reasoning,
-          keywords:
-            task.keywords.length > 0
-              ? task.keywords
-              : createClientPrompt(task, description, locale).keywords,
-        });
-      })
-    );
+            prompt: submitted.prompt,
+            serverTaskId: submitted.taskId,
+            providerTaskId: submitted.providerTaskId,
+            model: submitted.model,
+            status: 'rendering',
+          };
+        })
+      );
+      setSelectedTaskId(runnable[0]?.id ?? selectedTaskId);
+      await pollGenerationTasks(
+        batch.tasks.map((task) => task.taskId),
+        new Map(batch.tasks.map((task) => [task.taskId, task.id]))
+      );
+    } catch (error) {
+      setBatchNotice(
+        error instanceof Error ? error.message : 'Generation failed.'
+      );
+      setTasks((current) =>
+        current.map((task) =>
+          runnable.some((item) => item.id === task.id)
+            ? { ...task, status: 'failed' }
+            : task
+        )
+      );
+      void refreshCredits();
+    }
+  }
+
+  async function pollGenerationTasks(
+    serverTaskIds: string[],
+    clientTaskByServerTask: Map<string, string>
+  ) {
+    const pending = new Set(serverTaskIds);
+    for (let attempt = 0; attempt < 90 && pending.size > 0; attempt += 1) {
+      await wait(attempt === 0 ? 1200 : 2500);
+      const result = await getGenerationTaskStatuses({
+        data: { taskIds: Array.from(pending) },
+      });
+      setCredits(result.balance);
+      for (const status of result.statuses) {
+        const clientTaskId = clientTaskByServerTask.get(status.id);
+        if (!clientTaskId) continue;
+        if (status.status === 'completed' && status.imageUrl) {
+          pending.delete(status.id);
+          updateTask(clientTaskId, {
+            imageUrl: status.imageUrl,
+            status: 'done',
+          });
+        } else if (status.status === 'failed') {
+          pending.delete(status.id);
+          updateTask(clientTaskId, { status: 'failed' });
+          if (status.errorMessage) setBatchNotice(status.errorMessage);
+        } else {
+          updateTask(clientTaskId, { status: 'rendering' });
+        }
+      }
+    }
   }
 
   return (
@@ -652,6 +774,12 @@ export function SuiteWorkbench() {
       <header className="sticky top-0 z-30 border-[#dfe3d8] border-b bg-[#fbfcf7]/95 backdrop-blur">
         <div className="flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
+            <Link to={Routes.Root} className="hidden md:block">
+              <Button type="button" variant="ghost">
+                <IconArrowLeft className="size-4" />
+                {t.back}
+              </Button>
+            </Link>
             <div className="flex size-9 items-center justify-center rounded-lg bg-[#22251f] text-[#f5f7ed]">
               <IconSparkles className="size-5" />
             </div>
@@ -666,6 +794,13 @@ export function SuiteWorkbench() {
               onLocaleChange={setLocale}
               compact
             />
+            {!sessionPending && !signedIn ? (
+              <Link to={Routes.Login}>
+                <Button type="button" className="bg-[#20231e]">
+                  {t.login}
+                </Button>
+              </Link>
+            ) : null}
             <Button
               type="button"
               variant="outline"
@@ -680,6 +815,22 @@ export function SuiteWorkbench() {
               <span className="text-[#74796d]">{t.credits}</span>
               <strong>{credits}</strong>
             </div>
+            {signedIn ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="hidden bg-white md:inline-flex"
+                disabled={creditsLoading}
+                onClick={() => void refreshCredits()}
+              >
+                {creditsLoading ? (
+                  <IconLoader2 className="size-4 animate-spin" />
+                ) : (
+                  <IconBolt className="size-4" />
+                )}
+                {t.refreshCredits}
+              </Button>
+            ) : null}
           </div>
         </div>
       </header>
@@ -761,6 +912,9 @@ export function SuiteWorkbench() {
             <IconWand className="size-4" />
             {t.generateAll}
           </Button>
+          {!signedIn ? (
+            <p className="mt-3 text-[#72511f] text-sm">{t.authRequired}</p>
+          ) : null}
         </aside>
 
         <section className="min-w-0 bg-[#f7f8f4] p-4 md:p-6">
@@ -938,7 +1092,22 @@ function TaskCard({
 
       {task.expanded ? (
         <div className="space-y-4 p-4">
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-4">
+            <FieldSelect
+              label={t.model}
+              value={task.model}
+              values={KIE_MODELS.map((model) => model.id)}
+              labels={Object.fromEntries(
+                KIE_MODELS.map((model) => [model.id, model.label])
+              )}
+              onChange={(model) =>
+                onUpdate({
+                  model,
+                  imageUrl: undefined,
+                  status: 'ready',
+                })
+              }
+            />
             <FieldSelect
               label={t.style}
               value={task.style}
@@ -1058,11 +1227,13 @@ function FieldSelect({
   label,
   value,
   values,
+  labels,
   onChange,
 }: {
   label: string;
   value: string;
   values: string[];
+  labels?: Record<string, string>;
   onChange: (value: string) => void;
 }) {
   return (
@@ -1075,7 +1246,7 @@ function FieldSelect({
         <SelectContent>
           {values.map((item) => (
             <SelectItem key={item} value={item}>
-              {item}
+              {labels?.[item] ?? item}
             </SelectItem>
           ))}
         </SelectContent>
@@ -1152,6 +1323,14 @@ function Inspector({
           <dd className="text-right">{task.aspectRatio}</dd>
           <dt className="text-[#74796d]">{t.resolution}</dt>
           <dd className="text-right">{task.resolution}</dd>
+          <dt className="text-[#74796d]">{t.model}</dt>
+          <dd className="truncate text-right">{getModelLabel(task.model)}</dd>
+          {task.providerTaskId ? (
+            <>
+              <dt className="text-[#74796d]">{t.providerTask}</dt>
+              <dd className="truncate text-right">{task.providerTaskId}</dd>
+            </>
+          ) : null}
           <dt className="text-[#74796d]">{t.status}</dt>
           <dd className="text-right">{t.statuses[task.status]}</dd>
         </dl>
@@ -1209,6 +1388,7 @@ function createInitialTasks(
     id: 'task-main',
     kind: 'main',
     style: MAIN_STYLES[0],
+    model: KIE_MODELS[0].id,
     aspectRatio: ASPECT_RATIOS[0],
     resolution: RESOLUTIONS[0],
     prompt: '',
@@ -1221,6 +1401,7 @@ function createInitialTasks(
     id: 'task-detail',
     kind: 'detail',
     style: DETAIL_STYLES[0],
+    model: KIE_MODELS[0].id,
     aspectRatio: ASPECT_RATIOS[2],
     resolution: RESOLUTIONS[2],
     prompt: '',
@@ -1234,6 +1415,10 @@ function createInitialTasks(
     { ...mainTask, ...createClientPrompt(mainTask, description, locale) },
     { ...detailTask, ...createClientPrompt(detailTask, description, locale) },
   ];
+}
+
+function getModelLabel(modelId: string) {
+  return KIE_MODELS.find((model) => model.id === modelId)?.label ?? modelId;
 }
 
 function getClientReasoning(locale: Locale, isMain: boolean) {
@@ -1285,111 +1470,4 @@ function readFileAsDataUrl(file: File) {
 
 function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function composePreviewImage(sourceImage: string, task: WorkbenchTask) {
-  const [width, height] = parseResolution(task.resolution, task.aspectRatio);
-  const image = await loadImage(sourceImage);
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext('2d');
-  if (!context) return sourceImage;
-
-  paintBackground(context, width, height, task);
-
-  const maxWidth = width * (task.kind === 'main' ? 0.64 : 0.52);
-  const maxHeight = height * (task.kind === 'main' ? 0.68 : 0.56);
-  const scale = Math.min(maxWidth / image.width, maxHeight / image.height);
-  const drawWidth = image.width * scale;
-  const drawHeight = image.height * scale;
-  const x = (width - drawWidth) / 2;
-  const y = (height - drawHeight) * (task.kind === 'main' ? 0.5 : 0.58);
-
-  context.save();
-  context.shadowColor = 'rgba(24, 28, 22, 0.28)';
-  context.shadowBlur = width * 0.035;
-  context.shadowOffsetY = height * 0.035;
-  context.drawImage(image, x, y, drawWidth, drawHeight);
-  context.restore();
-
-  context.fillStyle = 'rgba(255, 255, 255, 0.22)';
-  context.fillRect(0, 0, width, height);
-
-  return canvas.toDataURL('image/png');
-}
-
-function parseResolution(resolution: string, ratio: string) {
-  const match = resolution.match(/^(\d+)x(\d+)$/);
-  if (match) return [Number(match[1]), Number(match[2])] as const;
-  const [ratioWidth, ratioHeight] = ratio.split(':').map(Number);
-  return [1024, Math.round((1024 * ratioHeight) / ratioWidth)] as const;
-}
-
-function loadImage(src: string) {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = reject;
-    image.src = src;
-  });
-}
-
-function paintBackground(
-  context: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  task: WorkbenchTask
-) {
-  const gradient = context.createLinearGradient(0, 0, width, height);
-  if (task.style.includes('Dark')) {
-    gradient.addColorStop(0, '#141712');
-    gradient.addColorStop(0.55, '#3c4236');
-    gradient.addColorStop(1, '#11130f');
-  } else if (task.style.includes('Neon')) {
-    gradient.addColorStop(0, '#132235');
-    gradient.addColorStop(0.55, '#2f5f4f');
-    gradient.addColorStop(1, '#c9822f');
-  } else if (task.style.includes('Color')) {
-    gradient.addColorStop(0, '#e2d4b8');
-    gradient.addColorStop(0.5, '#f8f4ea');
-    gradient.addColorStop(1, '#b8d5cd');
-  } else if (task.kind === 'detail') {
-    gradient.addColorStop(0, '#f1e6cf');
-    gradient.addColorStop(0.55, '#fbfcf7');
-    gradient.addColorStop(1, '#d7e2d7');
-  } else {
-    gradient.addColorStop(0, '#f8faf2');
-    gradient.addColorStop(0.52, '#ffffff');
-    gradient.addColorStop(1, '#dfe6d7');
-  }
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, width, height);
-
-  context.fillStyle = 'rgba(255, 255, 255, 0.42)';
-  context.beginPath();
-  context.ellipse(
-    width * 0.18,
-    height * 0.18,
-    width * 0.22,
-    height * 0.12,
-    -0.4,
-    0,
-    Math.PI * 2
-  );
-  context.fill();
-
-  context.fillStyle =
-    task.kind === 'main' ? 'rgba(32,35,30,0.08)' : 'rgba(47,95,79,0.12)';
-  context.beginPath();
-  context.ellipse(
-    width * 0.5,
-    height * 0.78,
-    width * 0.28,
-    height * 0.04,
-    0,
-    0,
-    Math.PI * 2
-  );
-  context.fill();
 }

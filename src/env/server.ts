@@ -40,6 +40,10 @@ export const serverEnv = createEnv({
 
     // AI image generation (fal.ai)
     FAL_KEY: z.string().optional(),
+
+    // AI image generation (Kie.ai)
+    KIE_API_KEY: z.string().optional(),
+    KIE_DEFAULT_MODEL: z.string().optional(),
   },
   runtimeEnv: process.env,
 });

@@ -17,7 +17,7 @@ export const guestRouteMiddleware = createMiddleware().server(
     }
 
     const headers = getRequestHeaders();
-    const session = await auth.api.getSession({ headers });
+    const session = await getSessionSafely(headers);
 
     if (session?.user) {
       throw redirect({ to: DEFAULT_LOGIN_REDIRECT });
@@ -26,3 +26,12 @@ export const guestRouteMiddleware = createMiddleware().server(
     return await next();
   }
 );
+
+async function getSessionSafely(headers: Headers) {
+  try {
+    return await auth.api.getSession({ headers });
+  } catch (error) {
+    console.error('guestRouteMiddleware, getSession error:', error);
+    return null;
+  }
+}
