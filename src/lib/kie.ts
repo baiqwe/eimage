@@ -68,11 +68,12 @@ export async function uploadBase64ToKie({
   );
 
   const result = (await response.json().catch(() => ({}))) as KieUploadResponse;
-  if (!response.ok || !result.data?.fileUrl) {
+  const uploadedUrl = result.data?.fileUrl ?? result.data?.downloadUrl;
+  if (!response.ok || !uploadedUrl) {
     throw new Error(result.msg || 'Kie file upload failed.');
   }
 
-  return result.data.fileUrl;
+  return uploadedUrl;
 }
 
 export async function createKieImageTask(input: KieCreateTaskInput) {

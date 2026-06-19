@@ -55,7 +55,7 @@ export const websiteConfig: WebsiteConfig = {
   },
   auth: {
     enable: true,
-    enableGoogleLogin: true,
+    enableGoogleLogin: false,
     enableCredentialLogin: true,
     enableDeleteAccount: true,
   },
