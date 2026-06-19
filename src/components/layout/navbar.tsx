@@ -63,7 +63,8 @@ export function Navbar({ scroll = true }: NavbarProps) {
   return (
     <header
       className={cn(
-        'sticky inset-x-0 top-0 z-40 py-4 transition-all duration-300',
+        'sticky inset-x-0 top-0 z-40 h-14 transition-all duration-300',
+        'bg-background/95 backdrop-blur-md',
         showBarBg && 'border-b'
       )}
     >
@@ -73,7 +74,7 @@ export function Navbar({ scroll = true }: NavbarProps) {
           aria-hidden="true"
         />
       )}
-      <div className="relative z-10">
+      <div className="relative z-10 flex h-full items-center">
         <Container className="px-4">
           <nav
             aria-label="Main navigation"
