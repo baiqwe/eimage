@@ -194,6 +194,12 @@ function findImageUrl(value: unknown): string | undefined {
   if (typeof value === 'object') {
     const record = value as Record<string, unknown>;
     for (const key of [
+      'resultJson',
+      'resultUrls',
+      'result_urls',
+      'output',
+      'outputs',
+      'images',
       'imageUrl',
       'image_url',
       'url',
@@ -205,12 +211,26 @@ function findImageUrl(value: unknown): string | undefined {
       const found = findImageUrl(record[key]);
       if (found) return found;
     }
-    for (const item of Object.values(record)) {
+    for (const [key, item] of Object.entries(record)) {
+      if (isSourceImageField(key)) continue;
       const found = findImageUrl(item);
       if (found) return found;
     }
   }
   return undefined;
+}
+
+function isSourceImageField(key: string) {
+  return [
+    'param',
+    'input',
+    'input_urls',
+    'inputUrls',
+    'image_urls',
+    'imageUrls',
+    'sourceImageUrl',
+    'source_image_url',
+  ].includes(key);
 }
 
 function requireKieApiKey() {

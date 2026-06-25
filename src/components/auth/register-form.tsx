@@ -18,6 +18,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { IconEye, IconEyeOff, IconLoader2 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useRouter } from '@tanstack/react-router';
 import * as z from 'zod';
 import { messages } from '@/messages';
 import { SocialLoginButton } from './social-login-button';
@@ -44,6 +45,7 @@ export function RegisterForm({
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [isPending, setIsPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const credentialLoginEnabled =
     websiteConfig.auth?.enableCredentialLogin ?? true;
@@ -74,7 +76,14 @@ export function RegisterForm({
           setSuccess('');
         },
         onResponse: () => setIsPending(false),
-        onSuccess: () => setSuccess(m.checkEmail),
+        onSuccess: async () => {
+          const { data: session } = await authClient.getSession();
+          if (session?.user) {
+            await router.navigate({ to: callbackUrl });
+            return;
+          }
+          setSuccess(m.checkEmail);
+        },
         onError: (ctx) => {
           const code = ctx.error.code;
           const friendlyMessage =

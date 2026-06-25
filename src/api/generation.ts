@@ -1,6 +1,7 @@
 import { getDb } from '@/db';
 import {
   generationBatches,
+  generationOutputs,
   generationTasks,
   productProjects,
 } from '@/db/app.schema';
@@ -8,6 +9,7 @@ import {
   buildOutputAltText,
   createGenerationBatchPlan,
   estimateTaskCreditCost,
+  parseResolution,
 } from '@/lib/product-generation';
 import {
   debitCredits,
@@ -332,6 +334,7 @@ export const getGenerationTaskStatuses = createServerFn({ method: 'POST' })
           const normalized = normalizeKieRecord(record);
           if (normalized.state === 'success' && normalized.imageUrl) {
             const completedAt = new Date();
+            const [width, height] = parseResolution(task.resolution);
             await db
               .update(generationTasks)
               .set({
@@ -345,6 +348,24 @@ export const getGenerationTaskStatuses = createServerFn({ method: 'POST' })
                 updatedAt: completedAt,
               })
               .where(eq(generationTasks.id, task.id));
+            await db.insert(generationOutputs).values({
+              id: createId('output'),
+              userId,
+              projectId: task.projectId,
+              batchId: task.batchId,
+              taskId: task.id,
+              storageTier: 'original',
+              r2Key: normalized.imageUrl,
+              thumbnailR2Key: null,
+              publicUrl: normalized.imageUrl,
+              width,
+              height,
+              contentType: 'image/png',
+              size: 0,
+              altText: `${task.style} ${task.kind} product image`,
+              expiresAt: null,
+              createdAt: completedAt,
+            });
             await reconcileBatch(task.batchId);
             return {
               ...taskStatusPayload(task),

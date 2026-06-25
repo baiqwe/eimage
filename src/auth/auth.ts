@@ -44,11 +44,14 @@ export const auth = betterAuth({
     requireEmailVerification: isEmailVerificationEnabled(),
     // https://www.better-auth.com/docs/authentication/email-password#forget-password
     sendResetPassword: async ({ user, url }) => {
-      await sendEmail({
+      const result = await sendEmail({
         to: user.email,
         template: 'forgotPassword',
         context: { url, name: user.name ?? '' },
       });
+      if (!result.success) {
+        throw new Error('Failed to send password reset email.');
+      }
     },
   },
   emailVerification: {
@@ -56,11 +59,14 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     // https://www.better-auth.com/docs/authentication/email-password#require-email-verification
     sendVerificationEmail: async ({ user, url }) => {
-      await sendEmail({
+      const result = await sendEmail({
         to: user.email,
         template: 'verifyEmail',
         context: { url, name: user.name ?? '' },
       });
+      if (!result.success) {
+        throw new Error('Failed to send verification email.');
+      }
     },
     sendOnSignIn: isEmailVerificationEnabled(),
   },

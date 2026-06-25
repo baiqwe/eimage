@@ -152,6 +152,8 @@ const WORKBENCH_COPY = {
     currentTask: '当前任务',
     waiting: '等待生成',
     rendering: '渲染中',
+    resultAssets: '结果资产',
+    noResults: '完成后会在这里展示本批次的全部图片。',
     download: '下载原图',
     details: '任务详情',
     type: '类型',
@@ -222,6 +224,8 @@ const WORKBENCH_COPY = {
     currentTask: 'Current task',
     waiting: 'Waiting',
     rendering: 'Rendering',
+    resultAssets: 'Result assets',
+    noResults: 'All completed images in this batch will appear here.',
     download: 'Download original',
     details: 'Task Details',
     type: 'Type',
@@ -291,6 +295,8 @@ const WORKBENCH_COPY = {
     currentTask: '現在のタスク',
     waiting: '生成待ち',
     rendering: 'レンダリング中',
+    resultAssets: '生成結果',
+    noResults: '完了した画像がここに一覧表示されます。',
     download: '元画像をダウンロード',
     details: 'タスク詳細',
     type: '種類',
@@ -361,6 +367,8 @@ const WORKBENCH_COPY = {
     currentTask: '현재 작업',
     waiting: '생성 대기',
     rendering: '렌더링 중',
+    resultAssets: '결과 에셋',
+    noResults: '완료된 이미지가 여기에 모두 표시됩니다.',
     download: '원본 다운로드',
     details: '작업 상세',
     type: '유형',
@@ -431,6 +439,8 @@ const WORKBENCH_COPY = {
     currentTask: 'Tarea actual',
     waiting: 'Esperando generación',
     rendering: 'Renderizando',
+    resultAssets: 'Assets generados',
+    noResults: 'Todas las imágenes completadas aparecerán aquí.',
     download: 'Descargar original',
     details: 'Detalles de tarea',
     type: 'Tipo',
@@ -995,7 +1005,13 @@ export function SuiteWorkbench() {
         </section>
 
         <aside className="border-[#dfe3d8] border-t bg-[#fbfcf7] p-4 lg:border-t-0 lg:border-l">
-          <Inspector task={selectedTask} t={t} />
+          <Inspector
+            task={selectedTask}
+            tasks={tasks}
+            selectedTaskId={selectedTask?.id}
+            onSelectTask={setSelectedTaskId}
+            t={t}
+          />
         </aside>
       </div>
     </main>
@@ -1257,11 +1273,18 @@ function FieldSelect({
 
 function Inspector({
   task,
+  tasks,
+  selectedTaskId,
+  onSelectTask,
   t,
 }: {
   task?: WorkbenchTask;
+  tasks: WorkbenchTask[];
+  selectedTaskId?: string;
+  onSelectTask: (id: string) => void;
   t: (typeof WORKBENCH_COPY)[Locale];
 }) {
+  const completedTasks = tasks.filter((item) => item.imageUrl);
   if (!task) {
     return (
       <div className="flex h-full items-center justify-center text-[#74796d] text-sm">
@@ -1277,6 +1300,44 @@ function Inspector({
         <p className="text-[#74796d] text-xs">
           {t.currentTask}: {task.style}
         </p>
+      </div>
+
+      <div className="rounded-lg border border-[#dfe3d8] bg-white p-3 shadow-sm">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <p className="font-semibold text-sm">{t.resultAssets}</p>
+          <span className="text-[#74796d] text-xs">
+            {completedTasks.length}/{tasks.length}
+          </span>
+        </div>
+        {completedTasks.length > 0 ? (
+          <div className="grid grid-cols-3 gap-2">
+            {completedTasks.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onSelectTask(item.id)}
+                className={cn(
+                  'group relative aspect-square overflow-hidden rounded-md border bg-[#f7f8f4]',
+                  'transition hover:border-[#2f5f4f] focus:outline-none focus:ring-2 focus:ring-[#2f5f4f]/30',
+                  selectedTaskId === item.id
+                    ? 'border-[#2f5f4f] ring-2 ring-[#2f5f4f]/20'
+                    : 'border-[#dfe3d8]'
+                )}
+              >
+                <img
+                  src={item.imageUrl}
+                  alt={`${item.style} generated asset`}
+                  className="h-full w-full object-cover"
+                />
+                <span className="absolute inset-x-1 bottom-1 truncate rounded bg-[#20231e]/80 px-1.5 py-0.5 text-[10px] text-white">
+                  {item.kind === 'main' ? t.main : t.detail}
+                </span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="text-[#74796d] text-sm">{t.noResults}</p>
+        )}
       </div>
 
       <div className="flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-[#dfe3d8] bg-white shadow-sm">
