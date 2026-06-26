@@ -619,7 +619,8 @@ export function getProductToolCopy(
     };
   }
 
-  const translated = TOOL_TRANSLATIONS[locale]?.[tool.slug];
+  const translated =
+    locale === 'en' ? undefined : TOOL_TRANSLATIONS[locale]?.[tool.slug];
   return {
     category: translated?.category ?? tool.category,
     title: translated?.title ?? tool.title,

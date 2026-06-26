@@ -9,10 +9,11 @@ import {
   IconShoppingBag,
   IconWand,
 } from '@tabler/icons-react';
-import { Link } from '@tanstack/react-router';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { ProductGallerySection } from '@/components/product/product-gallery';
 import {
+  getLocalizedPublicPath,
   ProductLanguageSelect,
   type ProductLocale,
   useProductLocale,
@@ -391,8 +392,18 @@ export function ProductHome({
 }: {
   locale?: ProductLocale;
 }) {
+  const pathname = useLocation().pathname;
+  const navigate = useNavigate();
   const { locale, setLocale } = useProductLocale(fixedLocale);
   const t = COPY[locale];
+
+  function handleLocaleChange(next: ProductLocale) {
+    setLocale(next);
+    const nextPath = getLocalizedPublicPath(pathname, next);
+    if (nextPath !== pathname) {
+      navigate({ to: nextPath });
+    }
+  }
 
   return (
     <div className="bg-[#f7f8f4] text-[#20231e]">
@@ -406,7 +417,7 @@ export function ProductHome({
               </span>
               <ProductLanguageSelect
                 locale={locale}
-                onLocaleChange={setLocale}
+                onLocaleChange={handleLocaleChange}
               />
             </div>
             <h1 className="max-w-3xl text-balance font-bold text-4xl tracking-tight md:text-6xl">
@@ -574,7 +585,7 @@ export function ProductHome({
               <Link
                 className="group rounded-lg border border-[#dfe3d8] bg-[#fbfcf7] p-5 transition hover:-translate-y-0.5 hover:border-[#2f5f4f] hover:shadow-sm"
                 key={item.href}
-                to={item.href}
+                {...getProductHomeLinkProps(item.href)}
               >
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="font-semibold text-base">{item.title}</h3>
@@ -590,4 +601,18 @@ export function ProductHome({
       </section>
     </div>
   );
+}
+
+function getProductHomeLinkProps(href: string) {
+  const slug = href.match(/^\/tools\/([^/]+)$/)?.[1];
+  if (slug) {
+    return {
+      to: '/tools/$slug' as const,
+      params: { slug },
+    };
+  }
+
+  return {
+    to: href as typeof Routes.Gallery | typeof Routes.Pricing,
+  };
 }

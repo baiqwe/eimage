@@ -27,6 +27,7 @@ import { useEffect, useState } from 'react';
 import { websiteConfig } from '@/config/website';
 import { messages } from '@/messages';
 import {
+  getLocalizedPublicPath,
   ProductLanguageSelect,
   useProductLocale,
 } from '@/components/product/product-locale';
@@ -232,23 +233,4 @@ export function Navbar({ scroll = true }: NavbarProps) {
       </div>
     </header>
   );
-}
-
-function getLocalizedPublicPath(pathname: string, locale: string) {
-  const slug = pathname.match(/^\/(?:zh\/)?tools\/([^/]+)\/?$/)?.[1];
-  if (locale === 'zh') {
-    if (slug) return `/zh/tools/${slug}`;
-    if (pathname === '/tools' || pathname === '/tools/') return '/zh/tools';
-    if (pathname === '/gallery') return '/zh/gallery';
-    if (['/', '/en', '/ja', '/ko', '/es'].includes(pathname)) return '/zh';
-    return pathname;
-  }
-
-  if (slug) return `/tools/${slug}`;
-  if (pathname === '/zh/tools' || pathname === '/zh/tools/') return '/tools';
-  if (pathname === '/zh/gallery') return '/gallery';
-  if (['/zh', '/en', '/ja', '/ko', '/es', '/'].includes(pathname)) {
-    return locale === 'en' ? '/' : `/${locale}`;
-  }
-  return pathname;
 }

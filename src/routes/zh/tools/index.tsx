@@ -90,7 +90,8 @@ function ZhToolsIndexPage() {
                     <Link
                       className="group rounded-lg border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-muted/40"
                       key={tool.slug}
-                      to={`/zh/tools/${tool.slug}`}
+                      to="/zh/tools/$slug"
+                      params={{ slug: tool.slug }}
                     >
                       <p className="font-semibold text-lg">{tool.titleZh}</p>
                       <p className="mt-3 text-muted-foreground text-sm leading-6">

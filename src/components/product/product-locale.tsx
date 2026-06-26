@@ -65,6 +65,29 @@ export function normalizeProductLocale(value?: string | null): ProductLocale {
   return 'en';
 }
 
+export function getProductLocaleFromPathname(pathname?: string | null) {
+  if (!pathname) return undefined;
+  const firstSegment = pathname.split('/').filter(Boolean)[0];
+  return PRODUCT_LOCALES.includes(firstSegment as ProductLocale)
+    ? (firstSegment as ProductLocale)
+    : undefined;
+}
+
+export function getStoredProductLocale() {
+  if (typeof window === 'undefined') return undefined;
+  return normalizeProductLocale(window.localStorage.getItem(PRODUCT_LOCALE_KEY));
+}
+
+export function getInitialProductLocale(initialLocale?: ProductLocale) {
+  if (initialLocale) return initialLocale;
+  if (typeof window === 'undefined') return 'zh';
+  return (
+    getProductLocaleFromPathname(window.location.pathname) ??
+    getStoredProductLocale() ??
+    'zh'
+  );
+}
+
 export function setGlobalProductLocale(next: ProductLocale) {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(PRODUCT_LOCALE_KEY, next);
@@ -76,17 +99,11 @@ export function setGlobalProductLocale(next: ProductLocale) {
 
 export function useProductLocale(initialLocale?: ProductLocale) {
   const [locale, setLocaleState] = useState<ProductLocale>(
-    initialLocale ?? 'zh'
+    () => getInitialProductLocale(initialLocale)
   );
 
   useEffect(() => {
-    const next = initialLocale
-      ? initialLocale
-      : normalizeProductLocale(
-          typeof window === 'undefined'
-            ? undefined
-            : window.localStorage.getItem(PRODUCT_LOCALE_KEY)
-        );
+    const next = getInitialProductLocale(initialLocale);
     setLocaleState(next);
     setGlobalProductLocale(next);
 
@@ -115,6 +132,33 @@ export function useProductLocale(initialLocale?: ProductLocale) {
   }
 
   return { locale, setLocale };
+}
+
+export function getLocalizedPublicPath(pathname: string, locale: ProductLocale) {
+  const cleanPathname = pathname === '' ? '/' : pathname;
+  const slug = cleanPathname.match(/^\/(?:zh\/)?tools\/([^/]+)\/?$/)?.[1];
+
+  if (locale === 'zh') {
+    if (slug) return `/zh/tools/${slug}`;
+    if (cleanPathname === '/tools' || cleanPathname === '/tools/') {
+      return '/zh/tools';
+    }
+    if (cleanPathname === '/gallery') return '/zh/gallery';
+    if (['/', '/en', '/ja', '/ko', '/es'].includes(cleanPathname)) {
+      return '/zh';
+    }
+    return cleanPathname;
+  }
+
+  if (slug) return `/tools/${slug}`;
+  if (cleanPathname === '/zh/tools' || cleanPathname === '/zh/tools/') {
+    return '/tools';
+  }
+  if (cleanPathname === '/zh/gallery') return '/gallery';
+  if (['/zh', '/en', '/ja', '/ko', '/es', '/'].includes(cleanPathname)) {
+    return locale === 'en' ? '/' : `/${locale}`;
+  }
+  return cleanPathname;
 }
 
 export function ProductLanguageSelect({

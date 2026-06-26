@@ -565,8 +565,7 @@ export const captionImage = createServerFn({ method: 'POST' })
 export const draftProductImagePrompt = createServerFn({ method: 'POST' })
   .inputValidator(workbenchPromptSchema)
   .handler(async ({ data }) => {
-    const systemPrompt =
-      'You are a senior ecommerce visual director. Return strict JSON only.';
+    const systemPrompt = getWorkbenchSystemPrompt(data.locale);
     const reasoningLanguage = {
       zh: 'Simplified Chinese',
       en: 'English',
@@ -574,22 +573,7 @@ export const draftProductImagePrompt = createServerFn({ method: 'POST' })
       ko: 'Korean',
       es: 'Spanish',
     }[data.locale];
-    const userPrompt = `Product base description: ${data.description}
-Image type: ${data.imageType === 'main' ? 'main hero image' : 'lifestyle detail image'}
-Style preset: ${data.style}
-User interface language: ${data.locale}
-
-Write a diffusion prompt that preserves the product silhouette, proportions,
-materials, logos, and front-facing structure from the source photo. The prompt
-may redesign only background, lighting, surface, reflection, atmosphere, and
-scene props. Do not invent another angle or alter the product geometry.
-
-Return JSON:
-{
-  "prompt": "long English image prompt",
-  "reasoning": "one clear ${reasoningLanguage} sentence explaining the scene logic",
-  "keywords": ["3-4 short display keywords in ${reasoningLanguage}"]
-}`;
+    const userPrompt = getWorkbenchUserPrompt(data, reasoningLanguage);
 
     const accountId = serverEnv.CLOUDFLARE_ACCOUNT_ID;
     const apiKey = serverEnv.CLOUDFLARE_API_TOKEN;
@@ -643,19 +627,107 @@ function parseJsonObject(text: string): Record<string, unknown> {
   return JSON.parse(json) as Record<string, unknown>;
 }
 
+function getWorkbenchSystemPrompt(
+  locale: z.infer<typeof workbenchPromptSchema>['locale']
+) {
+  return {
+    zh: '你是一名资深电商视觉总监。只返回严格 JSON，不要输出额外说明。',
+    en: 'You are a senior ecommerce visual director. Return strict JSON only.',
+    ja: 'あなたはシニア EC ビジュアルディレクターです。厳密な JSON のみを返してください。',
+    ko: '당신은 시니어 이커머스 비주얼 디렉터입니다. 엄격한 JSON만 반환하세요.',
+    es: 'Eres un director visual senior de ecommerce. Devuelve solo JSON estricto.',
+  }[locale];
+}
+
+function getWorkbenchUserPrompt(
+  data: z.infer<typeof workbenchPromptSchema>,
+  reasoningLanguage: string
+) {
+  const imageType =
+    data.imageType === 'main' ? 'main hero image' : 'lifestyle detail image';
+  return {
+    zh: `商品基础描述：${data.description}
+图片类型：${data.imageType === 'main' ? '平台主图' : '详情场景图'}
+风格预设：${data.style}
+当前界面语言：${data.locale}
+
+请编写一个适合扩散模型的提示词，要求严格保留源商品图的轮廓、比例、材质、logo、正面结构与主体几何。你只能重设计背景、光线、台面、反射、氛围与场景道具，不能虚构新的拍摄角度，也不能修改商品结构。
+
+请返回 JSON：
+{
+  "prompt": "完整图片提示词，语言与界面保持一致",
+  "reasoning": "一条清晰的${reasoningLanguage}说明，解释画面逻辑",
+  "keywords": ["3-4 个${reasoningLanguage}短关键词"]
+}`,
+    en: `Product base description: ${data.description}
+Image type: ${imageType}
+Style preset: ${data.style}
+User interface language: ${data.locale}
+
+Write a diffusion prompt that preserves the product silhouette, proportions,
+materials, logos, and front-facing structure from the source photo. The prompt
+may redesign only background, lighting, surface, reflection, atmosphere, and
+scene props. Do not invent another angle or alter the product geometry.
+
+Return JSON:
+{
+  "prompt": "long image prompt in the same language as the interface",
+  "reasoning": "one clear ${reasoningLanguage} sentence explaining the scene logic",
+  "keywords": ["3-4 short display keywords in ${reasoningLanguage}"]
+}`,
+    ja: `商品の基本説明：${data.description}
+画像タイプ：${data.imageType === 'main' ? '主画像' : '詳細ライフスタイル画像'}
+スタイルプリセット：${data.style}
+UI 言語：${data.locale}
+
+拡散モデル向けの Prompt を作成してください。元画像の商品シルエット、比率、素材、ロゴ、正面構造、主体ジオメトリは厳密に維持してください。変更してよいのは背景、照明、台面、反射、空気感、シーン小物のみです。新しい角度を作ったり、商品の構造を変えたりしないでください。
+
+JSON を返してください：
+{
+  "prompt": "UI と同じ言語の詳細な画像 Prompt",
+  "reasoning": "${reasoningLanguage}で画面意図を説明する明確な 1 文",
+  "keywords": ["${reasoningLanguage}の短い表示キーワードを 3〜4 個"]
+}`,
+    ko: `상품 기본 설명: ${data.description}
+이미지 유형: ${data.imageType === 'main' ? '메인 히어로 이미지' : '상세 라이프스타일 이미지'}
+스타일 프리셋: ${data.style}
+UI 언어: ${data.locale}
+
+확산 모델용 프롬프트를 작성하세요. 원본 상품 사진의 실루엣, 비율, 재질, 로고, 정면 구조와 형태를 엄격히 유지해야 합니다. 배경, 조명, 표면, 반사, 분위기, 소품만 재설계할 수 있으며 새로운 각도를 만들거나 상품 구조를 변경하면 안 됩니다.
+
+JSON 형식으로 반환하세요:
+{
+  "prompt": "인터페이스와 같은 언어로 된 긴 이미지 프롬프트",
+  "reasoning": "장면 의도를 설명하는 ${reasoningLanguage} 한 문장",
+  "keywords": ["${reasoningLanguage} 짧은 키워드 3-4개"]
+}`,
+    es: `Descripción base del producto: ${data.description}
+Tipo de imagen: ${data.imageType === 'main' ? 'imagen principal' : 'imagen lifestyle de detalle'}
+Preset de estilo: ${data.style}
+Idioma de la interfaz: ${data.locale}
+
+Escribe un prompt para un modelo de difusión que preserve la silueta, proporciones,
+materiales, logos y estructura frontal del producto de la foto original. El prompt
+solo puede rediseñar el fondo, la iluminación, la superficie, el reflejo, la atmósfera
+y los props de escena. No inventes otro ángulo ni alteres la geometría del producto.
+
+Devuelve JSON:
+{
+  "prompt": "prompt de imagen largo en el mismo idioma que la interfaz",
+  "reasoning": "una frase clara en ${reasoningLanguage} explicando la lógica visual",
+  "keywords": ["3-4 palabras clave cortas en ${reasoningLanguage}"]
+}`,
+  }[data.locale];
+}
+
 function createLocalProductPrompt(data: z.infer<typeof workbenchPromptSchema>) {
   const isMain = data.imageType === 'main';
-  const prompt = [
-    'Professional ecommerce product photography based on the provided source image.',
-    `Product description: ${data.description}.`,
-    `Visual direction: ${data.style}.`,
+  const prompt = getLocalPromptTemplate(
+    data.locale,
+    data.description,
+    data.style,
     isMain
-      ? 'Keep the original product centered, full silhouette visible, clean premium commercial composition, refined studio surface, controlled reflections, soft contact shadow.'
-      : 'Keep the original product unchanged inside a believable lifestyle environment, use scene context only around the product, natural depth, subtle supporting props, editorial detail-page composition.',
-    'Preserve exact product shape, proportions, material finish, color, label placement, logos, and front-facing structure from the source image.',
-    'Do not change the product angle, do not add duplicate products, do not deform edges, no extra handles, no invented parts, no text artifacts.',
-    'High-end lighting, realistic shadow integration, 85mm commercial lens look, sharp product edges, premium retouching, photorealistic.',
-  ].join(' ');
+  );
 
   return {
     prompt,
@@ -707,6 +779,71 @@ function getLocalPromptKeywords(
     es: isMain
       ? ['Silueta fija', 'Luz de estudio', 'Reflejo premium']
       : ['Escena lifestyle', 'Luz natural', 'Forma preservada'],
+  }[locale];
+}
+
+function getLocalPromptTemplate(
+  locale: z.infer<typeof workbenchPromptSchema>['locale'],
+  description: string,
+  style: string,
+  isMain: boolean
+) {
+  return {
+    zh: [
+      '基于提供的商品源图生成专业电商商品摄影画面。',
+      `商品描述：${description}。`,
+      `视觉方向：${style}。`,
+      isMain
+        ? '保持原商品居中并完整展示轮廓，采用干净高级的商业棚拍构图、精致台面、可控反射与柔和接触阴影。'
+        : '在可信的生活方式环境中保持原商品不变，只在商品周围构建场景语境、自然景深、克制道具与详情页式构图。 ',
+      '严格保留商品形状、比例、材质质感、颜色、标签位置、logo 与正面结构。',
+      '不要改变商品角度，不要添加重复商品，不要扭曲边缘，不要生成多余部件，也不要出现伪文字。',
+      '使用高端布光、真实阴影融合、85mm 商业镜头质感、清晰边缘与高级修图效果，整体保持写实。',
+    ].join(' '),
+    en: [
+      'Professional ecommerce product photography based on the provided source image.',
+      `Product description: ${description}.`,
+      `Visual direction: ${style}.`,
+      isMain
+        ? 'Keep the original product centered, full silhouette visible, with a clean premium commercial composition, refined studio surface, controlled reflections, and a soft contact shadow.'
+        : 'Keep the original product unchanged inside a believable lifestyle environment, using scene context only around the product, natural depth, subtle supporting props, and an editorial detail-page composition.',
+      'Preserve the exact product shape, proportions, material finish, color, label placement, logos, and front-facing structure from the source image.',
+      'Do not change the product angle, add duplicate products, deform edges, invent extra parts, or generate text artifacts.',
+      'Use high-end lighting, realistic shadow integration, an 85mm commercial lens look, sharp product edges, premium retouching, and a photorealistic finish.',
+    ].join(' '),
+    ja: [
+      '提供された商品元画像をもとに、プロ品質の EC 商品写真を生成してください。',
+      `商品説明：${description}。`,
+      `ビジュアル方針：${style}。`,
+      isMain
+        ? '元の商品を中央に配置し、輪郭を完全に見せたまま、クリーンで上質な商用スタジオ構図、洗練された台面、制御された反射、柔らかな接地影で構成します。'
+        : '信頼できるライフスタイル環境の中で商品本体は変えず、周囲にだけ自然な文脈、奥行き、控えめな小物、詳細ページ向けの構図を加えてください。',
+      '商品形状、比率、素材感、色、ラベル位置、ロゴ、正面構造は厳密に維持してください。',
+      '商品角度を変えず、重複商品を追加せず、輪郭を歪めず、余分な部品や偽テキストを生成しないでください。',
+      '高品質な照明、自然な影の統合、85mm 商用レンズらしい見え方、シャープな輪郭、上品なレタッチ、写実的な仕上がりを使用してください。',
+    ].join(' '),
+    ko: [
+      '제공된 상품 원본 이미지를 기반으로 전문적인 이커머스 상품 사진을 생성하세요.',
+      `상품 설명: ${description}.`,
+      `비주얼 방향: ${style}.`,
+      isMain
+        ? '원본 상품을 중앙에 두고 전체 실루엣이 보이도록 유지하며, 깔끔하고 고급스러운 상업용 스튜디오 구도, 정제된 표면, 제어된 반사, 부드러운 접지 그림자를 사용하세요.'
+        : '신뢰감 있는 라이프스타일 환경 안에서 상품은 그대로 유지하고, 상품 주변에만 자연스러운 맥락, 깊이감, 절제된 소품, 상세 페이지용 편집 구도를 더하세요.',
+      '원본 이미지의 상품 형태, 비율, 재질, 색상, 라벨 위치, 로고, 정면 구조를 정확히 유지하세요.',
+      '상품 각도를 바꾸지 말고, 중복 상품을 추가하지 말며, 가장자리를 왜곡하거나 불필요한 부품이나 가짜 텍스트를 만들지 마세요.',
+      '고급 조명, 사실적인 그림자 통합, 85mm 상업 렌즈 느낌, 선명한 윤곽, 프리미엄 리터칭, 사실적인 마감으로 표현하세요.',
+    ].join(' '),
+    es: [
+      'Genera una fotografía profesional de producto ecommerce basada en la imagen fuente proporcionada.',
+      `Descripción del producto: ${description}.`,
+      `Dirección visual: ${style}.`,
+      isMain
+        ? 'Mantén el producto original centrado y con la silueta completa visible, usando una composición comercial limpia y premium, superficie de estudio refinada, reflejos controlados y una sombra de contacto suave.'
+        : 'Mantén el producto original sin cambios dentro de un entorno lifestyle creíble, usando contexto de escena solo alrededor del producto, profundidad natural, props sutiles y composición editorial de página de detalle.',
+      'Conserva exactamente la forma, proporciones, acabado del material, color, ubicación de etiquetas, logos y estructura frontal del producto de la imagen fuente.',
+      'No cambies el ángulo del producto, no añadas productos duplicados, no deformes bordes, no inventes piezas extra ni generes artefactos de texto.',
+      'Usa iluminación de alto nivel, integración realista de sombras, apariencia de lente comercial de 85 mm, bordes nítidos, retoque premium y acabado fotorrealista.',
+    ].join(' '),
   }[locale];
 }
 

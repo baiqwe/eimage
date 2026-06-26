@@ -94,7 +94,8 @@ function ToolsIndexPage() {
                     <Link
                       className="group rounded-lg border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-muted/40"
                       key={tool.slug}
-                      to={`/tools/${tool.slug}`}
+                      to="/tools/$slug"
+                      params={{ slug: tool.slug }}
                     >
                       <p className="font-semibold text-lg">{tool.title}</p>
                       <p className="mt-3 text-muted-foreground text-sm leading-6">

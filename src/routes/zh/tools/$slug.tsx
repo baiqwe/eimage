@@ -25,6 +25,9 @@ export const Route = createFileRoute('/zh/tools/$slug')({
     return { tool };
   },
   head: ({ loaderData }) => {
+    if (!loaderData?.tool) {
+      return {};
+    }
     const { tool } = loaderData;
     const metadata = seo(`/zh/tools/${tool.slug}`, {
       title: `${tool.titleZh} | ProdList AI`,
@@ -44,14 +47,16 @@ export const Route = createFileRoute('/zh/tools/$slug')({
     const faq = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: tool.faqsZh.map((item) => ({
-        '@type': 'Question',
-        name: item.question,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: item.answer,
-        },
-      })),
+      mainEntity: tool.faqsZh.map(
+        (item: { question: string; answer: string }) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })
+      ),
     };
     return {
       ...metadata,
@@ -76,7 +81,11 @@ export const Route = createFileRoute('/zh/tools/$slug')({
 });
 
 function ToolPage() {
-  const { tool } = Route.useLoaderData();
+  const loaderData = Route.useLoaderData();
+  if (!loaderData?.tool) {
+    throw notFound();
+  }
+  const { tool } = loaderData;
 
   return (
     <Container className="px-4 py-16">

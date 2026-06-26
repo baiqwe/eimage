@@ -24,12 +24,12 @@ import { authClient } from '@/auth/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { useGenerationBatches } from '@/hooks/use-generation-history';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
 import { KIE_MODELS } from '@/lib/kie-models';
 import { Routes } from '@/lib/routes';
 import {
   ProductLanguageSelect,
-  PRODUCT_LOCALE_META,
   type ProductLocale,
   useProductLocale,
 } from '@/components/product/product-locale';
@@ -139,7 +139,7 @@ const WORKBENCH_COPY = {
     style: '风格预设',
     ratio: '尺寸比例',
     resolution: '分辨率',
-    prompt: '英文提示词',
+    prompt: '提示词',
     draft: '智能撰写',
     reference: '参考图',
     useGlobal: '默认使用全局商品图',
@@ -211,7 +211,7 @@ const WORKBENCH_COPY = {
     style: 'Style preset',
     ratio: 'Aspect ratio',
     resolution: 'Resolution',
-    prompt: 'English prompt',
+    prompt: 'Prompt',
     draft: 'Smart draft',
     reference: 'Reference image',
     useGlobal: 'Uses global product image by default',
@@ -282,7 +282,7 @@ const WORKBENCH_COPY = {
     style: 'スタイル',
     ratio: '比率',
     resolution: '解像度',
-    prompt: '英語 Prompt',
+    prompt: 'Prompt',
     draft: 'AI 下書き',
     reference: '参照画像',
     useGlobal: '通常は共通の商品画像を使用',
@@ -354,7 +354,7 @@ const WORKBENCH_COPY = {
     style: '스타일 프리셋',
     ratio: '화면 비율',
     resolution: '해상도',
-    prompt: '영문 Prompt',
+    prompt: '프롬프트',
     draft: 'AI 작성',
     reference: '참조 이미지',
     useGlobal: '기본적으로 전역 상품 이미지 사용',
@@ -426,7 +426,7 @@ const WORKBENCH_COPY = {
     style: 'Preset de estilo',
     ratio: 'Proporción',
     resolution: 'Resolución',
-    prompt: 'Prompt en inglés',
+    prompt: 'Prompt',
     draft: 'Redactar con IA',
     reference: 'Imagen de referencia',
     useGlobal: 'Usa la imagen global por defecto',
@@ -464,6 +464,10 @@ const WORKBENCH_COPY = {
 export function SuiteWorkbench() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { locale, setLocale } = useProductLocale();
+  const promptSyncRef = useRef({
+    locale,
+    description: DEFAULT_DESCRIPTION,
+  });
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const [sourceImage, setSourceImage] = useState<string>();
   const [sourceName, setSourceName] = useState('');
@@ -473,19 +477,15 @@ export function SuiteWorkbench() {
   const [selectedTaskId, setSelectedTaskId] = useState('task-main');
   const [batchNotice, setBatchNotice] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [batchHistory, setBatchHistory] = useState<
-    Array<{
-      batchId: string;
-      taskCount: number;
-      creditCost: number;
-      createdAt: string;
-    }>
-  >([]);
   const [tasks, setTasks] = useState<WorkbenchTask[]>(() =>
     createInitialTasks(DEFAULT_DESCRIPTION, locale)
   );
   const t = WORKBENCH_COPY[locale];
   const signedIn = Boolean(session?.user);
+  const { data: historyData, refetch: refetchHistory } = useGenerationBatches(
+    0,
+    10
+  );
 
   useEffect(() => {
     if (!signedIn) {
@@ -494,6 +494,49 @@ export function SuiteWorkbench() {
     }
     void refreshCredits();
   }, [signedIn]);
+
+  useEffect(() => {
+    const previous = promptSyncRef.current;
+    if (previous.locale === locale && previous.description === description) {
+      return;
+    }
+
+    setTasks((current) =>
+      current.map((task) => {
+        if (task.serverTaskId || task.imageUrl) {
+          return task;
+        }
+
+        const previousPrompt = createClientPrompt(
+          task,
+          previous.description,
+          previous.locale
+        );
+        const shouldSyncPrompt =
+          task.prompt.trim() === '' ||
+          task.prompt === previousPrompt.prompt ||
+          (task.reasoning === previousPrompt.reasoning &&
+            task.keywords.join('|') === previousPrompt.keywords.join('|'));
+
+        if (!shouldSyncPrompt) {
+          return task;
+        }
+
+        return {
+          ...task,
+          ...createClientPrompt(task, description, locale),
+        };
+      })
+    );
+
+    promptSyncRef.current = { locale, description };
+  }, [description, locale]);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.title = `${t.subtitle} | ProdList AI`;
+    }
+  }, [t.subtitle]);
 
   const selectedTask = useMemo(
     () => tasks.find((task) => task.id === selectedTaskId) ?? tasks[0],
@@ -698,17 +741,7 @@ export function SuiteWorkbench() {
       setBatchNotice(
         `${t.batchReady(batch.totalCreditCost, batch.tasks.length)} ${t.polling}`
       );
-      setBatchHistory((current) => [
-        {
-          batchId: batch.batchId,
-          taskCount: batch.tasks.length,
-          creditCost: batch.totalCreditCost,
-          createdAt: new Date().toLocaleString(
-            PRODUCT_LOCALE_META[locale].dateLocale
-          ),
-        },
-        ...current,
-      ]);
+      void refetchHistory();
 
       setTasks((current) =>
         current.map((task) => {
@@ -722,7 +755,7 @@ export function SuiteWorkbench() {
             ...promptPatch,
             prompt: submitted.prompt,
             serverTaskId: submitted.taskId,
-            providerTaskId: submitted.providerTaskId,
+            providerTaskId: submitted.providerTaskId ?? undefined,
             model: submitted.model,
             status: 'rendering',
           };
@@ -984,18 +1017,18 @@ export function SuiteWorkbench() {
                 <IconHistory className="size-4 text-[#2f5f4f]" />
                 {t.historyTitle}
               </p>
-              {batchHistory.length === 0 ? (
+              {!historyData?.items || historyData.items.length === 0 ? (
                 <p className="text-[#74796d] text-sm">{t.emptyHistory}</p>
               ) : (
                 <div className="space-y-2">
-                  {batchHistory.map((batch) => (
+                  {historyData.items.map((batch) => (
                     <div
-                      key={batch.batchId}
+                      key={batch.id}
                       className="grid gap-2 rounded-lg border border-[#edf0e8] p-3 text-sm md:grid-cols-[1fr_auto_auto]"
                     >
-                      <span className="truncate">{batch.batchId}</span>
+                      <span className="truncate">{batch.id}</span>
                       <span>{batch.taskCount} tasks</span>
-                      <span>{batch.creditCost} credits</span>
+                      <span>{batch.spentCredits} credits</span>
                     </div>
                   ))}
                 </div>
@@ -1426,16 +1459,7 @@ function createClientPrompt(
 ) {
   const isMain = task.kind === 'main';
   return {
-    prompt: [
-      'Photorealistic ecommerce image using the uploaded product as immutable source.',
-      `Product: ${description}.`,
-      `Style: ${task.style}.`,
-      isMain
-        ? 'Clean hero composition, centered product, premium studio background.'
-        : 'Lifestyle detail composition, realistic environmental context.',
-      'Preserve exact product shape, silhouette, material, color, labels, and geometry.',
-      'Change only background, lighting, shadow, reflection, and atmosphere.',
-    ].join(' '),
+    prompt: getClientPrompt(locale, description, task.style, isMain),
     reasoning: getClientReasoning(locale, isMain),
     keywords: getClientKeywords(locale, isMain),
   };
@@ -1501,6 +1525,67 @@ function getClientReasoning(locale: Locale, isMain: boolean) {
       : 'Una escena lifestyle añade contexto de compra sin alterar la forma del producto subido.',
   };
   return copy[locale];
+}
+
+function getClientPrompt(
+  locale: Locale,
+  description: string,
+  style: string,
+  isMain: boolean
+) {
+  const promptByLocale = {
+    zh: [
+      '基于上传商品图生成高真实感电商商品图，并将原商品作为不可变主体。',
+      `商品描述：${description}。`,
+      `风格方向：${style}。`,
+      isMain
+        ? '画面用于平台主图，主体居中，构图干净，高级棚拍背景。'
+        : '画面用于详情场景图，环境真实自然，保留生活化氛围。',
+      '严格保留商品原始形状、轮廓、材质、颜色、标签和几何结构。',
+      '只允许调整背景、光线、阴影、反射和氛围，不要改动商品本体。',
+    ],
+    en: [
+      'Create a photorealistic ecommerce image using the uploaded product as the immutable source.',
+      `Product description: ${description}.`,
+      `Style direction: ${style}.`,
+      isMain
+        ? 'Use a marketplace-ready hero composition with the product centered and a premium studio background.'
+        : 'Use a realistic lifestyle detail composition with believable environmental context.',
+      'Preserve the exact product shape, silhouette, material, color, labels, and geometry.',
+      'Change only the background, lighting, shadow, reflection, and atmosphere.',
+    ],
+    ja: [
+      'アップロードした商品画像を不変の主体として、高精細な EC 商品画像を生成してください。',
+      `商品説明：${description}。`,
+      `スタイル方針：${style}。`,
+      isMain
+        ? 'マーケットプレイス向け主画像として、商品を中央に配置し、上質なスタジオ背景で構成します。'
+        : '詳細ページ向けに、自然で信頼感のあるライフスタイルシーンで構成します。',
+      '商品の形状、輪郭、素材、色、ラベル、幾何構造は厳密に維持してください。',
+      '変更してよいのは背景、照明、影、反射、空気感のみです。',
+    ],
+    ko: [
+      '업로드한 상품 이미지를 변경 불가한 기준으로 사용해 사실적인 이커머스 이미지를 생성하세요.',
+      `상품 설명: ${description}.`,
+      `스타일 방향: ${style}.`,
+      isMain
+        ? '마켓플레이스용 메인 이미지처럼 상품을 중앙에 두고 프리미엄 스튜디오 배경으로 구성합니다.'
+        : '상세 페이지용 라이프스타일 장면처럼 자연스럽고 믿을 수 있는 환경 맥락을 구성합니다.',
+      '상품의 형태, 윤곽, 재질, 색상, 라벨, 기하 구조를 정확히 유지하세요.',
+      '배경, 조명, 그림자, 반사, 분위기만 변경하고 상품 본체는 바꾸지 마세요.',
+    ],
+    es: [
+      'Genera una imagen ecommerce fotorrealista usando el producto subido como fuente inmutable.',
+      `Descripción del producto: ${description}.`,
+      `Dirección de estilo: ${style}.`,
+      isMain
+        ? 'Usa una composición principal lista para marketplace, con el producto centrado y fondo de estudio premium.'
+        : 'Usa una composición lifestyle de detalle con un contexto ambiental creíble.',
+      'Conserva exactamente la forma, silueta, material, color, etiquetas y geometría del producto.',
+      'Cambia solo el fondo, la iluminación, la sombra, el reflejo y la atmósfera.',
+    ],
+  };
+  return promptByLocale[locale].join(' ');
 }
 
 function getClientKeywords(locale: Locale, isMain: boolean) {

@@ -1,19 +1,31 @@
+import { useEffect } from 'react';
 import {
   IconBolt,
   IconClock,
   IconPhoto,
   IconSparkles,
 } from '@tabler/icons-react';
-import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import {
+  getLocalizedPublicPath,
   ProductLanguageSelect,
   type ProductLocale,
   useProductLocale,
 } from '@/components/product/product-locale';
+import { useCurrentPlan } from '@/hooks/use-payment';
+import {
+  useGenerationBatches,
+  useGenerationCredits,
+  useGenerationStats,
+} from '@/hooks/use-generation-history';
 import { Routes } from '@/lib/routes';
-import { createFileRoute } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  Link,
+  useLocation,
+  useNavigate,
+} from '@tanstack/react-router';
 
 export const Route = createFileRoute('/dashboard/')({
   component: DashboardPage,
@@ -25,10 +37,13 @@ const DASHBOARD_COPY: Record<
     title: string;
     description: string;
     openGenerator: string;
-    cards: Array<{ label: string; value: string; hint: string }>;
+    cards: Array<{ label: string; hint: string }>;
     historyTitle: string;
     empty: string;
-    rows: string[][];
+    taskUnit: string;
+    creditUnit: string;
+    freePlan: string;
+    statuses: Record<string, string>;
   }
 > = {
   zh: {
@@ -36,19 +51,24 @@ const DASHBOARD_COPY: Record<
     description: '查看订阅、点数、近期生成历史，并继续创建新的视觉资产。',
     openGenerator: '打开生成器',
     cards: [
-      { label: '剩余点数', value: '45', hint: '本月可用' },
-      { label: '生成任务', value: '18', hint: '最近 30 天' },
-      { label: '已保存资产', value: '42', hint: '主图与详情图' },
-      { label: '订阅状态', value: 'Pro', hint: '自动续订中' },
+      { label: '剩余点数', hint: '当前账号' },
+      { label: '生成任务', hint: '最近 30 天' },
+      { label: '已保存资产', hint: '当前账号' },
+      { label: '订阅状态', hint: '当前方案' },
     ],
     historyTitle: '生成历史',
-    empty:
-      '真实生图 API 接入后，这里会展示每次生成的原图、Prompt、结果图和扣点记录。',
-    rows: [
-      ['陶瓷咖啡杯主图', '主图', 'Pure Studio Key Light', '已完成'],
-      ['清晨窗台详情图', '详情图', 'Morning Window Lifestyle', '已完成'],
-      ['暗调质感详情图', '详情图', 'Premium Dark Editorial', '排队中'],
-    ],
+    empty: '还没有生成记录。',
+    taskUnit: '个任务',
+    creditUnit: '点',
+    freePlan: '免费版',
+    statuses: {
+      pending: '待处理',
+      queued: '排队中',
+      processing: '处理中',
+      completed: '已完成',
+      failed: '失败',
+      partial: '部分完成',
+    },
   },
   en: {
     title: 'Product Image Dashboard',
@@ -56,24 +76,24 @@ const DASHBOARD_COPY: Record<
       'Track subscription, credits, generation history, and continue creating new visual assets.',
     openGenerator: 'Open generator',
     cards: [
-      { label: 'Credits left', value: '45', hint: 'Available this month' },
-      { label: 'Generation jobs', value: '18', hint: 'Last 30 days' },
-      { label: 'Saved assets', value: '42', hint: 'Main and detail images' },
-      { label: 'Subscription', value: 'Pro', hint: 'Renews automatically' },
+      { label: 'Credits left', hint: 'Current account' },
+      { label: 'Generation jobs', hint: 'Last 30 days' },
+      { label: 'Saved assets', hint: 'Current account' },
+      { label: 'Subscription', hint: 'Current plan' },
     ],
     historyTitle: 'Generation History',
-    empty:
-      'After the real image-generation API is connected, each row will keep the source image, prompt, result, and credit ledger.',
-    rows: [
-      ['Ceramic cup hero', 'Main', 'Pure Studio Key Light', 'Done'],
-      [
-        'Morning windowsill detail',
-        'Detail',
-        'Morning Window Lifestyle',
-        'Done',
-      ],
-      ['Premium dark detail', 'Detail', 'Premium Dark Editorial', 'Queued'],
-    ],
+    empty: 'No generation records yet.',
+    taskUnit: 'tasks',
+    creditUnit: 'credits',
+    freePlan: 'Free',
+    statuses: {
+      pending: 'Pending',
+      queued: 'Queued',
+      processing: 'Processing',
+      completed: 'Completed',
+      failed: 'Failed',
+      partial: 'Partially completed',
+    },
   },
   ja: {
     title: '商品画像ダッシュボード',
@@ -81,19 +101,24 @@ const DASHBOARD_COPY: Record<
       'サブスク、クレジット、最近の生成履歴を確認し、新しい素材を作成します。',
     openGenerator: '生成ツールを開く',
     cards: [
-      { label: '残クレジット', value: '45', hint: '今月利用可能' },
-      { label: '生成タスク', value: '18', hint: '過去 30 日' },
-      { label: '保存済み素材', value: '42', hint: '主画像と詳細画像' },
-      { label: '契約状態', value: 'Pro', hint: '自動更新中' },
+      { label: '残クレジット', hint: '現在のアカウント' },
+      { label: '生成タスク', hint: '過去 30 日' },
+      { label: '保存済み素材', hint: '現在のアカウント' },
+      { label: '契約状態', hint: '現在のプラン' },
     ],
     historyTitle: '生成履歴',
-    empty:
-      '実際の画像生成 API 接続後、元画像、Prompt、結果、クレジット記録が表示されます。',
-    rows: [
-      ['陶器カップ主画像', '主画像', 'Pure Studio Key Light', '完了'],
-      ['朝の窓辺詳細画像', '詳細', 'Morning Window Lifestyle', '完了'],
-      ['暗調プレミアム詳細画像', '詳細', 'Premium Dark Editorial', '待機中'],
-    ],
+    empty: 'まだ生成記録がありません。',
+    taskUnit: '件',
+    creditUnit: 'クレジット',
+    freePlan: '無料プラン',
+    statuses: {
+      pending: '保留中',
+      queued: '待機中',
+      processing: '処理中',
+      completed: '完了',
+      failed: '失敗',
+      partial: '一部完了',
+    },
   },
   ko: {
     title: '상품 이미지 대시보드',
@@ -101,19 +126,24 @@ const DASHBOARD_COPY: Record<
       '구독, 크레딧, 최근 생성 기록을 확인하고 새 비주얼 에셋을 만듭니다.',
     openGenerator: '생성기 열기',
     cards: [
-      { label: '남은 크레딧', value: '45', hint: '이번 달 사용 가능' },
-      { label: '생성 작업', value: '18', hint: '최근 30일' },
-      { label: '저장된 에셋', value: '42', hint: '메인 및 상세 이미지' },
-      { label: '구독 상태', value: 'Pro', hint: '자동 갱신 중' },
+      { label: '남은 크레딧', hint: '현재 계정' },
+      { label: '생성 작업', hint: '최근 30일' },
+      { label: '저장된 에셋', hint: '현재 계정' },
+      { label: '구독 상태', hint: '현재 플랜' },
     ],
     historyTitle: '생성 기록',
-    empty:
-      '실제 이미지 생성 API 연결 후 원본 이미지, Prompt, 결과, 크레딧 기록이 표시됩니다.',
-    rows: [
-      ['세라믹 컵 메인', '메인', 'Pure Studio Key Light', '완료'],
-      ['아침 창가 상세', '상세', 'Morning Window Lifestyle', '완료'],
-      ['프리미엄 다크 상세', '상세', 'Premium Dark Editorial', '대기 중'],
-    ],
+    empty: '아직 생성 기록이 없습니다.',
+    taskUnit: '개 작업',
+    creditUnit: '크레딧',
+    freePlan: '무료 플랜',
+    statuses: {
+      pending: '대기',
+      queued: '대기열',
+      processing: '처리 중',
+      completed: '완료',
+      failed: '실패',
+      partial: '일부 완료',
+    },
   },
   es: {
     title: 'Panel de imágenes de producto',
@@ -121,54 +151,56 @@ const DASHBOARD_COPY: Record<
       'Consulta suscripción, créditos, historial reciente y continúa creando assets visuales.',
     openGenerator: 'Abrir generador',
     cards: [
-      {
-        label: 'Créditos restantes',
-        value: '45',
-        hint: 'Disponibles este mes',
-      },
-      { label: 'Tareas generadas', value: '18', hint: 'Últimos 30 días' },
-      {
-        label: 'Assets guardados',
-        value: '42',
-        hint: 'Principales y detalles',
-      },
-      { label: 'Suscripción', value: 'Pro', hint: 'Renovación automática' },
+      { label: 'Créditos restantes', hint: 'Cuenta actual' },
+      { label: 'Tareas generadas', hint: 'Últimos 30 días' },
+      { label: 'Assets guardados', hint: 'Cuenta actual' },
+      { label: 'Suscripción', hint: 'Plan actual' },
     ],
     historyTitle: 'Historial de generación',
-    empty:
-      'Cuando se conecte la API real, aquí aparecerán imagen fuente, Prompt, resultado y créditos.',
-    rows: [
-      [
-        'Hero de taza cerámica',
-        'Principal',
-        'Pure Studio Key Light',
-        'Completado',
-      ],
-      [
-        'Detalle de ventana matutina',
-        'Detalle',
-        'Morning Window Lifestyle',
-        'Completado',
-      ],
-      [
-        'Detalle oscuro premium',
-        'Detalle',
-        'Premium Dark Editorial',
-        'En cola',
-      ],
-    ],
+    empty: 'Todavía no hay registros de generación.',
+    taskUnit: 'tareas',
+    creditUnit: 'créditos',
+    freePlan: 'Plan gratuito',
+    statuses: {
+      pending: 'Pendiente',
+      queued: 'En cola',
+      processing: 'Procesando',
+      completed: 'Completado',
+      failed: 'Fallido',
+      partial: 'Parcialmente completado',
+    },
   },
 };
 
 function DashboardPage() {
+  const pathname = useLocation().pathname;
+  const navigate = useNavigate();
   const { locale, setLocale } = useProductLocale();
   const t = DASHBOARD_COPY[locale];
+  const { data: creditsData } = useGenerationCredits();
+  const { data: statsData } = useGenerationStats();
+  const { data: batchesData } = useGenerationBatches(0, 3);
+  const { data: planData } = useCurrentPlan();
   const breadcrumbs = [
     {
       label: t.title,
       isCurrentPage: true,
     },
   ];
+
+  function handleLocaleChange(next: ProductLocale) {
+    setLocale(next);
+    const nextPath = getLocalizedPublicPath(pathname, next);
+    if (nextPath !== pathname) {
+      navigate({ to: nextPath });
+    }
+  }
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.title = `${t.title} | ProdList AI`;
+    }
+  }, [t.title]);
 
   return (
     <DashboardLayout
@@ -177,7 +209,10 @@ function DashboardPage() {
       description={t.description}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <ProductLanguageSelect locale={locale} onLocaleChange={setLocale} />
+        <ProductLanguageSelect
+          locale={locale}
+          onLocaleChange={handleLocaleChange}
+        />
         <Button render={<Link to={Routes.Generator} />}>
           <IconSparkles className="size-4" />
           {t.openGenerator}
@@ -187,13 +222,19 @@ function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {t.cards.map((card, index) => {
           const Icon = [IconBolt, IconClock, IconPhoto, IconSparkles][index];
+          const values = [
+            creditsData?.balance?.toString() ?? '0',
+            statsData?.recentBatches?.toString() ?? '0',
+            statsData?.totalOutputs?.toString() ?? '0',
+            planData?.currentPlan?.name ?? t.freePlan,
+          ];
           return (
             <div key={card.label} className="rounded-lg border bg-card p-5">
               <div className="mb-5 flex items-center justify-between">
                 <p className="text-muted-foreground text-sm">{card.label}</p>
                 <Icon className="size-5 text-primary" />
               </div>
-              <p className="font-bold text-3xl">{card.value}</p>
+              <p className="font-bold text-3xl">{values[index]}</p>
               <p className="mt-1 text-muted-foreground text-sm">{card.hint}</p>
             </div>
           );
@@ -203,19 +244,27 @@ function DashboardPage() {
       <div className="rounded-lg border bg-card">
         <div className="border-b p-5">
           <h2 className="font-semibold text-lg">{t.historyTitle}</h2>
-          <p className="mt-1 text-muted-foreground text-sm">{t.empty}</p>
         </div>
         <div className="divide-y">
-          {t.rows.map((row) => (
-            <div
-              key={row.join('-')}
-              className="grid gap-2 p-4 text-sm md:grid-cols-[1.4fr_0.6fr_1fr_0.6fr]"
-            >
-              {row.map((cell) => (
-                <span key={cell}>{cell}</span>
-              ))}
-            </div>
-          ))}
+          {!batchesData?.items?.length ? (
+            <div className="p-4 text-muted-foreground text-sm">{t.empty}</div>
+          ) : (
+            batchesData.items.map((batch) => (
+              <div
+                key={batch.id}
+                className="grid gap-2 p-4 text-sm md:grid-cols-[1.4fr_0.6fr_1fr_0.6fr]"
+              >
+                <span className="truncate">{batch.id}</span>
+                <span>
+                  {batch.taskCount} {t.taskUnit}
+                </span>
+                <span>{t.statuses[batch.status] ?? batch.status}</span>
+                <span>
+                  {batch.spentCredits} {t.creditUnit}
+                </span>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </DashboardLayout>

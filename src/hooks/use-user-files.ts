@@ -9,22 +9,27 @@ import {
   listUserFiles,
   uploadUserFile,
 } from '@/api/user-files';
+import { authClient } from '@/auth/client';
 import { DEFAULT_AVATARS_FOLDER } from '@/storage/constants';
 
 export const userFilesKeys = {
-  all: ['user-files'] as const,
-  lists: () => [...userFilesKeys.all, 'lists'] as const,
-  list: (params: { pageIndex: number; pageSize: number }) =>
-    [...userFilesKeys.lists(), params] as const,
+  all: (userId: string) => ['user-files', userId] as const,
+  lists: (userId: string) => [...userFilesKeys.all(userId), 'lists'] as const,
+  list: (userId: string, params: { pageIndex: number; pageSize: number }) =>
+    [...userFilesKeys.lists(userId), params] as const,
 };
 
 /**
  * Fetches a list of user files
  */
 export function useUserFiles(pageIndex: number, pageSize: number) {
+  const { data: session } = authClient.useSession();
+  const userId = session?.user.id ?? '';
+
   return useQuery({
-    queryKey: userFilesKeys.list({ pageIndex, pageSize }),
+    queryKey: userFilesKeys.list(userId, { pageIndex, pageSize }),
     queryFn: () => listUserFiles({ data: { pageIndex, pageSize } }),
+    enabled: Boolean(userId),
     placeholderData: keepPreviousData,
   });
 }
@@ -34,10 +39,13 @@ export function useUserFiles(pageIndex: number, pageSize: number) {
  */
 export function useDeleteUserFile() {
   const queryClient = useQueryClient();
+  const { data: session } = authClient.useSession();
+  const userId = session?.user.id ?? '';
+
   return useMutation({
     mutationFn: (id: string) => deleteUserFile({ data: { id } }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userFilesKeys.all });
+      queryClient.invalidateQueries({ queryKey: userFilesKeys.all(userId) });
     },
   });
 }
@@ -47,6 +55,9 @@ export function useDeleteUserFile() {
  */
 export function useUploadUserFile() {
   const queryClient = useQueryClient();
+  const { data: session } = authClient.useSession();
+  const userId = session?.user.id ?? '';
+
   return useMutation({
     mutationFn: async (params: {
       file: File;
@@ -64,7 +75,7 @@ export function useUploadUserFile() {
       return uploadUserFile({ data: form });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: userFilesKeys.all });
+      queryClient.invalidateQueries({ queryKey: userFilesKeys.all(userId) });
     },
   });
 }

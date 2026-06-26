@@ -27,7 +27,7 @@ import {
 import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, count, desc, eq, gte, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 
 const taskSchema = z.object({
@@ -52,6 +52,15 @@ const createBatchSchema = z.object({
 
 const statusSchema = z.object({
   taskIds: z.array(z.string().min(1)).min(1).max(12),
+});
+
+const listBatchesSchema = z.object({
+  pageIndex: z.number().int().min(0).default(0),
+  pageSize: z.number().int().min(1).max(100).default(20),
+});
+
+const batchDetailSchema = z.object({
+  batchId: z.string().min(1),
 });
 
 function createId(prefix: string) {
@@ -430,6 +439,125 @@ export const estimateGenerationCredits = createServerFn({ method: 'POST' })
       0
     ),
   }));
+
+export const listGenerationBatches = createServerFn({ method: 'GET' })
+  .inputValidator(listBatchesSchema)
+  .middleware([authApiMiddleware])
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const { pageIndex, pageSize } = data;
+    const db = getDb();
+    const where = eq(generationBatches.userId, userId);
+
+    const [totalRow] = await db
+      .select({ count: count() })
+      .from(generationBatches)
+      .where(where);
+
+    const items = await db
+      .select({
+        id: generationBatches.id,
+        projectId: generationBatches.projectId,
+        status: generationBatches.status,
+        locale: generationBatches.locale,
+        taskCount: generationBatches.taskCount,
+        completedTaskCount: generationBatches.completedTaskCount,
+        failedTaskCount: generationBatches.failedTaskCount,
+        reservedCredits: generationBatches.reservedCredits,
+        spentCredits: generationBatches.spentCredits,
+        provider: generationBatches.provider,
+        createdAt: generationBatches.createdAt,
+        updatedAt: generationBatches.updatedAt,
+      })
+      .from(generationBatches)
+      .where(where)
+      .orderBy(desc(generationBatches.createdAt))
+      .limit(pageSize)
+      .offset(pageIndex * pageSize);
+
+    return { items, total: totalRow?.count ?? 0 };
+  });
+
+export const getGenerationBatchDetail = createServerFn({ method: 'GET' })
+  .inputValidator(batchDetailSchema)
+  .middleware([authApiMiddleware])
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const db = getDb();
+
+    const [batch] = await db
+      .select()
+      .from(generationBatches)
+      .where(
+        and(
+          eq(generationBatches.id, data.batchId),
+          eq(generationBatches.userId, userId)
+        )
+      )
+      .limit(1);
+
+    if (!batch) {
+      throw new Error('Batch not found');
+    }
+
+    const tasks = await db
+      .select()
+      .from(generationTasks)
+      .where(
+        and(
+          eq(generationTasks.batchId, data.batchId),
+          eq(generationTasks.userId, userId)
+        )
+      )
+      .orderBy(desc(generationTasks.createdAt));
+
+    const outputs = await db
+      .select()
+      .from(generationOutputs)
+      .where(
+        and(
+          eq(generationOutputs.batchId, data.batchId),
+          eq(generationOutputs.userId, userId)
+        )
+      )
+      .orderBy(desc(generationOutputs.createdAt));
+
+    return { batch, tasks, outputs };
+  });
+
+export const getGenerationStats = createServerFn({ method: 'GET' })
+  .middleware([authApiMiddleware])
+  .handler(async ({ context }) => {
+    const { userId } = context;
+    const db = getDb();
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    const [batchCountRow] = await db
+      .select({ count: count() })
+      .from(generationBatches)
+      .where(eq(generationBatches.userId, userId));
+
+    const [recentBatchCountRow] = await db
+      .select({ count: count() })
+      .from(generationBatches)
+      .where(
+        and(
+          eq(generationBatches.userId, userId),
+          gte(generationBatches.createdAt, thirtyDaysAgo)
+        )
+      );
+
+    const [outputCountRow] = await db
+      .select({ count: count() })
+      .from(generationOutputs)
+      .where(eq(generationOutputs.userId, userId));
+
+    return {
+      totalBatches: batchCountRow?.count ?? 0,
+      recentBatches: recentBatchCountRow?.count ?? 0,
+      totalOutputs: outputCountRow?.count ?? 0,
+    };
+  });
 
 function taskStatusPayload(task: typeof generationTasks.$inferSelect) {
   const payload = safeJson(task.providerPayload);

@@ -29,6 +29,9 @@ export const Route = createFileRoute('/tools/$slug')({
     return { tool };
   },
   head: ({ loaderData }) => {
+    if (!loaderData?.tool) {
+      return {};
+    }
     const { tool } = loaderData;
     const metadata = seo(`/tools/${tool.slug}`, {
       title: `${tool.title} | ProdList AI`,
@@ -47,14 +50,16 @@ export const Route = createFileRoute('/tools/$slug')({
     const faq = {
       '@context': 'https://schema.org',
       '@type': 'FAQPage',
-      mainEntity: tool.faqs.map((item) => ({
-        '@type': 'Question',
-        name: item.question,
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: item.answer,
-        },
-      })),
+      mainEntity: tool.faqs.map(
+        (item: { question: string; answer: string }) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })
+      ),
     };
     return {
       ...metadata,
@@ -79,7 +84,11 @@ export const Route = createFileRoute('/tools/$slug')({
 });
 
 function ToolPage() {
-  const { tool } = Route.useLoaderData();
+  const loaderData = Route.useLoaderData();
+  if (!loaderData?.tool) {
+    throw notFound();
+  }
+  const { tool } = loaderData;
   const { locale, setLocale } = useProductLocale();
   const copy = getProductToolCopy(tool, locale);
 

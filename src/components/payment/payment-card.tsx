@@ -119,8 +119,8 @@ export function PaymentCard({
     if (status !== 'success' || !callback) return;
 
     const run = async () => {
-      await queryClient.invalidateQueries({ queryKey: ['currentPlan'] });
-      await queryClient.refetchQueries({ queryKey: ['currentPlan'] });
+      await queryClient.invalidateQueries({ queryKey: ['payment'] });
+      await queryClient.refetchQueries({ queryKey: ['payment'] });
       navigate({ to: callback });
     };
     run();
