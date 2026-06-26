@@ -75,7 +75,9 @@ export function getProductLocaleFromPathname(pathname?: string | null) {
 
 export function getStoredProductLocale() {
   if (typeof window === 'undefined') return undefined;
-  return normalizeProductLocale(window.localStorage.getItem(PRODUCT_LOCALE_KEY));
+  return normalizeProductLocale(
+    window.localStorage.getItem(PRODUCT_LOCALE_KEY)
+  );
 }
 
 export function getInitialProductLocale(initialLocale?: ProductLocale) {
@@ -98,8 +100,8 @@ export function setGlobalProductLocale(next: ProductLocale) {
 }
 
 export function useProductLocale(initialLocale?: ProductLocale) {
-  const [locale, setLocaleState] = useState<ProductLocale>(
-    () => getInitialProductLocale(initialLocale)
+  const [locale, setLocaleState] = useState<ProductLocale>(() =>
+    getInitialProductLocale(initialLocale)
   );
 
   useEffect(() => {
@@ -134,31 +136,43 @@ export function useProductLocale(initialLocale?: ProductLocale) {
   return { locale, setLocale };
 }
 
-export function getLocalizedPublicPath(pathname: string, locale: ProductLocale) {
+export function getLocalizedPublicPath(
+  pathname: string,
+  locale: ProductLocale
+) {
   const cleanPathname = pathname === '' ? '/' : pathname;
-  const slug = cleanPathname.match(/^\/(?:zh\/)?tools\/([^/]+)\/?$/)?.[1];
+  const normalized =
+    cleanPathname.length > 1 ? cleanPathname.replace(/\/$/, '') : cleanPathname;
+  const segments = normalized.split('/').filter(Boolean);
+  const firstSegment = segments[0];
+  const hasLocalePrefix = PRODUCT_LOCALES.includes(
+    firstSegment as ProductLocale
+  );
+  const pathWithoutLocale = hasLocalePrefix
+    ? `/${segments.slice(1).join('/')}` || '/'
+    : normalized;
 
-  if (locale === 'zh') {
-    if (slug) return `/zh/tools/${slug}`;
-    if (cleanPathname === '/tools' || cleanPathname === '/tools/') {
-      return '/zh/tools';
-    }
-    if (cleanPathname === '/gallery') return '/zh/gallery';
-    if (['/', '/en', '/ja', '/ko', '/es'].includes(cleanPathname)) {
-      return '/zh';
-    }
-    return cleanPathname;
-  }
-
-  if (slug) return `/tools/${slug}`;
-  if (cleanPathname === '/zh/tools' || cleanPathname === '/zh/tools/') {
-    return '/tools';
-  }
-  if (cleanPathname === '/zh/gallery') return '/gallery';
-  if (['/zh', '/en', '/ja', '/ko', '/es', '/'].includes(cleanPathname)) {
+  if (pathWithoutLocale === '/') {
     return locale === 'en' ? '/' : `/${locale}`;
   }
-  return cleanPathname;
+
+  const supportsAllLocales = pathWithoutLocale === '/batch-generator';
+  const supportsZhOnly =
+    pathWithoutLocale === '/gallery' ||
+    pathWithoutLocale === '/tools' ||
+    /^\/tools\/[^/]+$/.test(pathWithoutLocale);
+
+  if (supportsAllLocales) {
+    return locale === 'en'
+      ? pathWithoutLocale
+      : `/${locale}${pathWithoutLocale}`;
+  }
+
+  if (supportsZhOnly) {
+    return locale === 'zh' ? `/zh${pathWithoutLocale}` : pathWithoutLocale;
+  }
+
+  return normalized;
 }
 
 export function ProductLanguageSelect({

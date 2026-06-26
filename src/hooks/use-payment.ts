@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 
 export const paymentKeys = {
   all: (userId: string) => ['payment', userId] as const,
-  currentPlan: (userId: string) => [...paymentKeys.all(userId), 'currentPlan'] as const,
+  currentPlan: (userId: string) =>
+    [...paymentKeys.all(userId), 'currentPlan'] as const,
 };
 
 export function useCurrentPlan(enabled = true) {

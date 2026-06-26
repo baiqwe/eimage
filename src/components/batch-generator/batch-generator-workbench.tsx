@@ -15,8 +15,10 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import {
   useGenerationBatches,
+  useGenerationBatchDetail,
   useGenerationCredits,
 } from '@/hooks/use-generation-history';
+import { downloadFile } from '@/lib/download';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
 import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
 import { Routes } from '@/lib/routes';
@@ -25,6 +27,7 @@ import {
   IconCheck,
   IconCloudUpload,
   IconDownload,
+  IconEye,
   IconHistory,
   IconPhotoScan,
   IconPlayerPlay,
@@ -33,15 +36,15 @@ import {
   IconTrash,
   IconWand,
   IconX,
+  IconPackageExport,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent } from 'react';
 
 type BatchGeneratorLocale = 'zh' | 'en' | 'ja' | 'ko' | 'es';
-type OutputMode = 'translate' | 'resize' | 'outpaint' | 'marketplace';
-type AspectRatio = '1:1' | '3:4' | '4:5' | '16:9';
-type Resolution = '1024' | '1536' | '2048';
+type KieAspectRatio = (typeof KIE_MODELS)[number]['aspectRatios'][number];
+type KieResolution = (typeof KIE_MODELS)[number]['resolutions'][number];
 type BatchTaskStatus =
   | 'uploaded'
   | 'queued'
@@ -65,14 +68,6 @@ interface BatchImageTask {
 const MAX_IMAGES = 30;
 const MAX_SIZE_MB = 12;
 
-const OUTPUT_MODES: OutputMode[] = [
-  'marketplace',
-  'translate',
-  'resize',
-  'outpaint',
-];
-const ASPECT_RATIOS: AspectRatio[] = ['1:1', '3:4', '4:5', '16:9'];
-const RESOLUTIONS: Resolution[] = ['1024', '1536', '2048'];
 const TARGET_LANGUAGES = [
   'English',
   'Chinese',
@@ -80,7 +75,15 @@ const TARGET_LANGUAGES = [
   'Korean',
   'Spanish',
 ];
+const LOCALE_TARGET_LANGUAGE: Record<BatchGeneratorLocale, string> = {
+  zh: 'Chinese',
+  en: 'English',
+  ja: 'Japanese',
+  ko: 'Korean',
+  es: 'Spanish',
+};
 const DEFAULT_MODEL = KIE_MODELS[0]?.id ?? 'gpt-image-2-image-to-image';
+const DEFAULT_MODEL_CONFIG = KIE_MODELS[0];
 
 const COPY: Record<
   BatchGeneratorLocale,
@@ -96,11 +99,21 @@ const COPY: Record<
     limitHint: string;
     configTitle: string;
     configDescription: string;
-    mode: string;
     model: string;
     language: string;
     ratio: string;
     resolution: string;
+    parameterHint: string;
+    sourcePanel: string;
+    resultsPanel: string;
+    batchDownload: string;
+    preview: string;
+    historyDetail: string;
+    taskTime: string;
+    taskCredits: string;
+    promptLabel: string;
+    refunded: string;
+    notRefunded: string;
     prompt: string;
     promptPlaceholder: string;
     start: string;
@@ -131,8 +144,6 @@ const COPY: Record<
     apiError: string;
     insufficientCredits: (required: number, available: number) => string;
     resultPlan: string;
-    modes: Record<OutputMode, string>;
-    modeHints: Record<OutputMode, string>;
   }
 > = {
   zh: {
@@ -148,11 +159,21 @@ const COPY: Record<
     limitHint: 'JPG、PNG、WebP；提交后会按图片拆成多个 Kie 任务。',
     configTitle: '共享配置',
     configDescription: '所有图片共用一套生成意图，生成时每张图仍是独立任务。',
-    mode: '输出模式',
     model: '生图模型',
     language: '目标语言',
     ratio: '尺寸比例',
     resolution: '分辨率',
+    parameterHint: '参数会根据所选 Kie 模型自动切换。',
+    sourcePanel: '上传原图',
+    resultsPanel: '生成结果',
+    batchDownload: '下载 ZIP',
+    preview: '预览',
+    historyDetail: '批次任务详情',
+    taskTime: '时间',
+    taskCredits: '点数',
+    promptLabel: 'Prompt',
+    refunded: '失败已退回',
+    notRefunded: '已消耗/处理中',
     prompt: '统一指令',
     promptPlaceholder:
       '例如：把图片中的文字翻译成目标语言，保持产品形状不变，统一为干净的电商主图风格。',
@@ -186,18 +207,6 @@ const COPY: Record<
       `点数不足：需要 ${required} 点，当前 ${available} 点。`,
     resultPlan:
       '多张结果建议用“批次总览 + 单图检查器”：中间保留密集网格，右侧展示当前图片的大图、状态、下载和错误信息；历史批次作为轻量抽屉或侧栏，不抢占主画布。',
-    modes: {
-      marketplace: '电商套图统一',
-      translate: '图片文字翻译',
-      resize: '改比例/改尺寸',
-      outpaint: '背景扩图',
-    },
-    modeHints: {
-      marketplace: '统一光影、背景和平台主图风格。',
-      translate: '翻译包装或海报文字，尽量保持排版。',
-      resize: '按目标比例重构画布，保护商品主体。',
-      outpaint: '向外扩展背景，补齐商品周围空间。',
-    },
   },
   en: {
     back: 'Back home',
@@ -213,11 +222,22 @@ const COPY: Record<
     configTitle: 'Shared config',
     configDescription:
       'One intent for the whole batch; one independent task per image.',
-    mode: 'Output mode',
     model: 'Generation model',
     language: 'Target language',
     ratio: 'Aspect ratio',
     resolution: 'Resolution',
+    parameterHint:
+      'Parameters switch automatically from the selected Kie model.',
+    sourcePanel: 'Source images',
+    resultsPanel: 'Generated results',
+    batchDownload: 'Download ZIP',
+    preview: 'Preview',
+    historyDetail: 'Batch task detail',
+    taskTime: 'Time',
+    taskCredits: 'Credits',
+    promptLabel: 'Prompt',
+    refunded: 'Failed and refunded',
+    notRefunded: 'Spent / running',
     prompt: 'Shared instruction',
     promptPlaceholder:
       'Example: translate visible text to the target language, preserve the product, and unify the image as a clean ecommerce hero shot.',
@@ -252,19 +272,6 @@ const COPY: Record<
       `Insufficient credits: ${required} required, ${available} available.`,
     resultPlan:
       'For many outputs, use a batch overview plus single-image inspector: keep a dense grid in the center, show the selected result, status, download, and errors on the right, and keep history as a lightweight side panel.',
-    modes: {
-      marketplace: 'Marketplace set',
-      translate: 'Image text translation',
-      resize: 'Resize / ratio change',
-      outpaint: 'Background outpaint',
-    },
-    modeHints: {
-      marketplace: 'Unify lighting, background, and marketplace hero style.',
-      translate: 'Translate packaging or poster text while preserving layout.',
-      resize: 'Rebuild the canvas around the protected product subject.',
-      outpaint:
-        'Extend the background and create more space around the product.',
-    },
   },
   ja: {
     back: 'ホームへ戻る',
@@ -279,11 +286,21 @@ const COPY: Record<
     limitHint: 'JPG、PNG、WebP。送信後は画像ごとに Kie タスクになります。',
     configTitle: '共有設定',
     configDescription: 'バッチ全体で 1 つの意図を使い、画像ごとに処理します。',
-    mode: '出力モード',
     model: '生成モデル',
     language: '対象言語',
     ratio: '比率',
     resolution: '解像度',
+    parameterHint: '選択した Kie モデルに合わせてパラメータが切り替わります。',
+    sourcePanel: '元画像',
+    resultsPanel: '生成結果',
+    batchDownload: 'ZIP 保存',
+    preview: 'プレビュー',
+    historyDetail: 'バッチタスク詳細',
+    taskTime: '時間',
+    taskCredits: 'クレジット',
+    promptLabel: 'Prompt',
+    refunded: '失敗・返却済み',
+    notRefunded: '消費済み/処理中',
     prompt: '共通指示',
     promptPlaceholder:
       '例：画像内の文字を対象言語に翻訳し、商品形状を保ち、清潔な EC メイン画像に統一する。',
@@ -317,18 +334,6 @@ const COPY: Record<
       `クレジット不足：必要 ${required}、現在 ${available}。`,
     resultPlan:
       '多数の結果は「バッチ一覧 + 単画像インスペクター」が適しています。中央に密なグリッド、右側に選択画像、状態、保存、エラーを表示し、履歴は軽いサイドパネルにします。',
-    modes: {
-      marketplace: 'EC セット統一',
-      translate: '画像文字翻訳',
-      resize: '比率/サイズ変更',
-      outpaint: '背景拡張',
-    },
-    modeHints: {
-      marketplace: '光、背景、EC メイン画像の雰囲気を統一します。',
-      translate: '包装やポスター文字を翻訳し、レイアウトを保ちます。',
-      resize: '商品主体を保護してキャンバスを再構成します。',
-      outpaint: '背景を広げ、商品の周囲に余白を作ります。',
-    },
   },
   ko: {
     back: '홈으로',
@@ -344,11 +349,21 @@ const COPY: Record<
     configTitle: '공유 설정',
     configDescription:
       '배치 전체에 하나의 의도를 쓰고 이미지는 각각 처리합니다.',
-    mode: '출력 모드',
     model: '생성 모델',
     language: '대상 언어',
     ratio: '비율',
     resolution: '해상도',
+    parameterHint: '선택한 Kie 모델에 따라 파라미터가 자동 전환됩니다.',
+    sourcePanel: '원본 이미지',
+    resultsPanel: '생성 결과',
+    batchDownload: 'ZIP 다운로드',
+    preview: '미리보기',
+    historyDetail: '배치 작업 상세',
+    taskTime: '시간',
+    taskCredits: '크레딧',
+    promptLabel: 'Prompt',
+    refunded: '실패 환불됨',
+    notRefunded: '사용됨/처리 중',
     prompt: '공통 지시',
     promptPlaceholder:
       '예: 이미지 속 문구를 대상 언어로 번역하고 상품 형태를 유지하며 깔끔한 커머스 대표 이미지로 통일.',
@@ -383,18 +398,6 @@ const COPY: Record<
       `크레딧 부족: ${required} 필요, 현재 ${available}.`,
     resultPlan:
       '여러 결과는 배치 개요와 단일 이미지 검사기 조합이 적합합니다. 중앙은 촘촘한 그리드, 오른쪽은 선택 이미지와 상태, 다운로드, 오류를 표시하고 히스토리는 가벼운 사이드 패널로 둡니다.',
-    modes: {
-      marketplace: '마켓플레이스 세트',
-      translate: '이미지 텍스트 번역',
-      resize: '비율/크기 변경',
-      outpaint: '배경 확장',
-    },
-    modeHints: {
-      marketplace: '조명, 배경, 대표 이미지 스타일을 통일합니다.',
-      translate: '패키지나 포스터 문구를 번역하고 레이아웃을 유지합니다.',
-      resize: '상품 주체를 보호하며 캔버스를 재구성합니다.',
-      outpaint: '배경을 확장해 상품 주변 공간을 만듭니다.',
-    },
   },
   es: {
     back: 'Volver al inicio',
@@ -411,11 +414,21 @@ const COPY: Record<
     configTitle: 'Configuracion compartida',
     configDescription:
       'Una intencion para todo el lote; una tarea independiente por imagen.',
-    mode: 'Modo de salida',
     model: 'Modelo de generacion',
     language: 'Idioma objetivo',
     ratio: 'Proporcion',
     resolution: 'Resolucion',
+    parameterHint: 'Los parametros cambian segun el modelo Kie seleccionado.',
+    sourcePanel: 'Imagenes fuente',
+    resultsPanel: 'Resultados',
+    batchDownload: 'Descargar ZIP',
+    preview: 'Vista previa',
+    historyDetail: 'Detalle de tareas',
+    taskTime: 'Hora',
+    taskCredits: 'Creditos',
+    promptLabel: 'Prompt',
+    refunded: 'Fallida y reembolsada',
+    notRefunded: 'Consumida / en curso',
     prompt: 'Instruccion comun',
     promptPlaceholder:
       'Ejemplo: traducir el texto visible al idioma objetivo, conservar el producto y unificar la imagen como hero ecommerce limpio.',
@@ -451,18 +464,6 @@ const COPY: Record<
       `Creditos insuficientes: requiere ${required}, tienes ${available}.`,
     resultPlan:
       'Para muchos resultados conviene una vista de lote y un inspector: grid denso al centro, resultado seleccionado, estado, descarga y errores a la derecha, e historial como panel ligero.',
-    modes: {
-      marketplace: 'Set marketplace',
-      translate: 'Traduccion de texto',
-      resize: 'Cambiar proporcion',
-      outpaint: 'Expandir fondo',
-    },
-    modeHints: {
-      marketplace: 'Unifica luz, fondo y estilo hero de marketplace.',
-      translate: 'Traduce textos de empaque o poster preservando composicion.',
-      resize: 'Reconstruye el lienzo protegiendo el producto.',
-      outpaint: 'Extiende el fondo y crea mas espacio alrededor del producto.',
-    },
   },
 };
 
@@ -479,11 +480,19 @@ export function BatchGeneratorWorkbench({
   const inputRef = useRef<HTMLInputElement>(null);
   const [tasks, setTasks] = useState<BatchImageTask[]>([]);
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
-  const [mode, setMode] = useState<OutputMode>('marketplace');
   const [model, setModel] = useState<KieModelId>(DEFAULT_MODEL as KieModelId);
-  const [targetLanguage, setTargetLanguage] = useState('English');
-  const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
-  const [resolution, setResolution] = useState<Resolution>('1024');
+  const [selectedHistoryBatchId, setSelectedHistoryBatchId] = useState('');
+  const [targetLanguage, setTargetLanguage] = useState(
+    LOCALE_TARGET_LANGUAGE[locale]
+  );
+  const modelConfig =
+    KIE_MODELS.find((item) => item.id === model) ?? DEFAULT_MODEL_CONFIG;
+  const [aspectRatio, setAspectRatio] = useState<KieAspectRatio>(
+    DEFAULT_MODEL_CONFIG.aspectRatios[0]
+  );
+  const [resolution, setResolution] = useState<KieResolution>(
+    DEFAULT_MODEL_CONFIG.resolutions[0]
+  );
   const [prompt, setPrompt] = useState('');
   const [credits, setCredits] = useState(creditQuery.data?.balance ?? 0);
   const [batchNotice, setBatchNotice] = useState('');
@@ -499,13 +508,11 @@ export function BatchGeneratorWorkbench({
     ['queued', 'processing'].includes(task.status)
   ).length;
   const creditEstimate = useMemo(
-    () =>
-      tasks.length *
-      estimateTaskCreditCost({
-        kind: mode === 'marketplace' ? 'main' : 'detail',
-        resolution: buildResolution(aspectRatio, resolution),
-      }),
-    [aspectRatio, mode, resolution, tasks.length]
+    () => tasks.length * estimateTaskCreditCost({ resolution }),
+    [resolution, tasks.length]
+  );
+  const historyDetailQuery = useGenerationBatchDetail(
+    selectedHistoryBatchId || historyQuery.data?.items[0]?.id
   );
   const hasTasks = tasks.length > 0;
   const canStart = hasTasks && runningCount === 0;
@@ -515,6 +522,17 @@ export function BatchGeneratorWorkbench({
       setCredits(creditQuery.data.balance);
     }
   }, [creditQuery.data]);
+
+  useEffect(() => {
+    const nextConfig =
+      KIE_MODELS.find((item) => item.id === model) ?? DEFAULT_MODEL_CONFIG;
+    if (!(nextConfig.aspectRatios as readonly string[]).includes(aspectRatio)) {
+      setAspectRatio(nextConfig.aspectRatios[0]);
+    }
+    if (!(nextConfig.resolutions as readonly string[]).includes(resolution)) {
+      setResolution(nextConfig.resolutions[0]);
+    }
+  }, [aspectRatio, model, resolution]);
 
   async function addFiles(fileList: FileList | File[]) {
     const files = Array.from(fileList)
@@ -593,21 +611,19 @@ export function BatchGeneratorWorkbench({
 
     try {
       const sourceImage = tasks[0];
-      const builtResolution = buildResolution(aspectRatio, resolution);
       const plannedTasks = tasks.map((task) => ({
         id: task.id,
-        kind: mode === 'marketplace' ? ('main' as const) : ('detail' as const),
-        style: copy.modes[mode],
+        kind: 'detail' as const,
+        style: modelConfig.label,
         aspectRatio,
-        resolution: builtResolution,
+        resolution,
         model,
         prompt: buildBatchPrompt({
           prompt,
-          mode,
-          modeLabel: copy.modes[mode],
+          modelLabel: modelConfig.label,
           targetLanguage,
           aspectRatio,
-          resolution: builtResolution,
+          resolution,
         }),
         referenceImageDataUrl:
           task.id === sourceImage.id ? undefined : task.sourceDataUrl,
@@ -619,7 +635,7 @@ export function BatchGeneratorWorkbench({
           locale,
           productDescription:
             prompt.trim() ||
-            `${copy.modes[mode]} batch image edit for ${tasks.length} product images`,
+            `${modelConfig.label} batch image edit for ${tasks.length} product images`,
           sourceImageDataUrl: sourceImage.sourceDataUrl,
           sourceName: sourceImage.name,
           tasks: plannedTasks,
@@ -751,11 +767,28 @@ export function BatchGeneratorWorkbench({
   }
 
   function downloadSelectedTask() {
-    if (!(selectedTask?.resultDataUrl || selectedTask?.sourceDataUrl)) return;
-    const anchor = document.createElement('a');
-    anchor.href = selectedTask.resultDataUrl ?? selectedTask.sourceDataUrl;
-    anchor.download = `prodlist-${selectedTask.name}`;
-    anchor.click();
+    if (!selectedTask?.resultDataUrl) return;
+    void downloadFile(
+      selectedTask.resultDataUrl,
+      `prodlist-${selectedTask.name}`
+    );
+  }
+
+  async function downloadCompletedZip() {
+    const completedTasks = tasks.filter((task) => task.resultDataUrl);
+    if (completedTasks.length === 0) return;
+    const files = await Promise.all(
+      completedTasks.map(async (task, index) => ({
+        name: `${String(index + 1).padStart(2, '0')}-${sanitizeFilename(
+          task.name
+        )}`,
+        blob: await fetchImageBlob(task.resultDataUrl!),
+      }))
+    );
+    const zipBlob = await createZipFromFiles(files);
+    const url = URL.createObjectURL(zipBlob);
+    await downloadFile(url, `prodlist-batch-${Date.now()}.zip`);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   return (
@@ -871,18 +904,11 @@ export function BatchGeneratorWorkbench({
 
               <div className="mt-4 grid gap-3">
                 <FieldSelect
-                  label={copy.mode}
-                  value={mode}
-                  options={OUTPUT_MODES}
-                  renderOption={(value) => copy.modes[value]}
-                  onChange={(value) => setMode(value as OutputMode)}
-                />
-                <FieldSelect
                   label={copy.model}
                   value={model}
                   options={KIE_MODELS.map((item) => item.id)}
                   renderOption={(value) =>
-                    KIE_MODELS.find((item) => item.id === value)?.name ?? value
+                    KIE_MODELS.find((item) => item.id === value)?.label ?? value
                   }
                   onChange={(value) => setModel(value as KieModelId)}
                 />
@@ -897,16 +923,20 @@ export function BatchGeneratorWorkbench({
                   <FieldSelect
                     label={copy.ratio}
                     value={aspectRatio}
-                    options={ASPECT_RATIOS}
+                    options={modelConfig.aspectRatios}
                     renderOption={(value) => value}
-                    onChange={(value) => setAspectRatio(value as AspectRatio)}
+                    onChange={(value) =>
+                      setAspectRatio(value as KieAspectRatio)
+                    }
                   />
                   <FieldSelect
                     label={copy.resolution}
                     value={resolution}
-                    options={RESOLUTIONS}
-                    renderOption={(value) => `${value}px`}
-                    onChange={(value) => setResolution(value as Resolution)}
+                    options={modelConfig.resolutions}
+                    renderOption={(value) =>
+                      `${value} · ${modelConfig.resolutionLabel}`
+                    }
+                    onChange={(value) => setResolution(value as KieResolution)}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -925,7 +955,7 @@ export function BatchGeneratorWorkbench({
                   />
                 </div>
                 <p className="rounded-md bg-[#f7f8f4] px-3 py-2 text-[#5f665b] text-xs leading-5">
-                  {copy.modeHints[mode]}
+                  {copy.parameterHint}
                 </p>
               </div>
             </section>
@@ -974,6 +1004,15 @@ export function BatchGeneratorWorkbench({
               </Button>
               <Button
                 type="button"
+                variant="outline"
+                disabled={completedCount === 0}
+                onClick={() => void downloadCompletedZip()}
+              >
+                <IconPackageExport className="size-4" />
+                {copy.batchDownload}
+              </Button>
+              <Button
+                type="button"
                 className="bg-[#20231e]"
                 disabled={!canStart}
                 onClick={startBatch}
@@ -985,60 +1024,29 @@ export function BatchGeneratorWorkbench({
           </div>
 
           {hasTasks ? (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-              {tasks.map((task) => (
-                <button
-                  type="button"
-                  key={task.id}
-                  className={`group overflow-hidden rounded-lg border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
-                    selectedTask?.id === task.id
-                      ? 'border-[#2f5f4f] ring-2 ring-[#2f5f4f]/15'
-                      : 'border-[#dfe3d8]'
-                  }`}
-                  onClick={() => setSelectedTaskId(task.id)}
-                >
-                  <div className="relative aspect-[4/3] overflow-hidden bg-[#eef1e8]">
-                    <img
-                      src={task.resultDataUrl ?? task.sourceDataUrl}
-                      alt={task.name}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
-                    />
-                    <div className="absolute top-2 left-2">
-                      <StatusBadge status={task.status} copy={copy} />
-                    </div>
-                    {task.status === 'processing' ? (
-                      <div className="absolute inset-x-3 bottom-3 h-1 rounded-full bg-white/70">
-                        <div
-                          className="h-full rounded-full bg-[#d83b01]"
-                          style={{ width: `${task.progress}%` }}
-                        />
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className="p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="line-clamp-1 font-medium text-sm">
-                        {task.name}
-                      </p>
-                      <button
-                        type="button"
-                        className="rounded-md p-1 text-[#8a9282] hover:bg-[#f2f4ed] hover:text-[#20231e]"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          removeTask(task.id);
-                        }}
-                        aria-label={copy.remove}
-                      >
-                        <IconX className="size-4" />
-                      </button>
-                    </div>
-                    <p className="mt-1 text-[#7c8476] text-xs">
-                      {formatFileSize(task.size)} · {aspectRatio} · {resolution}
-                      px
-                    </p>
-                  </div>
-                </button>
-              ))}
+            <div className="space-y-6">
+              <AssetGridSection
+                title={copy.sourcePanel}
+                tasks={tasks}
+                selectedTaskId={selectedTask?.id}
+                imageKind="source"
+                copy={copy}
+                aspectRatio={aspectRatio}
+                resolution={resolution}
+                onSelect={setSelectedTaskId}
+                onRemove={removeTask}
+              />
+              <AssetGridSection
+                title={copy.resultsPanel}
+                tasks={tasks}
+                selectedTaskId={selectedTask?.id}
+                imageKind="result"
+                copy={copy}
+                aspectRatio={aspectRatio}
+                resolution={resolution}
+                onSelect={setSelectedTaskId}
+                onRemove={removeTask}
+              />
             </div>
           ) : (
             <div className="flex min-h-[520px] items-center justify-center rounded-lg border border-dashed border-[#cbd2c3] bg-white">
@@ -1065,14 +1073,35 @@ export function BatchGeneratorWorkbench({
             </div>
             {selectedTask ? (
               <div className="mt-4">
-                <div className="overflow-hidden rounded-lg border border-[#dfe3d8] bg-[#f7f8f4]">
-                  <img
-                    src={
-                      selectedTask.resultDataUrl ?? selectedTask.sourceDataUrl
-                    }
-                    alt={selectedTask.name}
-                    className="aspect-square w-full object-cover"
-                  />
+                <div className="grid gap-3">
+                  <div>
+                    <p className="mb-2 font-medium text-[#74796d] text-xs">
+                      {copy.sourcePanel}
+                    </p>
+                    <div className="overflow-hidden rounded-lg border border-[#dfe3d8] bg-[#f7f8f4]">
+                      <img
+                        src={selectedTask.sourceDataUrl}
+                        alt={selectedTask.name}
+                        className="aspect-square w-full object-cover"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="mb-2 font-medium text-[#74796d] text-xs">
+                      {copy.resultsPanel}
+                    </p>
+                    <div className="flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-[#dfe3d8] bg-[#f7f8f4]">
+                      {selectedTask.resultDataUrl ? (
+                        <img
+                          src={selectedTask.resultDataUrl}
+                          alt={selectedTask.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <StatusBadge status={selectedTask.status} copy={copy} />
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-3">
                   <div className="min-w-0">
@@ -1086,11 +1115,10 @@ export function BatchGeneratorWorkbench({
                   <StatusBadge status={selectedTask.status} copy={copy} />
                 </div>
                 <dl className="mt-4 grid gap-2 text-sm">
-                  <InspectorRow label={copy.mode} value={copy.modes[mode]} />
                   <InspectorRow
                     label={copy.model}
                     value={
-                      KIE_MODELS.find((item) => item.id === model)?.name ??
+                      KIE_MODELS.find((item) => item.id === model)?.label ??
                       model
                     }
                   />
@@ -1098,7 +1126,7 @@ export function BatchGeneratorWorkbench({
                   <InspectorRow label={copy.ratio} value={aspectRatio} />
                   <InspectorRow
                     label={copy.resolution}
-                    value={`${resolution}px`}
+                    value={`${resolution} · ${modelConfig.resolutionLabel}`}
                   />
                   {selectedTask.providerTaskId ? (
                     <InspectorRow
@@ -1135,9 +1163,18 @@ export function BatchGeneratorWorkbench({
             <div className="mt-4 space-y-2">
               {signedIn && historyQuery.data?.items.length ? (
                 historyQuery.data.items.map((item) => (
-                  <div
+                  <button
+                    type="button"
                     key={item.id}
-                    className="rounded-md border border-[#e5e8df] bg-[#fbfcf7] p-3"
+                    className={`w-full rounded-md border p-3 text-left ${
+                      (
+                        selectedHistoryBatchId ||
+                          historyQuery.data?.items[0]?.id
+                      ) === item.id
+                        ? 'border-[#2f5f4f] bg-[#edf7ef]'
+                        : 'border-[#e5e8df] bg-[#fbfcf7]'
+                    }`}
+                    onClick={() => setSelectedHistoryBatchId(item.id)}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <p className="font-medium text-sm">
@@ -1149,13 +1186,86 @@ export function BatchGeneratorWorkbench({
                       {item.completedTaskCount}/{item.taskCount}{' '}
                       {copy.completed} · {item.failedTaskCount} {copy.failed}
                     </p>
-                  </div>
+                  </button>
                 ))
               ) : (
                 <p className="text-[#74796d] text-sm">{copy.resultPlan}</p>
               )}
             </div>
           </section>
+
+          {historyDetailQuery.data ? (
+            <section className="mt-4 rounded-lg border border-[#dfe3d8] bg-white p-4 shadow-sm">
+              <h2 className="font-semibold">{copy.historyDetail}</h2>
+              <div className="mt-4 max-h-[520px] space-y-3 overflow-y-auto pr-1">
+                {historyDetailQuery.data.tasks.map((task) => {
+                  const output = historyDetailQuery.data.outputs.find(
+                    (item) => item.taskId === task.id
+                  );
+                  return (
+                    <article
+                      key={task.id}
+                      className="rounded-md border border-[#e5e8df] bg-[#fbfcf7] p-3"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <StatusBadge
+                          status={toBatchTaskStatus(task.status)}
+                          copy={copy}
+                        />
+                        <span className="text-[#74796d] text-xs">
+                          {copy.taskCredits}: {task.creditCost} ·{' '}
+                          {task.status === 'failed'
+                            ? copy.refunded
+                            : copy.notRefunded}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-[#74796d] text-xs">
+                        {copy.taskTime}:{' '}
+                        {new Date(task.createdAt).toLocaleString()}
+                      </p>
+                      <p className="mt-2 line-clamp-3 text-[#5f665b] text-xs">
+                        {copy.promptLabel}: {task.prompt}
+                      </p>
+                      {output?.publicUrl ? (
+                        <div className="mt-3 flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() =>
+                              window.open(
+                                output.publicUrl ?? '',
+                                '_blank',
+                                'noopener,noreferrer'
+                              )
+                            }
+                          >
+                            <IconEye className="size-4" />
+                            {copy.preview}
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            className="flex-1 bg-[#d83b01]"
+                            onClick={() =>
+                              void downloadFile(
+                                output.publicUrl ?? '',
+                                `prodlist-${task.id}.png`
+                              )
+                            }
+                          >
+                            <IconDownload className="size-4" />
+                            {copy.download}
+                          </Button>
+                        </div>
+                      ) : null}
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
 
           <section className="mt-4 rounded-lg border border-[#d4eadb] bg-[#edf7ef] p-4 text-[#43634b] text-sm leading-6">
             <IconCheck className="mb-2 size-5" />
@@ -1165,6 +1275,111 @@ export function BatchGeneratorWorkbench({
         </aside>
       </section>
     </main>
+  );
+}
+
+function AssetGridSection({
+  title,
+  tasks,
+  selectedTaskId,
+  imageKind,
+  copy,
+  aspectRatio,
+  resolution,
+  onSelect,
+  onRemove,
+}: {
+  title: string;
+  tasks: BatchImageTask[];
+  selectedTaskId?: string;
+  imageKind: 'source' | 'result';
+  copy: (typeof COPY)[BatchGeneratorLocale];
+  aspectRatio: string;
+  resolution: string;
+  onSelect: (id: string) => void;
+  onRemove: (id: string) => void;
+}) {
+  return (
+    <section>
+      <h3 className="mb-3 font-semibold text-xl">{title}</h3>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        {tasks.map((task) => {
+          const imageUrl =
+            imageKind === 'source' ? task.sourceDataUrl : task.resultDataUrl;
+          return (
+            <article
+              key={`${imageKind}-${task.id}`}
+              className={`group overflow-hidden rounded-lg border bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+                selectedTaskId === task.id
+                  ? 'border-[#2f5f4f] ring-2 ring-[#2f5f4f]/15'
+                  : 'border-[#dfe3d8]'
+              }`}
+            >
+              <button
+                type="button"
+                className="block w-full text-left"
+                onClick={() => onSelect(task.id)}
+              >
+                <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[#eef1e8]">
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt={task.name}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                    />
+                  ) : (
+                    <div className="text-center text-[#74796d] text-sm">
+                      <StatusBadge status={task.status} copy={copy} />
+                    </div>
+                  )}
+                  <div className="absolute top-2 left-2">
+                    <StatusBadge status={task.status} copy={copy} />
+                  </div>
+                  {task.status === 'processing' ? (
+                    <div className="absolute inset-x-3 bottom-3 h-1 rounded-full bg-white/70">
+                      <div
+                        className="h-full rounded-full bg-[#d83b01]"
+                        style={{ width: `${task.progress}%` }}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              </button>
+              <div className="p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <button
+                    type="button"
+                    className="min-w-0 flex-1 text-left"
+                    onClick={() => onSelect(task.id)}
+                  >
+                    <p className="line-clamp-1 font-medium text-sm">
+                      {task.name}
+                    </p>
+                  </button>
+                  {imageKind === 'source' ? (
+                    <button
+                      type="button"
+                      className="rounded-md p-1 text-[#8a9282] hover:bg-[#f2f4ed] hover:text-[#20231e]"
+                      onClick={() => onRemove(task.id)}
+                      aria-label={copy.remove}
+                    >
+                      <IconX className="size-4" />
+                    </button>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  className="mt-1 text-left text-[#7c8476] text-xs"
+                  onClick={() => onSelect(task.id)}
+                >
+                  {formatFileSize(task.size)} · {aspectRatio} · {resolution}
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -1256,45 +1471,129 @@ function makeTaskId() {
   return `task-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-function buildResolution(aspectRatio: AspectRatio, resolution: Resolution) {
-  const base = Number(resolution);
-  const [widthRatio, heightRatio] = aspectRatio.split(':').map(Number);
-  if (!widthRatio || !heightRatio) return `${base}x${base}`;
-  if (widthRatio === heightRatio) return `${base}x${base}`;
-  if (widthRatio < heightRatio) {
-    return `${base}x${Math.round((base * heightRatio) / widthRatio)}`;
-  }
-  return `${Math.round((base * widthRatio) / heightRatio)}x${base}`;
-}
-
 function buildBatchPrompt({
   prompt,
-  mode,
-  modeLabel,
+  modelLabel,
   targetLanguage,
   aspectRatio,
   resolution,
 }: {
   prompt: string;
-  mode: OutputMode;
-  modeLabel: string;
+  modelLabel: string;
   targetLanguage: string;
-  aspectRatio: AspectRatio;
+  aspectRatio: string;
   resolution: string;
 }) {
   const instruction = prompt.trim()
     ? prompt.trim()
-    : `Apply the ${modeLabel} workflow to the uploaded product image.`;
+    : 'Create a polished ecommerce product image from the uploaded source.';
   return [
     'Use the uploaded image as the immutable source image.',
-    `Batch edit mode: ${mode}.`,
+    `Generation model: ${modelLabel}.`,
     `Target language: ${targetLanguage}.`,
-    `Output aspect ratio: ${aspectRatio}. Output resolution: ${resolution}.`,
+    `Kie aspect ratio: ${aspectRatio}. Kie quality/resolution: ${resolution}.`,
     instruction,
     'Preserve the exact product identity, geometry, material, logos, labels, and visible structure unless the user explicitly asks to translate visible text.',
     'Do not invent extra products. Do not change the product category. Keep the result suitable for ecommerce listing use.',
   ].join(' ');
 }
+
+function toBatchTaskStatus(status: string): BatchTaskStatus {
+  if (status === 'completed') return 'completed';
+  if (status === 'failed' || status === 'cancelled') return 'failed';
+  if (status === 'running') return 'processing';
+  if (status === 'queued') return 'queued';
+  return 'uploaded';
+}
+
+async function fetchImageBlob(url: string) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Download failed: ${response.status}`);
+  return response.blob();
+}
+
+function sanitizeFilename(name: string) {
+  return name.replace(/[^\w.-]+/g, '-').replace(/^-+|-+$/g, '') || 'image.png';
+}
+
+async function createZipFromFiles(files: Array<{ name: string; blob: Blob }>) {
+  const encoder = new TextEncoder();
+  const chunks: Uint8Array[] = [];
+  const centralDirectory: Uint8Array[] = [];
+  let offset = 0;
+
+  for (const file of files) {
+    const nameBytes = encoder.encode(file.name);
+    const data = new Uint8Array(await file.blob.arrayBuffer());
+    const crc = crc32(data);
+    const localHeader = new Uint8Array(30 + nameBytes.length);
+    const local = new DataView(localHeader.buffer);
+    local.setUint32(0, 0x04034b50, true);
+    local.setUint16(4, 20, true);
+    local.setUint16(6, 0, true);
+    local.setUint16(8, 0, true);
+    local.setUint16(10, 0, true);
+    local.setUint16(12, 0, true);
+    local.setUint32(14, crc, true);
+    local.setUint32(18, data.length, true);
+    local.setUint32(22, data.length, true);
+    local.setUint16(26, nameBytes.length, true);
+    localHeader.set(nameBytes, 30);
+
+    const centralHeader = new Uint8Array(46 + nameBytes.length);
+    const central = new DataView(centralHeader.buffer);
+    central.setUint32(0, 0x02014b50, true);
+    central.setUint16(4, 20, true);
+    central.setUint16(6, 20, true);
+    central.setUint16(8, 0, true);
+    central.setUint16(10, 0, true);
+    central.setUint16(12, 0, true);
+    central.setUint16(14, 0, true);
+    central.setUint32(16, crc, true);
+    central.setUint32(20, data.length, true);
+    central.setUint32(24, data.length, true);
+    central.setUint16(28, nameBytes.length, true);
+    central.setUint32(42, offset, true);
+    centralHeader.set(nameBytes, 46);
+
+    chunks.push(localHeader, data);
+    centralDirectory.push(centralHeader);
+    offset += localHeader.length + data.length;
+  }
+
+  const centralOffset = offset;
+  const centralSize = centralDirectory.reduce(
+    (sum, item) => sum + item.length,
+    0
+  );
+  const end = new Uint8Array(22);
+  const endView = new DataView(end.buffer);
+  endView.setUint32(0, 0x06054b50, true);
+  endView.setUint16(8, files.length, true);
+  endView.setUint16(10, files.length, true);
+  endView.setUint32(12, centralSize, true);
+  endView.setUint32(16, centralOffset, true);
+
+  return new Blob([...chunks, ...centralDirectory, end], {
+    type: 'application/zip',
+  });
+}
+
+function crc32(data: Uint8Array) {
+  let crc = -1;
+  for (const byte of data) {
+    crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ byte) & 0xff];
+  }
+  return (crc ^ -1) >>> 0;
+}
+
+const CRC_TABLE = Array.from({ length: 256 }, (_unused, index) => {
+  let value = index;
+  for (let bit = 0; bit < 8; bit += 1) {
+    value = value & 1 ? 0xedb88320 ^ (value >>> 1) : value >>> 1;
+  }
+  return value >>> 0;
+});
 
 function formatFileSize(size: number) {
   if (size < 1024 * 1024) {

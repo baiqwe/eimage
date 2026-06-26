@@ -139,15 +139,24 @@ export function normalizeKieRecord(record: KieRecordInfoResponse) {
 
 function createModelInput(input: KieCreateTaskInput) {
   const model = getKieModel(input.model);
-  const [width, height] = input.resolution.split('x').map(Number);
-  const imageResolution = width >= 1536 || height >= 1536 ? '2K' : '1K';
+  const quality = normalizeKieQuality(input.resolution);
+
+  if (model.adapter === 'seedream-4-5') {
+    return {
+      prompt: input.prompt,
+      image_urls: [input.imageUrl],
+      aspect_ratio: input.aspectRatio || 'match_input_image',
+      quality,
+      max_images: 1,
+    };
+  }
 
   if (model.adapter === 'seedream') {
     return {
       prompt: input.prompt,
       image_urls: [input.imageUrl],
       image_size: aspectRatioToSeedreamSize(input.aspectRatio),
-      image_resolution: imageResolution,
+      image_resolution: quality === '4K' ? '2K' : quality,
       max_images: 1,
       nsfw_checker: true,
     };
@@ -157,8 +166,19 @@ function createModelInput(input: KieCreateTaskInput) {
     prompt: input.prompt,
     input_urls: [input.imageUrl],
     aspect_ratio: input.aspectRatio || 'auto',
-    resolution: imageResolution,
+    resolution: quality,
   };
+}
+
+function normalizeKieQuality(resolution: string) {
+  if (resolution === '4K' || resolution === '2K' || resolution === '1K') {
+    return resolution;
+  }
+  const [width, height] = resolution.split('x').map(Number);
+  const longestSide = Math.max(width || 0, height || 0);
+  if (longestSide >= 3072) return '4K';
+  if (longestSide >= 1536) return '2K';
+  return '1K';
 }
 
 function aspectRatioToSeedreamSize(aspectRatio: string) {
@@ -206,7 +226,6 @@ function findImageUrl(value: unknown): string | undefined {
       'fileUrl',
       'resultUrl',
       'downloadUrl',
-      'originUrl',
     ]) {
       const found = findImageUrl(record[key]);
       if (found) return found;

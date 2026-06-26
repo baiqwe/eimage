@@ -34,9 +34,9 @@ export type ProductGenerationBatchPlan = {
 };
 
 export const CREDIT_COST = {
-  main: 2,
-  detail: 3,
-  highResolutionSurcharge: 1,
+  oneK: 10,
+  twoK: 20,
+  fourK: 40,
 } as const;
 
 export const STORAGE_POLICY = {
@@ -48,16 +48,24 @@ export const STORAGE_POLICY = {
   thumbnailWidth: 512,
 } as const;
 
-export function estimateTaskCreditCost(task: {
-  kind: ProductImageKind;
-  resolution: string;
-}) {
-  const [width, height] = parseResolution(task.resolution);
-  const isHighResolution = width * height >= 1536 * 1536;
-  return (
-    CREDIT_COST[task.kind] +
-    (isHighResolution ? CREDIT_COST.highResolutionSurcharge : 0)
-  );
+export function estimateTaskCreditCost(task: { resolution: string }) {
+  const tier = getResolutionCreditTier(task.resolution);
+  return {
+    '1K': CREDIT_COST.oneK,
+    '2K': CREDIT_COST.twoK,
+    '4K': CREDIT_COST.fourK,
+  }[tier];
+}
+
+export function getResolutionCreditTier(resolution: string) {
+  if (resolution === '4K' || resolution === '2K' || resolution === '1K') {
+    return resolution;
+  }
+  const [width, height] = parseResolution(resolution);
+  const longestSide = Math.max(width, height);
+  if (longestSide >= 3072) return '4K';
+  if (longestSide >= 1536) return '2K';
+  return '1K';
 }
 
 export function createGenerationBatchPlan({
