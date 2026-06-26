@@ -1,5 +1,5 @@
 import { clientEnv } from '@/env/client';
-import { messages } from '@/messages';
+import { getMessages } from '@/messages';
 import type { WebsiteConfig } from '../types';
 import {
   DEFAULT_ALLOWED_TYPES,
@@ -11,6 +11,7 @@ import {
 const paymentProvider = clientEnv.VITE_PAYMENT_PROVIDER;
 const isPaymentEnabled = paymentProvider !== '';
 const isCreemPayment = paymentProvider === 'creem';
+const defaultMessages = getMessages('en');
 
 // Resolve price/product IDs based on the active payment provider
 const priceIds = isPaymentEnabled
@@ -38,9 +39,9 @@ export const websiteConfig: WebsiteConfig = {
     },
   },
   metadata: {
-    name: messages.site.name,
-    title: messages.site.title,
-    description: messages.site.description,
+    name: defaultMessages.site.name,
+    title: defaultMessages.site.title,
+    description: defaultMessages.site.description,
     images: {
       ogImage: '/og.png',
       logoLight: '/logo.png',
@@ -99,10 +100,10 @@ export const websiteConfig: WebsiteConfig = {
           prices: [],
           isFree: true,
           isLifetime: false,
-          name: messages.pricing.plans.free.name,
-          description: messages.pricing.plans.free.description,
-          features: [...messages.pricing.plans.free.features],
-          limits: [...messages.pricing.plans.free.limits],
+          name: defaultMessages.pricing.plans.free.name,
+          description: defaultMessages.pricing.plans.free.description,
+          features: [...defaultMessages.pricing.plans.free.features],
+          limits: [...defaultMessages.pricing.plans.free.limits],
         },
         pro: {
           id: 'pro',
@@ -125,10 +126,10 @@ export const websiteConfig: WebsiteConfig = {
           isFree: false,
           isLifetime: false,
           popular: true,
-          name: messages.pricing.plans.pro.name,
-          description: messages.pricing.plans.pro.description,
-          features: [...messages.pricing.plans.pro.features],
-          limits: [...messages.pricing.plans.pro.limits],
+          name: defaultMessages.pricing.plans.pro.name,
+          description: defaultMessages.pricing.plans.pro.description,
+          features: [...defaultMessages.pricing.plans.pro.features],
+          limits: [...defaultMessages.pricing.plans.pro.limits],
         },
         lifetime: {
           id: 'lifetime',
@@ -143,10 +144,10 @@ export const websiteConfig: WebsiteConfig = {
           ],
           isFree: false,
           isLifetime: true,
-          name: messages.pricing.plans.lifetime.name,
-          description: messages.pricing.plans.lifetime.description,
-          features: [...messages.pricing.plans.lifetime.features],
-          limits: [...messages.pricing.plans.lifetime.limits],
+          name: defaultMessages.pricing.plans.lifetime.name,
+          description: defaultMessages.pricing.plans.lifetime.description,
+          features: [...defaultMessages.pricing.plans.lifetime.features],
+          limits: [...defaultMessages.pricing.plans.lifetime.limits],
         },
       },
     },
