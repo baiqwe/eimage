@@ -1,3 +1,8 @@
+import {
+  createGenerationBatch,
+  getGenerationTaskStatuses,
+} from '@/api/generation';
+import { authClient } from '@/auth/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,6 +13,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  useGenerationBatches,
+  useGenerationCredits,
+} from '@/hooks/use-generation-history';
+import { estimateTaskCreditCost } from '@/lib/product-generation';
+import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
 import { Routes } from '@/lib/routes';
 import {
   IconArrowLeft,
@@ -15,7 +26,6 @@ import {
   IconCloudUpload,
   IconDownload,
   IconHistory,
-  IconLanguage,
   IconPhotoScan,
   IconPlayerPlay,
   IconRefresh,
@@ -25,7 +35,7 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent } from 'react';
 
 type BatchGeneratorLocale = 'zh' | 'en' | 'ja' | 'ko' | 'es';
@@ -45,18 +55,11 @@ interface BatchImageTask {
   size: number;
   sourceDataUrl: string;
   resultDataUrl?: string;
+  serverTaskId?: string;
+  providerTaskId?: string | null;
   status: BatchTaskStatus;
   progress: number;
   error?: string;
-}
-
-interface BatchHistoryItem {
-  id: string;
-  name: string;
-  total: number;
-  completed: number;
-  failed: number;
-  mode: OutputMode;
 }
 
 const MAX_IMAGES = 30;
@@ -77,6 +80,7 @@ const TARGET_LANGUAGES = [
   'Korean',
   'Spanish',
 ];
+const DEFAULT_MODEL = KIE_MODELS[0]?.id ?? 'gpt-image-2-image-to-image';
 
 const COPY: Record<
   BatchGeneratorLocale,
@@ -93,6 +97,7 @@ const COPY: Record<
     configTitle: string;
     configDescription: string;
     mode: string;
+    model: string;
     language: string;
     ratio: string;
     resolution: string;
@@ -109,6 +114,8 @@ const COPY: Record<
     emptyDescription: string;
     selected: string;
     credits: string;
+    login: string;
+    refreshCredits: string;
     ready: string;
     queued: string;
     processing: string;
@@ -118,6 +125,11 @@ const COPY: Record<
     remove: string;
     noSelection: string;
     localOnly: string;
+    authRequired: string;
+    submitting: string;
+    polling: string;
+    apiError: string;
+    insufficientCredits: (required: number, available: number) => string;
     resultPlan: string;
     modes: Record<OutputMode, string>;
     modeHints: Record<OutputMode, string>;
@@ -133,10 +145,11 @@ const COPY: Record<
     uploadDescription: '支持 1-30 张商品图，单张不超过 12MB。',
     chooseFiles: '选择图片',
     dropHint: '拖拽图片到这里',
-    limitHint: 'JPG、PNG、WebP；本阶段先在前端模拟任务流。',
+    limitHint: 'JPG、PNG、WebP；提交后会按图片拆成多个 Kie 任务。',
     configTitle: '共享配置',
     configDescription: '所有图片共用一套生成意图，生成时每张图仍是独立任务。',
     mode: '输出模式',
+    model: '生图模型',
     language: '目标语言',
     ratio: '尺寸比例',
     resolution: '分辨率',
@@ -154,6 +167,8 @@ const COPY: Record<
     emptyDescription: '建议先用同一批 SKU 或同一类目图片，结果更容易统一。',
     selected: '已选择',
     credits: '预计点数',
+    login: '登录',
+    refreshCredits: '刷新点数',
     ready: '已上传',
     queued: '排队中',
     processing: '处理中',
@@ -162,7 +177,13 @@ const COPY: Record<
     download: '下载结果',
     remove: '移除',
     noSelection: '选择一张图片查看详情',
-    localOnly: '阶段二为前端本地任务流，阶段三会接入真实生图 API。',
+    localOnly: '批量任务会提交到 Kie，每张图片都是独立任务。',
+    authRequired: '请先登录后再提交批量任务。',
+    submitting: '正在提交批量任务...',
+    polling: '任务已提交到 Kie，正在轮询生成结果。',
+    apiError: '批量任务提交失败。',
+    insufficientCredits: (required, available) =>
+      `点数不足：需要 ${required} 点，当前 ${available} 点。`,
     resultPlan:
       '多张结果建议用“批次总览 + 单图检查器”：中间保留密集网格，右侧展示当前图片的大图、状态、下载和错误信息；历史批次作为轻量抽屉或侧栏，不抢占主画布。',
     modes: {
@@ -188,11 +209,12 @@ const COPY: Record<
     uploadDescription: 'Upload 1-30 product images, up to 12MB each.',
     chooseFiles: 'Choose images',
     dropHint: 'Drop product images here',
-    limitHint: 'JPG, PNG, or WebP. This phase simulates the task flow locally.',
+    limitHint: 'JPG, PNG, or WebP. Each image becomes a Kie task.',
     configTitle: 'Shared config',
     configDescription:
       'One intent for the whole batch; one independent task per image.',
     mode: 'Output mode',
+    model: 'Generation model',
     language: 'Target language',
     ratio: 'Aspect ratio',
     resolution: 'Resolution',
@@ -211,6 +233,8 @@ const COPY: Record<
       'Use one SKU family or one product category for more consistent outputs.',
     selected: 'selected',
     credits: 'Estimated credits',
+    login: 'Log in',
+    refreshCredits: 'Refresh credits',
     ready: 'Uploaded',
     queued: 'Queued',
     processing: 'Processing',
@@ -219,8 +243,13 @@ const COPY: Record<
     download: 'Download result',
     remove: 'Remove',
     noSelection: 'Select an image to inspect it',
-    localOnly:
-      'Phase 2 runs a local task flow. Phase 3 connects the real image API.',
+    localOnly: 'Batch runs on Kie. Every image is submitted as one task.',
+    authRequired: 'Please log in before submitting a batch.',
+    submitting: 'Submitting batch tasks...',
+    polling: 'Tasks submitted to Kie. Polling generated results.',
+    apiError: 'Batch submission failed.',
+    insufficientCredits: (required, available) =>
+      `Insufficient credits: ${required} required, ${available} available.`,
     resultPlan:
       'For many outputs, use a batch overview plus single-image inspector: keep a dense grid in the center, show the selected result, status, download, and errors on the right, and keep history as a lightweight side panel.',
     modes: {
@@ -247,10 +276,11 @@ const COPY: Record<
     uploadDescription: '1-30 枚の商品画像、1 枚 12MB まで対応。',
     chooseFiles: '画像を選択',
     dropHint: '商品画像をここにドロップ',
-    limitHint: 'JPG、PNG、WebP。現段階ではローカルでタスク流を再現します。',
+    limitHint: 'JPG、PNG、WebP。送信後は画像ごとに Kie タスクになります。',
     configTitle: '共有設定',
     configDescription: 'バッチ全体で 1 つの意図を使い、画像ごとに処理します。',
     mode: '出力モード',
+    model: '生成モデル',
     language: '対象言語',
     ratio: '比率',
     resolution: '解像度',
@@ -268,6 +298,8 @@ const COPY: Record<
     emptyDescription: '同じ SKU 系列や同じカテゴリを使うと結果が安定します。',
     selected: '選択中',
     credits: '推定クレジット',
+    login: 'ログイン',
+    refreshCredits: 'クレジット更新',
     ready: 'アップロード済み',
     queued: '待機中',
     processing: '処理中',
@@ -276,8 +308,13 @@ const COPY: Record<
     download: '結果を保存',
     remove: '削除',
     noSelection: '画像を選択して詳細を確認',
-    localOnly:
-      'フェーズ 2 はローカル処理です。フェーズ 3 で実 API に接続します。',
+    localOnly: 'バッチは Kie に送信され、各画像は独立タスクになります。',
+    authRequired: 'バッチ送信前にログインしてください。',
+    submitting: 'バッチタスクを送信中...',
+    polling: 'Kie にタスクを送信しました。結果を確認しています。',
+    apiError: 'バッチ送信に失敗しました。',
+    insufficientCredits: (required, available) =>
+      `クレジット不足：必要 ${required}、現在 ${available}。`,
     resultPlan:
       '多数の結果は「バッチ一覧 + 単画像インスペクター」が適しています。中央に密なグリッド、右側に選択画像、状態、保存、エラーを表示し、履歴は軽いサイドパネルにします。',
     modes: {
@@ -303,11 +340,12 @@ const COPY: Record<
     uploadDescription: '1-30장, 이미지당 최대 12MB.',
     chooseFiles: '이미지 선택',
     dropHint: '상품 이미지를 여기에 놓기',
-    limitHint: 'JPG, PNG, WebP. 이 단계는 로컬 작업 흐름을 시뮬레이션합니다.',
+    limitHint: 'JPG, PNG, WebP. 제출 후 이미지는 각각 Kie 작업이 됩니다.',
     configTitle: '공유 설정',
     configDescription:
       '배치 전체에 하나의 의도를 쓰고 이미지는 각각 처리합니다.',
     mode: '출력 모드',
+    model: '생성 모델',
     language: '대상 언어',
     ratio: '비율',
     resolution: '해상도',
@@ -326,6 +364,8 @@ const COPY: Record<
       '같은 SKU 묶음이나 같은 카테고리를 쓰면 결과가 더 안정적입니다.',
     selected: '선택됨',
     credits: '예상 크레딧',
+    login: '로그인',
+    refreshCredits: '크레딧 새로고침',
     ready: '업로드됨',
     queued: '대기 중',
     processing: '처리 중',
@@ -334,7 +374,13 @@ const COPY: Record<
     download: '결과 다운로드',
     remove: '삭제',
     noSelection: '이미지를 선택해 상세 확인',
-    localOnly: '2단계는 로컬 작업 흐름입니다. 3단계에서 실제 API를 연결합니다.',
+    localOnly: '배치는 Kie로 제출되며 각 이미지는 독립 작업입니다.',
+    authRequired: '배치 제출 전에 로그인해 주세요.',
+    submitting: '배치 작업 제출 중...',
+    polling: 'Kie에 작업을 제출했습니다. 결과를 확인 중입니다.',
+    apiError: '배치 제출에 실패했습니다.',
+    insufficientCredits: (required, available) =>
+      `크레딧 부족: ${required} 필요, 현재 ${available}.`,
     resultPlan:
       '여러 결과는 배치 개요와 단일 이미지 검사기 조합이 적합합니다. 중앙은 촘촘한 그리드, 오른쪽은 선택 이미지와 상태, 다운로드, 오류를 표시하고 히스토리는 가벼운 사이드 패널로 둡니다.',
     modes: {
@@ -361,11 +407,12 @@ const COPY: Record<
     uploadDescription: 'Sube de 1 a 30 imagenes, hasta 12MB cada una.',
     chooseFiles: 'Elegir imagenes',
     dropHint: 'Arrastra imagenes aqui',
-    limitHint: 'JPG, PNG o WebP. Esta fase simula el flujo localmente.',
+    limitHint: 'JPG, PNG o WebP. Cada imagen se envia como tarea Kie.',
     configTitle: 'Configuracion compartida',
     configDescription:
       'Una intencion para todo el lote; una tarea independiente por imagen.',
     mode: 'Modo de salida',
+    model: 'Modelo de generacion',
     language: 'Idioma objetivo',
     ratio: 'Proporcion',
     resolution: 'Resolucion',
@@ -384,6 +431,8 @@ const COPY: Record<
       'Usa una familia de SKU o una categoria para resultados mas consistentes.',
     selected: 'seleccionada',
     credits: 'Creditos estimados',
+    login: 'Iniciar sesion',
+    refreshCredits: 'Actualizar creditos',
     ready: 'Subida',
     queued: 'En cola',
     processing: 'Procesando',
@@ -392,7 +441,14 @@ const COPY: Record<
     download: 'Descargar resultado',
     remove: 'Eliminar',
     noSelection: 'Selecciona una imagen para revisarla',
-    localOnly: 'La fase 2 usa un flujo local. La fase 3 conectara la API real.',
+    localOnly:
+      'El lote se envia a Kie. Cada imagen es una tarea independiente.',
+    authRequired: 'Inicia sesion antes de enviar el lote.',
+    submitting: 'Enviando tareas del lote...',
+    polling: 'Tareas enviadas a Kie. Consultando resultados.',
+    apiError: 'No se pudo enviar el lote.',
+    insufficientCredits: (required, available) =>
+      `Creditos insuficientes: requiere ${required}, tienes ${available}.`,
     resultPlan:
       'Para muchos resultados conviene una vista de lote y un inspector: grid denso al centro, resultado seleccionado, estado, descarga y errores a la derecha, e historial como panel ligero.',
     modes: {
@@ -416,17 +472,22 @@ export function BatchGeneratorWorkbench({
   locale?: BatchGeneratorLocale;
 }) {
   const copy = COPY[locale];
+  const { data: session, isPending: sessionPending } = authClient.useSession();
+  const signedIn = !!session?.user;
+  const creditQuery = useGenerationCredits();
+  const historyQuery = useGenerationBatches(0, 5);
   const inputRef = useRef<HTMLInputElement>(null);
-  const timerRef = useRef<number[]>([]);
   const [tasks, setTasks] = useState<BatchImageTask[]>([]);
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
   const [mode, setMode] = useState<OutputMode>('marketplace');
+  const [model, setModel] = useState<KieModelId>(DEFAULT_MODEL as KieModelId);
   const [targetLanguage, setTargetLanguage] = useState('English');
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
   const [resolution, setResolution] = useState<Resolution>('1024');
   const [prompt, setPrompt] = useState('');
+  const [credits, setCredits] = useState(creditQuery.data?.balance ?? 0);
+  const [batchNotice, setBatchNotice] = useState('');
   const [isDragging, setIsDragging] = useState(false);
-  const [history, setHistory] = useState<BatchHistoryItem[]>([]);
 
   const selectedTask =
     tasks.find((task) => task.id === selectedTaskId) ?? tasks[0];
@@ -440,11 +501,20 @@ export function BatchGeneratorWorkbench({
   const creditEstimate = useMemo(
     () =>
       tasks.length *
-      (resolution === '2048' ? 3 : resolution === '1536' ? 2 : 1),
-    [resolution, tasks.length]
+      estimateTaskCreditCost({
+        kind: mode === 'marketplace' ? 'main' : 'detail',
+        resolution: buildResolution(aspectRatio, resolution),
+      }),
+    [aspectRatio, mode, resolution, tasks.length]
   );
   const hasTasks = tasks.length > 0;
   const canStart = hasTasks && runningCount === 0;
+
+  useEffect(() => {
+    if (creditQuery.data) {
+      setCredits(creditQuery.data.balance);
+    }
+  }, [creditQuery.data]);
 
   async function addFiles(fileList: FileList | File[]) {
     const files = Array.from(fileList)
@@ -494,16 +564,21 @@ export function BatchGeneratorWorkbench({
   }
 
   function clearTasks() {
-    stopTimers();
     setTasks([]);
     setSelectedTaskId('');
+    setBatchNotice('');
   }
 
-  function startBatch() {
+  async function startBatch() {
     if (!canStart) return;
-    stopTimers();
-    const batchId = makeTaskId();
-    const batchName = `Batch ${new Date().toLocaleTimeString()}`;
+    if (!signedIn) {
+      setBatchNotice(copy.authRequired);
+      return;
+    }
+    if (credits < creditEstimate) {
+      setBatchNotice(copy.insufficientCredits(creditEstimate, credits));
+      return;
+    }
 
     setTasks((current) =>
       current.map((task) => ({
@@ -514,62 +589,149 @@ export function BatchGeneratorWorkbench({
         resultDataUrl: undefined,
       }))
     );
+    setBatchNotice(copy.submitting);
 
-    tasks.forEach((task, index) => {
-      const processingTimer = window.setTimeout(
-        () => {
-          setTasks((current) =>
-            current.map((item) =>
-              item.id === task.id
-                ? { ...item, status: 'processing', progress: 54 }
-                : item
-            )
-          );
+    try {
+      const sourceImage = tasks[0];
+      const builtResolution = buildResolution(aspectRatio, resolution);
+      const plannedTasks = tasks.map((task) => ({
+        id: task.id,
+        kind: mode === 'marketplace' ? ('main' as const) : ('detail' as const),
+        style: copy.modes[mode],
+        aspectRatio,
+        resolution: builtResolution,
+        model,
+        prompt: buildBatchPrompt({
+          prompt,
+          mode,
+          modeLabel: copy.modes[mode],
+          targetLanguage,
+          aspectRatio,
+          resolution: builtResolution,
+        }),
+        referenceImageDataUrl:
+          task.id === sourceImage.id ? undefined : task.sourceDataUrl,
+        referenceName: task.name,
+      }));
+
+      const batch = await createGenerationBatch({
+        data: {
+          locale,
+          productDescription:
+            prompt.trim() ||
+            `${copy.modes[mode]} batch image edit for ${tasks.length} product images`,
+          sourceImageDataUrl: sourceImage.sourceDataUrl,
+          sourceName: sourceImage.name,
+          tasks: plannedTasks,
         },
-        420 + index * 220
+      });
+
+      if (!batch.ok) {
+        setCredits(batch.availableCredits);
+        setBatchNotice(
+          copy.insufficientCredits(
+            batch.requiredCredits,
+            batch.availableCredits
+          )
+        );
+        setTasks((current) =>
+          current.map((task) => ({ ...task, status: 'uploaded', progress: 0 }))
+        );
+        return;
+      }
+
+      setCredits(batch.balance);
+      setBatchNotice(copy.polling);
+      void historyQuery.refetch();
+
+      setTasks((current) =>
+        current.map((task) => {
+          const submitted = batch.tasks.find((item) => item.id === task.id);
+          if (!submitted) return task;
+          return {
+            ...task,
+            serverTaskId: submitted.taskId,
+            providerTaskId: submitted.providerTaskId,
+            status: submitted.status === 'failed' ? 'failed' : 'processing',
+            progress: submitted.status === 'failed' ? 100 : 24,
+            error: submitted.errorMessage,
+          };
+        })
       );
 
-      const completedTimer = window.setTimeout(
-        () => {
+      await pollGenerationTasks(
+        batch.tasks.map((task) => task.taskId),
+        new Map(batch.tasks.map((task) => [task.taskId, task.id]))
+      );
+      void historyQuery.refetch();
+      void creditQuery.refetch();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : copy.apiError;
+      setBatchNotice(message);
+      setTasks((current) =>
+        current.map((task) =>
+          ['queued', 'processing'].includes(task.status)
+            ? { ...task, status: 'failed', progress: 100, error: message }
+            : task
+        )
+      );
+    }
+  }
+
+  async function pollGenerationTasks(
+    serverTaskIds: string[],
+    clientTaskByServerTask: Map<string, string>
+  ) {
+    const pending = new Set(serverTaskIds);
+    for (let attempt = 0; attempt < 90 && pending.size > 0; attempt += 1) {
+      await wait(attempt === 0 ? 1200 : 2500);
+      const result = await getGenerationTaskStatuses({
+        data: { taskIds: Array.from(pending) },
+      });
+      setCredits(result.balance);
+      for (const status of result.statuses) {
+        const clientTaskId = clientTaskByServerTask.get(status.id);
+        if (!clientTaskId) continue;
+        if (status.status === 'completed' && status.imageUrl) {
+          pending.delete(status.id);
           setTasks((current) =>
-            current.map((item) =>
-              item.id === task.id
+            current.map((task) =>
+              task.id === clientTaskId
                 ? {
-                    ...item,
+                    ...task,
                     status: 'completed',
                     progress: 100,
-                    resultDataUrl: item.sourceDataUrl,
+                    resultDataUrl: status.imageUrl,
+                    error: undefined,
                   }
-                : item
+                : task
             )
           );
-        },
-        1300 + index * 360
-      );
-
-      timerRef.current.push(processingTimer, completedTimer);
-    });
-
-    const historyTimer = window.setTimeout(
-      () => {
-        setHistory((current) =>
-          [
-            {
-              id: batchId,
-              name: batchName,
-              total: tasks.length,
-              completed: tasks.length,
-              failed: 0,
-              mode,
-            },
-            ...current,
-          ].slice(0, 5)
-        );
-      },
-      1500 + tasks.length * 360
-    );
-
-    timerRef.current.push(historyTimer);
+        } else if (status.status === 'failed') {
+          pending.delete(status.id);
+          setTasks((current) =>
+            current.map((task) =>
+              task.id === clientTaskId
+                ? {
+                    ...task,
+                    status: 'failed',
+                    progress: 100,
+                    error: status.errorMessage ?? copy.apiError,
+                  }
+                : task
+            )
+          );
+        } else {
+          setTasks((current) =>
+            current.map((task) =>
+              task.id === clientTaskId
+                ? { ...task, status: 'processing', progress: 56 }
+                : task
+            )
+          );
+        }
+      }
+    }
   }
 
   function retryFailed() {
@@ -596,13 +758,6 @@ export function BatchGeneratorWorkbench({
     anchor.click();
   }
 
-  function stopTimers() {
-    timerRef.current.forEach((timer) => {
-      window.clearTimeout(timer);
-    });
-    timerRef.current = [];
-  }
-
   return (
     <main className="min-h-screen bg-[#f7f8f4] text-[#20231e]">
       <header className="sticky top-0 z-20 border-[#dfe3d8] border-b bg-[#fbfcf7]/95 backdrop-blur">
@@ -617,6 +772,30 @@ export function BatchGeneratorWorkbench({
           </Button>
           <div className="hidden rounded-full border border-[#dfe3d8] px-3 py-1 text-[#74796d] text-sm md:block">
             {copy.localOnly}
+          </div>
+          <div className="flex items-center gap-2">
+            {!sessionPending && !signedIn ? (
+              <Button
+                type="button"
+                className="bg-[#20231e]"
+                render={<Link to={Routes.Login} />}
+              >
+                {copy.login}
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              variant="outline"
+              className="hidden bg-white md:inline-flex"
+              disabled={!signedIn || creditQuery.isFetching}
+              onClick={() => void creditQuery.refetch()}
+            >
+              <IconRefresh className="size-4" />
+              {copy.refreshCredits}
+            </Button>
+            <div className="rounded-lg border border-[#dfe3d8] bg-white px-3 py-2 text-sm shadow-sm">
+              {copy.credits}: <strong>{credits}</strong>
+            </div>
           </div>
         </div>
       </header>
@@ -699,6 +878,15 @@ export function BatchGeneratorWorkbench({
                   onChange={(value) => setMode(value as OutputMode)}
                 />
                 <FieldSelect
+                  label={copy.model}
+                  value={model}
+                  options={KIE_MODELS.map((item) => item.id)}
+                  renderOption={(value) =>
+                    KIE_MODELS.find((item) => item.id === value)?.name ?? value
+                  }
+                  onChange={(value) => setModel(value as KieModelId)}
+                />
+                <FieldSelect
                   label={copy.language}
                   value={targetLanguage}
                   options={TARGET_LANGUAGES}
@@ -756,6 +944,11 @@ export function BatchGeneratorWorkbench({
                 </Badge>
               </div>
               <p className="mt-2 text-[#6d7468]">{copy.gridDescription}</p>
+              {batchNotice ? (
+                <p className="mt-2 rounded-md border border-[#eadfca] bg-[#fff8ea] px-3 py-2 text-[#8a5a16] text-sm">
+                  {batchNotice}
+                </p>
+              ) : null}
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="rounded-md border border-[#dfe3d8] bg-white px-3 py-2 text-sm">
@@ -894,13 +1087,31 @@ export function BatchGeneratorWorkbench({
                 </div>
                 <dl className="mt-4 grid gap-2 text-sm">
                   <InspectorRow label={copy.mode} value={copy.modes[mode]} />
+                  <InspectorRow
+                    label={copy.model}
+                    value={
+                      KIE_MODELS.find((item) => item.id === model)?.name ??
+                      model
+                    }
+                  />
                   <InspectorRow label={copy.language} value={targetLanguage} />
                   <InspectorRow label={copy.ratio} value={aspectRatio} />
                   <InspectorRow
                     label={copy.resolution}
                     value={`${resolution}px`}
                   />
+                  {selectedTask.providerTaskId ? (
+                    <InspectorRow
+                      label="Kie"
+                      value={selectedTask.providerTaskId.slice(0, 14)}
+                    />
+                  ) : null}
                 </dl>
+                {selectedTask.error ? (
+                  <p className="mt-3 rounded-md border border-[#f0b4b4] bg-[#fff0f0] px-3 py-2 text-[#b42318] text-sm">
+                    {selectedTask.error}
+                  </p>
+                ) : null}
                 <Button
                   type="button"
                   className="mt-4 w-full bg-[#d83b01]"
@@ -922,19 +1133,21 @@ export function BatchGeneratorWorkbench({
               <IconHistory className="size-5 text-[#2f5f4f]" />
             </div>
             <div className="mt-4 space-y-2">
-              {history.length > 0 ? (
-                history.map((item) => (
+              {signedIn && historyQuery.data?.items.length ? (
+                historyQuery.data.items.map((item) => (
                   <div
                     key={item.id}
                     className="rounded-md border border-[#e5e8df] bg-[#fbfcf7] p-3"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-medium text-sm">{item.name}</p>
-                      <Badge variant="outline">{copy.modes[item.mode]}</Badge>
+                      <p className="font-medium text-sm">
+                        {new Date(item.createdAt).toLocaleDateString()}
+                      </p>
+                      <Badge variant="outline">{item.status}</Badge>
                     </div>
                     <p className="mt-2 text-[#74796d] text-xs">
-                      {item.completed}/{item.total} {copy.completed} ·{' '}
-                      {item.failed} {copy.failed}
+                      {item.completedTaskCount}/{item.taskCount}{' '}
+                      {copy.completed} · {item.failedTaskCount} {copy.failed}
                     </p>
                   </div>
                 ))
@@ -1043,9 +1256,53 @@ function makeTaskId() {
   return `task-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function buildResolution(aspectRatio: AspectRatio, resolution: Resolution) {
+  const base = Number(resolution);
+  const [widthRatio, heightRatio] = aspectRatio.split(':').map(Number);
+  if (!widthRatio || !heightRatio) return `${base}x${base}`;
+  if (widthRatio === heightRatio) return `${base}x${base}`;
+  if (widthRatio < heightRatio) {
+    return `${base}x${Math.round((base * heightRatio) / widthRatio)}`;
+  }
+  return `${Math.round((base * widthRatio) / heightRatio)}x${base}`;
+}
+
+function buildBatchPrompt({
+  prompt,
+  mode,
+  modeLabel,
+  targetLanguage,
+  aspectRatio,
+  resolution,
+}: {
+  prompt: string;
+  mode: OutputMode;
+  modeLabel: string;
+  targetLanguage: string;
+  aspectRatio: AspectRatio;
+  resolution: string;
+}) {
+  const instruction = prompt.trim()
+    ? prompt.trim()
+    : `Apply the ${modeLabel} workflow to the uploaded product image.`;
+  return [
+    'Use the uploaded image as the immutable source image.',
+    `Batch edit mode: ${mode}.`,
+    `Target language: ${targetLanguage}.`,
+    `Output aspect ratio: ${aspectRatio}. Output resolution: ${resolution}.`,
+    instruction,
+    'Preserve the exact product identity, geometry, material, logos, labels, and visible structure unless the user explicitly asks to translate visible text.',
+    'Do not invent extra products. Do not change the product category. Keep the result suitable for ecommerce listing use.',
+  ].join(' ');
+}
+
 function formatFileSize(size: number) {
   if (size < 1024 * 1024) {
     return `${Math.max(1, Math.round(size / 1024))}KB`;
   }
   return `${(size / 1024 / 1024).toFixed(1)}MB`;
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
 }

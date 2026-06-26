@@ -47,11 +47,11 @@ const createBatchSchema = z.object({
   productDescription: z.string().min(4).max(800),
   sourceImageDataUrl: z.string().min(40),
   sourceName: z.string().max(255).default('source-product.png'),
-  tasks: z.array(taskSchema).min(1).max(12),
+  tasks: z.array(taskSchema).min(1).max(30),
 });
 
 const statusSchema = z.object({
-  taskIds: z.array(z.string().min(1)).min(1).max(12),
+  taskIds: z.array(z.string().min(1)).min(1).max(30),
 });
 
 const listBatchesSchema = z.object({
@@ -432,7 +432,7 @@ export const getGenerationTaskStatuses = createServerFn({ method: 'POST' })
   });
 
 export const estimateGenerationCredits = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ tasks: z.array(taskSchema).min(1).max(12) }))
+  .inputValidator(z.object({ tasks: z.array(taskSchema).min(1).max(30) }))
   .handler(async ({ data }) => ({
     totalCreditCost: data.tasks.reduce(
       (sum, task) => sum + estimateTaskCreditCost(task),
