@@ -35,7 +35,7 @@ const taskSchema = z.object({
   kind: z.enum(['main', 'detail']),
   style: z.string().min(2).max(120),
   aspectRatio: z.string().min(3).max(12),
-  resolution: z.string().min(7).max(20),
+  resolution: z.string().min(2).max(20),
   prompt: z.string().min(10).max(20_000),
   model: z.string().min(2).max(120).optional(),
   referenceImageDataUrl: z.string().optional(),
