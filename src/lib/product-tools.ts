@@ -53,6 +53,70 @@ export type ProductToolCopy = {
 
 export const PRODUCT_TOOLS: ProductTool[] = [
   {
+    slug: 'batch-image-editor',
+    category: 'Batch Image Editing',
+    title: 'Batch Image Editor for Ecommerce',
+    titleZh: '电商批量改图工具',
+    navTitle: 'Batch image editor',
+    navTitleZh: '批量改图',
+    navDescription:
+      'Upload many product images and process each one as an independent AI task.',
+    navDescriptionZh:
+      '批量上传商品图，用一套配置把每张图片拆成独立任务分别处理。',
+    description:
+      'Upload up to 30 product images, apply one shared prompt, and process every image separately for translation, ratio conversion, and background extension.',
+    descriptionZh:
+      '一次上传最多 30 张商品图，统一填写 Prompt，把每张图片作为独立任务分别执行，适合批量翻译、改比例和背景扩图。',
+    h1: 'Batch image editor for ecommerce translation, ratio changes, and AI extension',
+    h1Zh: '适合电商批量翻译、改比例与扩图的批量改图工具',
+    imageAlt:
+      'Batch AI image editor processing many ecommerce product images with one shared configuration',
+    imageAltZh: '使用同一套配置批量处理多张电商商品图的 AI 批量改图工具示意',
+    visual: 'marketplace',
+    navGroup: 'core',
+    useCases: [
+      'Batch image translation',
+      'Bulk ratio conversion',
+      'Catalog localization',
+    ],
+    useCasesZh: ['批量图片翻译', '批量改 4:3 比例', '商品目录本地化'],
+    styles: ['Batch Translate', 'Batch Resize', 'Batch Outpaint'],
+    painPoints: [
+      'Upload many source images once and run one shared instruction set.',
+      'Turn every uploaded image into its own task with independent status and result.',
+      'Handle ecommerce localization workflows faster than editing image by image.',
+    ],
+    painPointsZh: [
+      '一次上传多张商品图，统一使用一套共享配置。',
+      '每张上传图片都会拆成独立任务，分别返回状态和结果。',
+      '比逐张处理更快完成跨境电商本地化与批量改图工作。',
+    ],
+    faqs: [
+      {
+        question: 'Does one prompt create one batch or many tasks?',
+        answer:
+          'One shared prompt creates one batch record, but every uploaded image runs as its own task so results, retries, and failures stay independent.',
+      },
+      {
+        question: 'Can I upload 30 images and get 30 outputs?',
+        answer:
+          'Yes. The batch editor is designed for one-input-per-task processing, so 30 uploaded images can produce 30 separate outputs.',
+      },
+    ],
+    faqsZh: [
+      {
+        question: '一个 Prompt 是生成一个任务还是多个任务？',
+        answer:
+          '它会先创建一个批次，但每张上传图片都会拆成独立任务执行，所以结果、失败和重试都是按单张图管理的。',
+      },
+      {
+        question: '上传 30 张图片后，会得到 30 个结果吗？',
+        answer:
+          '会。批量改图模式本质上是单图单任务处理，所以 30 张上传图会对应 30 个独立输出结果。',
+      },
+    ],
+  },
+  {
     slug: 'batch-product-photo-generator',
     category: 'Batch Generation',
     title: 'Batch Product Photo Generator',
@@ -716,6 +780,38 @@ const TOOL_TRANSLATIONS: Partial<
   >
 > = {
   ja: {
+    'batch-image-editor': {
+      category: '一括画像編集',
+      title: 'EC 向け一括画像編集ツール',
+      description:
+        '最大 30 枚の商品画像をアップロードし、1 つの共有 Prompt で翻訳、比率変更、背景拡張を画像ごとに個別処理します。',
+      h1: '翻訳、比率変更、AI 拡張に対応した EC 向け一括画像編集ツール',
+      imageAlt:
+        '同じ設定で複数の EC 商品画像を処理する AI 一括画像編集ツールの例',
+      useCases: [
+        '画像の一括翻訳',
+        '4:3 などへの一括比率変換',
+        '商品カタログのローカライズ',
+      ],
+      painPoints: [
+        '複数の元画像を一度にアップロードし、共有設定で実行できます。',
+        '各画像は独立タスクになり、状態と結果を個別に追跡できます。',
+        '画像を 1 枚ずつ編集するより速く越境 EC の運用を進められます。',
+      ],
+      faqs: [
+        {
+          question:
+            '1 つの Prompt で 1 タスクですか、それとも複数タスクですか？',
+          answer:
+            '共有 Prompt で 1 つのバッチを作成しつつ、アップロードした各画像は独立タスクとして実行されるため、結果や再試行は画像単位で管理されます。',
+        },
+        {
+          question: '30 枚アップロードすると 30 件の結果が返りますか？',
+          answer:
+            'はい。一括画像編集は 1 画像 1 タスクの処理なので、30 枚の入力に対して 30 件の独立した出力を返せます。',
+        },
+      ],
+    },
     'batch-product-photo-generator': {
       category: '一括生成',
       title: '商品写真一括生成ツール',
@@ -961,6 +1057,37 @@ const TOOL_TRANSLATIONS: Partial<
     },
   },
   ko: {
+    'batch-image-editor': {
+      category: '배치 이미지 편집',
+      title: '이커머스 배치 이미지 편집기',
+      description:
+        '최대 30장의 상품 이미지를 업로드하고 하나의 공유 프롬프트로 번역, 비율 변경, 배경 확장을 이미지별로 개별 처리합니다.',
+      h1: '번역, 비율 변경, AI 확장을 위한 이커머스 배치 이미지 편집기',
+      imageAlt:
+        '같은 설정으로 여러 이커머스 상품 이미지를 처리하는 AI 배치 이미지 편집기 예시',
+      useCases: [
+        '이미지 일괄 번역',
+        '4:3 등 일괄 비율 변환',
+        '상품 카탈로그 현지화',
+      ],
+      painPoints: [
+        '여러 원본 이미지를 한 번에 업로드하고 공유 설정으로 실행할 수 있습니다.',
+        '각 이미지는 독립 작업으로 분리되어 상태와 결과를 따로 추적할 수 있습니다.',
+        '이미지를 하나씩 편집하는 것보다 더 빠르게 크로스보더 이커머스 운영을 진행할 수 있습니다.',
+      ],
+      faqs: [
+        {
+          question: '하나의 프롬프트는 하나의 작업인가요, 여러 작업인가요?',
+          answer:
+            '공유 프롬프트는 하나의 배치를 만들지만 업로드한 각 이미지는 독립 작업으로 실행되므로 결과와 재시도는 이미지별로 관리됩니다.',
+        },
+        {
+          question: '30장을 올리면 30개의 결과를 받을 수 있나요?',
+          answer:
+            '네. 배치 편집은 1이미지 1작업 방식이므로 30장의 입력에 대해 30개의 독립 결과를 받을 수 있습니다.',
+        },
+      ],
+    },
     'batch-product-photo-generator': {
       category: '일괄 생성',
       title: '상품 사진 일괄 생성기',
@@ -1206,6 +1333,37 @@ const TOOL_TRANSLATIONS: Partial<
     },
   },
   es: {
+    'batch-image-editor': {
+      category: 'Edicion por lotes',
+      title: 'Editor por lotes de imagenes para ecommerce',
+      description:
+        'Sube hasta 30 imagenes de producto, aplica un prompt compartido y procesa cada imagen por separado para traduccion, cambio de proporcion y expansion de fondo.',
+      h1: 'Editor por lotes para traduccion, cambio de proporcion y extension AI en ecommerce',
+      imageAlt:
+        'Editor AI por lotes procesando muchas imagenes de producto ecommerce con una configuracion compartida',
+      useCases: [
+        'Traduccion por lotes de imagenes',
+        'Cambio masivo de proporcion',
+        'Localizacion de catalogos',
+      ],
+      painPoints: [
+        'Sube muchas imagenes fuente una sola vez y ejecuta una configuracion compartida.',
+        'Cada imagen subida se convierte en una tarea independiente con estado y resultado propios.',
+        'Acelera los flujos de localizacion ecommerce frente a la edicion imagen por imagen.',
+      ],
+      faqs: [
+        {
+          question: 'Un prompt crea un lote o varias tareas?',
+          answer:
+            'Un prompt compartido crea un lote, pero cada imagen subida se ejecuta como tarea independiente para que resultados, reintentos y fallos se gestionen por separado.',
+        },
+        {
+          question: 'Si subo 30 imagenes, obtendre 30 resultados?',
+          answer:
+            'Si. El editor por lotes esta disenado para procesar una imagen por tarea, por lo que 30 imagenes pueden producir 30 resultados separados.',
+        },
+      ],
+    },
     'batch-product-photo-generator': {
       category: 'Generación por lotes',
       title: 'Generador por lotes de fotos de producto',

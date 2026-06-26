@@ -91,6 +91,10 @@ function ToolPage() {
   const { tool } = loaderData;
   const { locale, setLocale } = useProductLocale();
   const copy = getProductToolCopy(tool, locale);
+  const generatorHref =
+    tool.slug === 'batch-image-editor'
+      ? getBatchGeneratorPath(locale)
+      : Routes.Generator;
 
   return (
     <Container className="px-4 py-16">
@@ -118,7 +122,7 @@ function ToolPage() {
             {copy.description}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button render={<Link to={Routes.Generator} />}>
+            <Button render={<Link to={generatorHref} />}>
               <IconSparkles className="size-4" />
               {copy.openGenerator}
             </Button>
@@ -182,4 +186,8 @@ function ToolPage() {
       </section>
     </Container>
   );
+}
+
+function getBatchGeneratorPath(locale: string) {
+  return locale === 'en' ? Routes.BatchGenerator : `/${locale}/batch-generator`;
 }

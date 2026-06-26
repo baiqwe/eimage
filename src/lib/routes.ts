@@ -1,6 +1,7 @@
 export const Routes = {
   Root: '/',
   Generator: '/generator',
+  BatchGenerator: '/batch-generator',
   Gallery: '/gallery',
   Tools: '/tools',
 

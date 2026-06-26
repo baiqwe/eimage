@@ -86,6 +86,10 @@ function ToolPage() {
     throw notFound();
   }
   const { tool } = loaderData;
+  const generatorHref =
+    tool.slug === 'batch-image-editor'
+      ? '/zh/batch-generator'
+      : Routes.Generator;
 
   return (
     <Container className="px-4 py-16">
@@ -110,7 +114,7 @@ function ToolPage() {
             {tool.descriptionZh}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button render={<Link to={Routes.Generator} />}>
+            <Button render={<Link to={generatorHref} />}>
               <IconSparkles className="size-4" />
               进入生成器
             </Button>
