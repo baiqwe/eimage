@@ -1,5 +1,9 @@
 import { Routes } from '@/lib/routes';
 import type { ProductLocale } from '@/components/product/product-locale';
+import {
+  getProductGeneratorPath,
+  getProductHomePath,
+} from '@/components/product/product-locale';
 import type { MenuItemConfig } from '../types';
 import { websiteConfig } from './website';
 
@@ -140,8 +144,12 @@ const FOOTER_COPY: Record<
 export function getFooterLinks(locale: ProductLocale = 'en'): MenuItemConfig[] {
   const copy = FOOTER_COPY[locale];
   const productItems: MenuItemConfig[] = [
-    { title: copy.home, href: Routes.Root, external: false },
-    { title: copy.generator, href: Routes.Generator, external: false },
+    { title: copy.home, href: getProductHomePath(locale), external: false },
+    {
+      title: copy.generator,
+      href: getProductGeneratorPath(locale),
+      external: false,
+    },
     {
       title: copy.gallery,
       href: locale === 'zh' ? '/zh/gallery' : Routes.Gallery,

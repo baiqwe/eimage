@@ -6,6 +6,8 @@ import {
 } from '@tabler/icons-react';
 import Container from '@/components/layout/container';
 import {
+  getProductBatchGeneratorPath,
+  getProductGeneratorPath,
   ProductLanguageSelect,
   useProductLocale,
 } from '@/components/product/product-locale';
@@ -92,9 +94,10 @@ function ToolPage() {
   const { locale, setLocale } = useProductLocale();
   const copy = getProductToolCopy(tool, locale);
   const generatorHref =
-    tool.slug === 'batch-image-editor'
-      ? getBatchGeneratorPath(locale)
-      : Routes.Generator;
+    tool.slug === 'batch-image-editor' ||
+    tool.slug === 'batch-product-photo-generator'
+      ? getProductBatchGeneratorPath(locale)
+      : getProductGeneratorPath(locale);
 
   return (
     <Container className="px-4 py-16">
@@ -186,8 +189,4 @@ function ToolPage() {
       </section>
     </Container>
   );
-}
-
-function getBatchGeneratorPath(locale: string) {
-  return locale === 'en' ? Routes.BatchGenerator : `/${locale}/batch-generator`;
 }

@@ -29,6 +29,10 @@ import { estimateTaskCreditCost } from '@/lib/product-generation';
 import { KIE_MODELS } from '@/lib/kie-models';
 import { Routes } from '@/lib/routes';
 import {
+  getLocalizedPublicPath,
+  getProductBatchGeneratorPath,
+  getProductGeneratorPath,
+  getProductHomePath,
   ProductLanguageSelect,
   type ProductLocale,
   useProductLocale,
@@ -43,7 +47,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { downloadFile } from '@/lib/download';
 import { cn } from '@/lib/utils';
-import { Link } from '@tanstack/react-router';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 
 type TaskKind = 'main' | 'detail';
 type TaskStatus =
@@ -171,6 +175,8 @@ const WORKBENCH_COPY = {
     },
     globalBadge: '全局',
     sourceAlt: '商品素材图',
+    generatorSet: '套图生成器',
+    batchEditor: '批量生图',
   },
   en: {
     subtitle: 'Product image generation workbench',
@@ -243,6 +249,8 @@ const WORKBENCH_COPY = {
     },
     globalBadge: 'Global',
     sourceAlt: 'Source product image',
+    generatorSet: 'Photo set',
+    batchEditor: 'Batch editor',
   },
   ja: {
     subtitle: '商品画像生成ワークベンチ',
@@ -314,6 +322,8 @@ const WORKBENCH_COPY = {
     },
     globalBadge: '共通',
     sourceAlt: '商品素材画像',
+    generatorSet: 'セット生成',
+    batchEditor: '一括編集',
   },
   ko: {
     subtitle: '상품 이미지 생성 워크벤치',
@@ -386,6 +396,8 @@ const WORKBENCH_COPY = {
     },
     globalBadge: '전역',
     sourceAlt: '상품 소재 이미지',
+    generatorSet: '세트 생성',
+    batchEditor: '배치 편집',
   },
   es: {
     subtitle: 'Workbench de generación de imágenes de producto',
@@ -458,12 +470,20 @@ const WORKBENCH_COPY = {
     },
     globalBadge: 'Global',
     sourceAlt: 'Imagen fuente del producto',
+    generatorSet: 'Set de fotos',
+    batchEditor: 'Editor por lotes',
   },
 } as const;
 
-export function SuiteWorkbench() {
+export function SuiteWorkbench({
+  initialLocale,
+}: {
+  initialLocale?: ProductLocale;
+}) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { locale, setLocale } = useProductLocale();
+  const { locale, setLocale } = useProductLocale(initialLocale);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const promptSyncRef = useRef({
     locale,
     description: DEFAULT_DESCRIPTION,
@@ -486,6 +506,14 @@ export function SuiteWorkbench() {
     0,
     10
   );
+
+  function handleLocaleChange(next: ProductLocale) {
+    setLocale(next);
+    const nextPath = getLocalizedPublicPath(pathname, next);
+    if (nextPath !== pathname) {
+      navigate({ to: nextPath });
+    }
+  }
 
   useEffect(() => {
     if (!signedIn) {
@@ -817,7 +845,7 @@ export function SuiteWorkbench() {
       <header className="sticky top-0 z-30 border-[#dfe3d8] border-b bg-[#fbfcf7]/95 backdrop-blur">
         <div className="flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
-            <Link to={Routes.Root} className="hidden md:block">
+            <Link to={getProductHomePath(locale)} className="hidden md:block">
               <Button type="button" variant="ghost">
                 <IconArrowLeft className="size-4" />
                 {t.back}
@@ -832,9 +860,27 @@ export function SuiteWorkbench() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <div className="hidden rounded-lg border border-[#dfe3d8] bg-white p-1 shadow-sm md:flex">
+              <Button
+                type="button"
+                size="sm"
+                className="bg-[#20231e]"
+                render={<Link to={getProductGeneratorPath(locale)} />}
+              >
+                {t.generatorSet}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                render={<Link to={getProductBatchGeneratorPath(locale)} />}
+              >
+                {t.batchEditor}
+              </Button>
+            </div>
             <ProductLanguageSelect
               locale={locale}
-              onLocaleChange={setLocale}
+              onLocaleChange={handleLocaleChange}
               compact
             />
             {!sessionPending && !signedIn ? (

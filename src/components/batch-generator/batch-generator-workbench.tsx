@@ -17,6 +17,12 @@ import { useGenerationCredits } from '@/hooks/use-generation-history';
 import { downloadFile } from '@/lib/download';
 import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
+import {
+  getProductBatchGeneratorPath,
+  getProductGeneratorPath,
+  getProductHomePath,
+} from '@/components/product/product-locale';
+import type { ProductLocale } from '@/components/product/product-locale';
 import { Routes } from '@/lib/routes';
 import {
   IconArrowLeft,
@@ -114,6 +120,11 @@ const COPY: Record<
     submitting: string;
     polling: string;
     apiError: string;
+    zipPreparing: string;
+    zipReady: string;
+    zipFallback: string;
+    generatorSet: string;
+    batchEditor: string;
     insufficientCredits: (required: number, available: number) => string;
   }
 > = {
@@ -167,6 +178,11 @@ const COPY: Record<
     submitting: '正在提交批量任务...',
     polling: '任务已提交，正在生成结果。',
     apiError: '批量任务提交失败。',
+    zipPreparing: '正在打包 ZIP...',
+    zipReady: 'ZIP 已开始下载。',
+    zipFallback: 'ZIP 打包失败，请先使用单张下载。',
+    generatorSet: '套图生成器',
+    batchEditor: '批量生图',
     insufficientCredits: (required, available) =>
       `点数不足：需要 ${required} 点，当前 ${available} 点。`,
   },
@@ -223,6 +239,11 @@ const COPY: Record<
     submitting: 'Submitting batch tasks...',
     polling: 'Tasks submitted. Generating results.',
     apiError: 'Batch submission failed.',
+    zipPreparing: 'Preparing ZIP...',
+    zipReady: 'ZIP download started.',
+    zipFallback: 'ZIP packaging failed. Please use single-image downloads.',
+    generatorSet: 'Photo set',
+    batchEditor: 'Batch editor',
     insufficientCredits: (required, available) =>
       `Insufficient credits: ${required} required, ${available} available.`,
   },
@@ -276,6 +297,11 @@ const COPY: Record<
     submitting: 'バッチタスクを送信中...',
     polling: 'タスクを送信しました。結果を生成しています。',
     apiError: 'バッチ送信に失敗しました。',
+    zipPreparing: 'ZIP を準備しています...',
+    zipReady: 'ZIP のダウンロードを開始しました。',
+    zipFallback: 'ZIP 作成に失敗しました。個別保存を使用してください。',
+    generatorSet: 'セット生成',
+    batchEditor: '一括編集',
     insufficientCredits: (required, available) =>
       `クレジット不足：必要 ${required}、現在 ${available}。`,
   },
@@ -331,6 +357,11 @@ const COPY: Record<
     submitting: '배치 작업 제출 중...',
     polling: '작업을 제출했습니다. 결과를 생성 중입니다.',
     apiError: '배치 제출에 실패했습니다.',
+    zipPreparing: 'ZIP 준비 중...',
+    zipReady: 'ZIP 다운로드를 시작했습니다.',
+    zipFallback: 'ZIP 패키징에 실패했습니다. 개별 다운로드를 사용해 주세요.',
+    generatorSet: '세트 생성',
+    batchEditor: '배치 편집',
     insufficientCredits: (required, available) =>
       `크레딧 부족: ${required} 필요, 현재 ${available}.`,
   },
@@ -387,6 +418,12 @@ const COPY: Record<
     submitting: 'Enviando tareas del lote...',
     polling: 'Tareas enviadas. Generando resultados.',
     apiError: 'No se pudo enviar el lote.',
+    zipPreparing: 'Preparando ZIP...',
+    zipReady: 'La descarga ZIP comenzo.',
+    zipFallback:
+      'No se pudo crear el ZIP. Usa las descargas individuales por ahora.',
+    generatorSet: 'Set de fotos',
+    batchEditor: 'Editor por lotes',
     insufficientCredits: (required, available) =>
       `Creditos insuficientes: requiere ${required}, tienes ${available}.`,
   },
@@ -398,6 +435,7 @@ export function BatchGeneratorWorkbench({
   locale?: BatchGeneratorLocale;
 }) {
   const copy = COPY[locale];
+  const typedLocale = locale as ProductLocale;
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const signedIn = !!session?.user;
   const creditQuery = useGenerationCredits();
@@ -418,6 +456,7 @@ export function BatchGeneratorWorkbench({
   const [batchNotice, setBatchNotice] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
+  const [zipDownloading, setZipDownloading] = useState(false);
 
   const selectedTask =
     tasks.find((task) => task.id === selectedTaskId) ?? tasks[0];
@@ -678,18 +717,27 @@ export function BatchGeneratorWorkbench({
   async function downloadCompletedZip() {
     const completedTasks = tasks.filter((task) => task.resultDataUrl);
     if (completedTasks.length === 0) return;
-    const files = await Promise.all(
-      completedTasks.map(async (task, index) => ({
-        name: `${String(index + 1).padStart(2, '0')}-${sanitizeFilename(
-          task.name
-        )}`,
-        blob: await fetchImageBlob(task.resultDataUrl!),
-      }))
-    );
-    const zipBlob = await createZipFromFiles(files);
-    const url = URL.createObjectURL(zipBlob);
-    await downloadFile(url, `prodlist-batch-${Date.now()}.zip`);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setZipDownloading(true);
+    setBatchNotice(copy.zipPreparing);
+    try {
+      const files = await Promise.all(
+        completedTasks.map(async (task, index) => ({
+          name: `${String(index + 1).padStart(2, '0')}-${sanitizeFilename(
+            task.name
+          )}`,
+          blob: await fetchImageBlob(task.resultDataUrl!),
+        }))
+      );
+      const zipBlob = await createZipFromFiles(files);
+      const url = URL.createObjectURL(zipBlob);
+      await downloadFile(url, `prodlist-batch-${Date.now()}.zip`);
+      setBatchNotice(copy.zipReady);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      setBatchNotice(copy.zipFallback);
+    } finally {
+      setZipDownloading(false);
+    }
   }
 
   return (
@@ -699,7 +747,7 @@ export function BatchGeneratorWorkbench({
           <Button
             type="button"
             variant="ghost"
-            render={<Link to={Routes.Root} />}
+            render={<Link to={getProductHomePath(typedLocale)} />}
           >
             <IconArrowLeft className="size-4" />
             {copy.back}
@@ -708,6 +756,24 @@ export function BatchGeneratorWorkbench({
             {copy.localOnly}
           </div>
           <div className="flex items-center gap-2">
+            <div className="hidden rounded-lg border border-[#dfe3d8] bg-white p-1 shadow-sm md:flex">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                render={<Link to={getProductGeneratorPath(typedLocale)} />}
+              >
+                {copy.generatorSet}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                className="bg-[#20231e]"
+                render={<Link to={getProductBatchGeneratorPath(typedLocale)} />}
+              >
+                {copy.batchEditor}
+              </Button>
+            </div>
             <Button
               type="button"
               variant="outline"
@@ -743,7 +809,7 @@ export function BatchGeneratorWorkbench({
         </div>
       </header>
 
-      <section className="grid min-h-[calc(100vh-4rem)] grid-cols-1 xl:grid-cols-[340px_minmax(0,0.82fr)_520px]">
+      <section className="grid min-h-[calc(100vh-4rem)] grid-cols-1 xl:grid-cols-[400px_minmax(0,0.8fr)_460px]">
         <aside className="border-[#dfe3d8] border-b bg-[#fbfcf7] p-4 lg:border-r lg:border-b-0">
           <div className="mb-5">
             <p className="font-semibold text-[#2f5f4f] text-sm">
@@ -956,7 +1022,7 @@ export function BatchGeneratorWorkbench({
                 type="button"
                 variant="outline"
                 className="bg-white"
-                disabled={completedCount === 0}
+                disabled={completedCount === 0 || zipDownloading}
                 onClick={() => void downloadCompletedZip()}
               >
                 <IconPackageExport className="size-4" />
@@ -1263,6 +1329,14 @@ function buildBatchPrompt({
 }
 
 async function fetchImageBlob(url: string) {
+  if (url.startsWith('data:')) {
+    const response = await fetch(url);
+    return response.blob();
+  }
+  if (url.startsWith('blob:')) {
+    const response = await fetch(url);
+    return response.blob();
+  }
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Download failed: ${response.status}`);
   return response.blob();

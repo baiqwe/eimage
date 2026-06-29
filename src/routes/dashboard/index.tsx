@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { DashboardLayout } from '@/components/layout/dashboard-layout';
 import {
   getLocalizedPublicPath,
+  getProductBatchGeneratorPath,
   ProductLanguageSelect,
   type ProductLocale,
   useProductLocale,
@@ -26,7 +27,6 @@ import {
   useGenerationStats,
 } from '@/hooks/use-generation-history';
 import { downloadFile } from '@/lib/download';
-import { Routes } from '@/lib/routes';
 import {
   createFileRoute,
   Link,
@@ -316,7 +316,7 @@ function DashboardPage() {
           locale={locale}
           onLocaleChange={handleLocaleChange}
         />
-        <Button render={<Link to={Routes.BatchGenerator} />}>
+        <Button render={<Link to={getProductBatchGeneratorPath(locale)} />}>
           <IconSparkles className="size-4" />
           {t.openGenerator}
         </Button>

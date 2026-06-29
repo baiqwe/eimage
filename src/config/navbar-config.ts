@@ -1,6 +1,10 @@
 import { Routes } from '@/lib/routes';
 import type { ProductLocale } from '@/components/product/product-locale';
 import {
+  getProductBatchGeneratorPath,
+  getProductGeneratorPath,
+} from '@/components/product/product-locale';
+import {
   PRODUCT_TOOLS,
   PRODUCT_TOOL_NAV_GROUPS,
   getProductToolCopy,
@@ -103,7 +107,9 @@ export function getNavbarLinks(locale: ProductLocale = 'en'): MenuItemConfig[] {
     if (path === Routes.Root) return `/${locale}`;
     if (path === Routes.Gallery && locale !== 'zh') return Routes.Gallery;
     if (path === Routes.Tools && locale !== 'zh') return Routes.Tools;
-    if (path === Routes.BatchGenerator) return `/${locale}/batch-generator`;
+    if (path === Routes.Generator) return getProductGeneratorPath(locale);
+    if (path === Routes.BatchGenerator)
+      return getProductBatchGeneratorPath(locale);
     return path;
   };
   const toolItems = PRODUCT_TOOL_NAV_GROUPS.flatMap((group) => {
@@ -134,7 +140,7 @@ export function getNavbarLinks(locale: ProductLocale = 'en'): MenuItemConfig[] {
     {
       title: copy.singleGenerator,
       description: copy.singleGeneratorDescription,
-      href: Routes.Generator,
+      href: localizedPath(Routes.Generator),
       external: false,
     },
     {
@@ -148,7 +154,7 @@ export function getNavbarLinks(locale: ProductLocale = 'en'): MenuItemConfig[] {
     { title: copy.home, href: localizedPath(Routes.Root), external: false },
     {
       title: copy.generator,
-      href: Routes.Generator,
+      href: localizedPath(Routes.Generator),
       external: false,
       items: generatorItems,
     },

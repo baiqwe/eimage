@@ -15,12 +15,13 @@ export async function downloadFile(
   filename?: string
 ): Promise<void> {
   const isDataUrl = url.startsWith('data:');
+  const isBlobUrl = url.startsWith('blob:');
   const finalName = filename ?? defaultFilename(url);
 
   let blobUrl = url;
   let shouldRevoke = false;
 
-  if (!isDataUrl) {
+  if (!(isDataUrl || isBlobUrl)) {
     try {
       const res = await fetch(url, { mode: 'cors' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);

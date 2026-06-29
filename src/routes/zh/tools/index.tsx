@@ -69,7 +69,7 @@ function ZhToolsIndexPage() {
               根据搜索意图选择合适工具页：批量生成、商品套图、干净背景、平台上架图，或针对珠宝、美妆、鞋类的类目商品摄影。
             </p>
             <div className="mt-6">
-              <Button render={<Link to={Routes.Generator} />}>
+              <Button render={<Link to="/zh/generator" />}>
                 <IconSparkles className="size-4" />
                 进入生成器
               </Button>

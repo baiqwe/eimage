@@ -31,6 +31,7 @@ import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as ZhGeneratorRouteImport } from './routes/zh/generator'
 import { Route as ZhGalleryRouteImport } from './routes/zh/gallery'
 import { Route as ZhBatchGeneratorRouteImport } from './routes/zh/batch-generator'
 import { Route as ToolsSlugRouteImport } from './routes/tools/$slug'
@@ -41,8 +42,11 @@ import { Route as SettingsNotificationsRouteImport } from './routes/settings/not
 import { Route as SettingsFilesRouteImport } from './routes/settings/files'
 import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
 import { Route as SettingsApikeysRouteImport } from './routes/settings/apikeys'
+import { Route as KoGeneratorRouteImport } from './routes/ko/generator'
 import { Route as KoBatchGeneratorRouteImport } from './routes/ko/batch-generator'
+import { Route as JaGeneratorRouteImport } from './routes/ja/generator'
 import { Route as JaBatchGeneratorRouteImport } from './routes/ja/batch-generator'
+import { Route as EsGeneratorRouteImport } from './routes/es/generator'
 import { Route as EsBatchGeneratorRouteImport } from './routes/es/batch-generator'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
@@ -181,6 +185,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const ZhGeneratorRoute = ZhGeneratorRouteImport.update({
+  id: '/generator',
+  path: '/generator',
+  getParentRoute: () => ZhRoute,
+} as any)
 const ZhGalleryRoute = ZhGalleryRouteImport.update({
   id: '/gallery',
   path: '/gallery',
@@ -231,15 +240,30 @@ const SettingsApikeysRoute = SettingsApikeysRouteImport.update({
   path: '/apikeys',
   getParentRoute: () => SettingsRoute,
 } as any)
+const KoGeneratorRoute = KoGeneratorRouteImport.update({
+  id: '/generator',
+  path: '/generator',
+  getParentRoute: () => KoRoute,
+} as any)
 const KoBatchGeneratorRoute = KoBatchGeneratorRouteImport.update({
   id: '/batch-generator',
   path: '/batch-generator',
   getParentRoute: () => KoRoute,
 } as any)
+const JaGeneratorRoute = JaGeneratorRouteImport.update({
+  id: '/generator',
+  path: '/generator',
+  getParentRoute: () => JaRoute,
+} as any)
 const JaBatchGeneratorRoute = JaBatchGeneratorRouteImport.update({
   id: '/batch-generator',
   path: '/batch-generator',
   getParentRoute: () => JaRoute,
+} as any)
+const EsGeneratorRoute = EsGeneratorRouteImport.update({
+  id: '/generator',
+  path: '/generator',
+  getParentRoute: () => EsRoute,
 } as any)
 const EsBatchGeneratorRoute = EsBatchGeneratorRouteImport.update({
   id: '/batch-generator',
@@ -415,8 +439,11 @@ export interface FileRoutesByFullPath {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/es/batch-generator': typeof EsBatchGeneratorRoute
+  '/es/generator': typeof EsGeneratorRoute
   '/ja/batch-generator': typeof JaBatchGeneratorRoute
+  '/ja/generator': typeof JaGeneratorRoute
   '/ko/batch-generator': typeof KoBatchGeneratorRoute
+  '/ko/generator': typeof KoGeneratorRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -427,6 +454,7 @@ export interface FileRoutesByFullPath {
   '/tools/$slug': typeof ToolsSlugRoute
   '/zh/batch-generator': typeof ZhBatchGeneratorRoute
   '/zh/gallery': typeof ZhGalleryRoute
+  '/zh/generator': typeof ZhGeneratorRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -474,8 +502,11 @@ export interface FileRoutesByTo {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/es/batch-generator': typeof EsBatchGeneratorRoute
+  '/es/generator': typeof EsGeneratorRoute
   '/ja/batch-generator': typeof JaBatchGeneratorRoute
+  '/ja/generator': typeof JaGeneratorRoute
   '/ko/batch-generator': typeof KoBatchGeneratorRoute
+  '/ko/generator': typeof KoGeneratorRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -486,6 +517,7 @@ export interface FileRoutesByTo {
   '/tools/$slug': typeof ToolsSlugRoute
   '/zh/batch-generator': typeof ZhBatchGeneratorRoute
   '/zh/gallery': typeof ZhGalleryRoute
+  '/zh/generator': typeof ZhGeneratorRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -538,8 +570,11 @@ export interface FileRoutesById {
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/es/batch-generator': typeof EsBatchGeneratorRoute
+  '/es/generator': typeof EsGeneratorRoute
   '/ja/batch-generator': typeof JaBatchGeneratorRoute
+  '/ja/generator': typeof JaGeneratorRoute
   '/ko/batch-generator': typeof KoBatchGeneratorRoute
+  '/ko/generator': typeof KoGeneratorRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -550,6 +585,7 @@ export interface FileRoutesById {
   '/tools/$slug': typeof ToolsSlugRoute
   '/zh/batch-generator': typeof ZhBatchGeneratorRoute
   '/zh/gallery': typeof ZhGalleryRoute
+  '/zh/generator': typeof ZhGeneratorRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -603,8 +639,11 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/blog/$slug'
     | '/es/batch-generator'
+    | '/es/generator'
     | '/ja/batch-generator'
+    | '/ja/generator'
     | '/ko/batch-generator'
+    | '/ko/generator'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -615,6 +654,7 @@ export interface FileRouteTypes {
     | '/tools/$slug'
     | '/zh/batch-generator'
     | '/zh/gallery'
+    | '/zh/generator'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
@@ -662,8 +702,11 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/blog/$slug'
     | '/es/batch-generator'
+    | '/es/generator'
     | '/ja/batch-generator'
+    | '/ja/generator'
     | '/ko/batch-generator'
+    | '/ko/generator'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -674,6 +717,7 @@ export interface FileRouteTypes {
     | '/tools/$slug'
     | '/zh/batch-generator'
     | '/zh/gallery'
+    | '/zh/generator'
     | '/admin'
     | '/blog'
     | '/dashboard'
@@ -725,8 +769,11 @@ export interface FileRouteTypes {
     | '/auth/reset-password'
     | '/blog/$slug'
     | '/es/batch-generator'
+    | '/es/generator'
     | '/ja/batch-generator'
+    | '/ja/generator'
     | '/ko/batch-generator'
+    | '/ko/generator'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -737,6 +784,7 @@ export interface FileRouteTypes {
     | '/tools/$slug'
     | '/zh/batch-generator'
     | '/zh/gallery'
+    | '/zh/generator'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
@@ -947,6 +995,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/zh/generator': {
+      id: '/zh/generator'
+      path: '/generator'
+      fullPath: '/zh/generator'
+      preLoaderRoute: typeof ZhGeneratorRouteImport
+      parentRoute: typeof ZhRoute
+    }
     '/zh/gallery': {
       id: '/zh/gallery'
       path: '/gallery'
@@ -1017,6 +1072,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsApikeysRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/ko/generator': {
+      id: '/ko/generator'
+      path: '/generator'
+      fullPath: '/ko/generator'
+      preLoaderRoute: typeof KoGeneratorRouteImport
+      parentRoute: typeof KoRoute
+    }
     '/ko/batch-generator': {
       id: '/ko/batch-generator'
       path: '/batch-generator'
@@ -1024,12 +1086,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KoBatchGeneratorRouteImport
       parentRoute: typeof KoRoute
     }
+    '/ja/generator': {
+      id: '/ja/generator'
+      path: '/generator'
+      fullPath: '/ja/generator'
+      preLoaderRoute: typeof JaGeneratorRouteImport
+      parentRoute: typeof JaRoute
+    }
     '/ja/batch-generator': {
       id: '/ja/batch-generator'
       path: '/batch-generator'
       fullPath: '/ja/batch-generator'
       preLoaderRoute: typeof JaBatchGeneratorRouteImport
       parentRoute: typeof JaRoute
+    }
+    '/es/generator': {
+      id: '/es/generator'
+      path: '/generator'
+      fullPath: '/es/generator'
+      preLoaderRoute: typeof EsGeneratorRouteImport
+      parentRoute: typeof EsRoute
     }
     '/es/batch-generator': {
       id: '/es/batch-generator'
@@ -1267,30 +1343,36 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 interface EsRouteChildren {
   EsBatchGeneratorRoute: typeof EsBatchGeneratorRoute
+  EsGeneratorRoute: typeof EsGeneratorRoute
 }
 
 const EsRouteChildren: EsRouteChildren = {
   EsBatchGeneratorRoute: EsBatchGeneratorRoute,
+  EsGeneratorRoute: EsGeneratorRoute,
 }
 
 const EsRouteWithChildren = EsRoute._addFileChildren(EsRouteChildren)
 
 interface JaRouteChildren {
   JaBatchGeneratorRoute: typeof JaBatchGeneratorRoute
+  JaGeneratorRoute: typeof JaGeneratorRoute
 }
 
 const JaRouteChildren: JaRouteChildren = {
   JaBatchGeneratorRoute: JaBatchGeneratorRoute,
+  JaGeneratorRoute: JaGeneratorRoute,
 }
 
 const JaRouteWithChildren = JaRoute._addFileChildren(JaRouteChildren)
 
 interface KoRouteChildren {
   KoBatchGeneratorRoute: typeof KoBatchGeneratorRoute
+  KoGeneratorRoute: typeof KoGeneratorRoute
 }
 
 const KoRouteChildren: KoRouteChildren = {
   KoBatchGeneratorRoute: KoBatchGeneratorRoute,
+  KoGeneratorRoute: KoGeneratorRoute,
 }
 
 const KoRouteWithChildren = KoRoute._addFileChildren(KoRouteChildren)
@@ -1324,6 +1406,7 @@ const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
 interface ZhRouteChildren {
   ZhBatchGeneratorRoute: typeof ZhBatchGeneratorRoute
   ZhGalleryRoute: typeof ZhGalleryRoute
+  ZhGeneratorRoute: typeof ZhGeneratorRoute
   ZhIndexRoute: typeof ZhIndexRoute
   ZhToolsSlugRoute: typeof ZhToolsSlugRoute
   ZhToolsIndexRoute: typeof ZhToolsIndexRoute
@@ -1332,6 +1415,7 @@ interface ZhRouteChildren {
 const ZhRouteChildren: ZhRouteChildren = {
   ZhBatchGeneratorRoute: ZhBatchGeneratorRoute,
   ZhGalleryRoute: ZhGalleryRoute,
+  ZhGeneratorRoute: ZhGeneratorRoute,
   ZhIndexRoute: ZhIndexRoute,
   ZhToolsSlugRoute: ZhToolsSlugRoute,
   ZhToolsIndexRoute: ZhToolsIndexRoute,

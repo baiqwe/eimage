@@ -2,13 +2,14 @@ import { SuiteWorkbench } from '@/components/suite-workbench/suite-workbench';
 import { seo } from '@/lib/seo';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/generator')({
+export const Route = createFileRoute('/ko/generator')({
   head: () =>
-    seo('/generator', {
+    seo('/ko/generator', {
       title: 'ProdList AI Generator',
       description:
-        'Generate main product images and detail-page scenes from one source product photo.',
+        'Upload one product image and generate main images plus detail-page scenes.',
+      locale: 'ko',
       robots: 'noindex,nofollow',
     }),
-  component: () => <SuiteWorkbench initialLocale="en" />,
+  component: () => <SuiteWorkbench initialLocale="ko" />,
 });

@@ -87,9 +87,10 @@ function ToolPage() {
   }
   const { tool } = loaderData;
   const generatorHref =
-    tool.slug === 'batch-image-editor'
+    tool.slug === 'batch-image-editor' ||
+    tool.slug === 'batch-product-photo-generator'
       ? '/zh/batch-generator'
-      : Routes.Generator;
+      : '/zh/generator';
 
   return (
     <Container className="px-4 py-16">

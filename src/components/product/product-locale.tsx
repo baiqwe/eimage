@@ -156,7 +156,9 @@ export function getLocalizedPublicPath(
     return locale === 'en' ? '/' : `/${locale}`;
   }
 
-  const supportsAllLocales = pathWithoutLocale === '/batch-generator';
+  const supportsAllLocales =
+    pathWithoutLocale === '/generator' ||
+    pathWithoutLocale === '/batch-generator';
   const supportsZhOnly =
     pathWithoutLocale === '/gallery' ||
     pathWithoutLocale === '/tools' ||
@@ -173,6 +175,18 @@ export function getLocalizedPublicPath(
   }
 
   return normalized;
+}
+
+export function getProductHomePath(locale: ProductLocale) {
+  return locale === 'en' ? '/' : `/${locale}`;
+}
+
+export function getProductGeneratorPath(locale: ProductLocale) {
+  return locale === 'en' ? '/generator' : `/${locale}/generator`;
+}
+
+export function getProductBatchGeneratorPath(locale: ProductLocale) {
+  return locale === 'en' ? '/batch-generator' : `/${locale}/batch-generator`;
 }
 
 export function ProductLanguageSelect({

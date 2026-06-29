@@ -116,6 +116,7 @@ function RootComponent() {
   const isAppWorkbench =
     pathname === Routes.Generator ||
     pathname === Routes.BatchGenerator ||
+    /^\/(zh|ja|ko|es)\/generator\/?$/.test(pathname) ||
     /^\/(zh|ja|ko|es)\/batch-generator\/?$/.test(pathname);
   // When no child route matches (e.g. /hello), only root is in matches; use minimal layout
   const isNotFound =
