@@ -1,7 +1,6 @@
 import { getAvatarLinks } from '@/config/avatar-config';
-import { authClient } from '@/auth/client';
-import { IconLogout } from '@tabler/icons-react';
-import { Link, useRouter } from '@tanstack/react-router';
+import { IconLoader2, IconLogout } from '@tabler/icons-react';
+import { Link } from '@tanstack/react-router';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,31 +11,17 @@ import {
 import { UserAvatar } from './user-avatar';
 import { messages } from '@/messages';
 import { useState } from 'react';
-import { toast } from 'sonner';
 import type { SessionUser } from '@/auth/types';
+import { useReliableSignOut } from '@/hooks/use-reliable-sign-out';
 
 interface UserButtonProps {
   user: SessionUser;
 }
 
 export function UserButton({ user }: UserButtonProps) {
-  const router = useRouter();
   const avatarLinks = getAvatarLinks();
   const [open, setOpen] = useState(false);
-
-  const handleSignOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.navigate({ to: '/' });
-        },
-        onError: (err) => {
-          toast.error(messages.auth.common.logoutFailed);
-          console.error('sign out error:', err);
-        },
-      },
-    });
-  };
+  const { isSigningOut, signOut } = useReliableSignOut();
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -69,13 +54,18 @@ export function UserButton({ user }: UserButtonProps) {
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
+          disabled={isSigningOut}
           onClick={async (event) => {
             event.preventDefault();
             setOpen(false);
-            await handleSignOut();
+            await signOut();
           }}
         >
-          <IconLogout className="mr-2 size-4" />
+          {isSigningOut ? (
+            <IconLoader2 className="mr-2 size-4 animate-spin" />
+          ) : (
+            <IconLogout className="mr-2 size-4" />
+          )}
           {messages.auth.common.logout}
         </DropdownMenuItem>
       </DropdownMenuContent>

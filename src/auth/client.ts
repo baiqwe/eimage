@@ -7,12 +7,17 @@ import { createAuthClient } from 'better-auth/react';
 import { getBaseUrl } from '@/lib/urls';
 import type { auth } from './auth';
 
+function getAuthClientBaseUrl() {
+  if (typeof window !== 'undefined') return window.location.origin;
+  return getBaseUrl();
+}
+
 /**
  * Better Auth Client Configuration
  * https://www.better-auth.com/docs/integrations/tanstack
  */
 export const authClient = createAuthClient({
-  baseURL: getBaseUrl(),
+  baseURL: getAuthClientBaseUrl(),
   plugins: [
     // https://www.better-auth.com/docs/plugins/admin#add-the-client-plugin
     adminClient(),

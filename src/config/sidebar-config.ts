@@ -13,7 +13,9 @@ import {
 } from '@tabler/icons-react';
 import { Routes } from '@/lib/routes';
 import {
+  getProductBatchGeneratorPath,
   getProductGeneratorPath,
+  getWhiteBackgroundGeneratorPath,
   type ProductLocale,
 } from '@/components/product/product-locale';
 import type { MenuItemConfig } from '../types';
@@ -23,12 +25,49 @@ import { websiteConfig } from './website';
 const m = messages.dashboard.sidebar;
 const am = messages.admin;
 
+const generatorLabels: Record<
+  ProductLocale,
+  { group: string; photoSet: string; batch: string; white: string }
+> = {
+  zh: {
+    group: '生成器',
+    photoSet: '套图生成器',
+    batch: '批量生图',
+    white: '白底图',
+  },
+  en: {
+    group: 'Generators',
+    photoSet: 'Photo set',
+    batch: 'Batch editor',
+    white: 'White background',
+  },
+  ja: {
+    group: '生成ツール',
+    photoSet: 'セット生成',
+    batch: '一括編集',
+    white: '白背景',
+  },
+  ko: {
+    group: '생성기',
+    photoSet: '세트 생성',
+    batch: '배치 편집',
+    white: '흰 배경',
+  },
+  es: {
+    group: 'Generadores',
+    photoSet: 'Set de fotos',
+    batch: 'Editor por lotes',
+    white: 'Fondo blanco',
+  },
+};
+
 /**
  * Sidebar links
  */
 export function getSidebarLinks(
   locale: ProductLocale = 'en'
 ): MenuItemConfig[] {
+  const generator = generatorLabels[locale];
   return [
     {
       title: m.dashboard,
@@ -37,9 +76,28 @@ export function getSidebarLinks(
       external: false,
     },
     {
-      title: 'Generator',
+      title: generator.group,
       icon: IconSparkles,
-      href: getProductGeneratorPath(locale),
+      items: [
+        {
+          title: generator.photoSet,
+          icon: IconSparkles,
+          href: getProductGeneratorPath(locale),
+          external: false,
+        },
+        {
+          title: generator.batch,
+          icon: IconSparkles,
+          href: getProductBatchGeneratorPath(locale),
+          external: false,
+        },
+        {
+          title: generator.white,
+          icon: IconSparkles,
+          href: getWhiteBackgroundGeneratorPath(locale),
+          external: false,
+        },
+      ],
       external: false,
     },
     {

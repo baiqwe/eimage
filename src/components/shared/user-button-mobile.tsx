@@ -1,11 +1,9 @@
-import { authClient } from '@/auth/client';
 import { getAvatarLinks } from '@/config/avatar-config';
 import { messages } from '@/messages';
 import type { SessionUser } from '@/auth/types';
-import { IconLogout } from '@tabler/icons-react';
-import { Link, useRouter } from '@tanstack/react-router';
+import { IconLoader2, IconLogout } from '@tabler/icons-react';
+import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
-import { toast } from 'sonner';
 import {
   Drawer,
   DrawerContent,
@@ -14,6 +12,7 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer';
 import { UserAvatar } from '@/components/shared/user-avatar';
+import { useReliableSignOut } from '@/hooks/use-reliable-sign-out';
 
 interface UserButtonMobileProps {
   user: SessionUser;
@@ -23,26 +22,11 @@ interface UserButtonMobileProps {
  * Mobile user button
  */
 export function UserButtonMobile({ user }: UserButtonMobileProps) {
-  const router = useRouter();
   const avatarLinks = getAvatarLinks();
   const [open, setOpen] = useState(false);
+  const { isSigningOut, signOut } = useReliableSignOut();
 
   const closeDrawer = () => setOpen(false);
-
-  const handleSignOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          closeDrawer();
-          router.navigate({ to: '/' });
-        },
-        onError: (err) => {
-          toast.error(messages.auth.common.logoutFailed);
-          console.error(err);
-        },
-      },
-    });
-  };
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -94,13 +78,18 @@ export function UserButtonMobile({ user }: UserButtonMobileProps) {
           <li className="rounded-lg text-foreground hover:bg-muted">
             <button
               type="button"
+              disabled={isSigningOut}
               onClick={() => {
                 closeDrawer();
-                handleSignOut();
+                void signOut();
               }}
-              className="flex w-full items-center gap-3 px-2.5 py-2 text-left"
+              className="flex w-full items-center gap-3 px-2.5 py-2 text-left disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <IconLogout className="size-4 shrink-0" />
+              {isSigningOut ? (
+                <IconLoader2 className="size-4 shrink-0 animate-spin" />
+              ) : (
+                <IconLogout className="size-4 shrink-0" />
+              )}
               <span className="text-sm">{messages.auth.common.logout}</span>
             </button>
           </li>

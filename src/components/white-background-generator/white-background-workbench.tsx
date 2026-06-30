@@ -20,12 +20,18 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useGenerationCredits } from '@/hooks/use-generation-history';
 import { downloadFile } from '@/lib/download';
+import {
+  clearGeneratorSession,
+  loadGeneratorSession,
+  saveGeneratorSession,
+} from '@/lib/generator-session';
 import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
 import {
   IconCloudUpload,
   IconDownload,
   IconEye,
+  IconLoader2,
   IconPlayerPlay,
   IconPhotoScan,
   IconWand,
@@ -282,6 +288,7 @@ export function WhiteBackgroundWorkbench({
   const signedIn = !!session?.user;
   const creditQuery = useGenerationCredits();
   const inputRef = useRef<HTMLInputElement>(null);
+  const restoredSessionRef = useRef(false);
   const [sourceImage, setSourceImage] = useState('');
   const [sourceName, setSourceName] = useState('');
   const [description, setDescription] = useState('');
@@ -324,6 +331,22 @@ export function WhiteBackgroundWorkbench({
       setResolution(modelConfig.resolutions[0]);
     }
   }, [aspectRatio, modelConfig, resolution]);
+
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId || restoredSessionRef.current || resultUrl || sourceImage) {
+      return;
+    }
+    const saved = loadGeneratorSession('white-background', userId);
+    const task = saved?.tasks[0];
+    if (!saved || !task) return;
+
+    restoredSessionRef.current = true;
+    setSourceName(task.name);
+    setStatus('processing');
+    setNotice(copy.polling);
+    void pollTask(task.serverTaskId, saved.batchId);
+  }, [copy.polling, resultUrl, session?.user?.id, sourceImage]);
 
   function handleLocaleChange(next: ProductLocale) {
     setLocale(next);
@@ -411,7 +434,22 @@ export function WhiteBackgroundWorkbench({
       setStatus('processing');
       setNotice(copy.polling);
       const taskId = batch.tasks[0]?.taskId;
-      if (taskId) await pollTask(taskId);
+      if (taskId && session?.user?.id) {
+        saveGeneratorSession({
+          mode: 'white-background',
+          userId: session.user.id,
+          batchId: batch.batchId,
+          createdAt: Date.now(),
+          tasks: [
+            {
+              clientId: 'white-background-output',
+              serverTaskId: taskId,
+              name: sourceName || 'white-background.png',
+            },
+          ],
+        });
+      }
+      if (taskId) await pollTask(taskId, batch.batchId);
       void creditQuery.refetch();
     } catch {
       setNotice(copy.failed);
@@ -420,7 +458,7 @@ export function WhiteBackgroundWorkbench({
     }
   }
 
-  async function pollTask(taskId: string) {
+  async function pollTask(taskId: string, batchId?: string) {
     for (let attempt = 0; attempt < 90; attempt += 1) {
       await wait(attempt === 0 ? 1200 : 2500);
       const result = await getGenerationTaskStatuses({
@@ -433,14 +471,35 @@ export function WhiteBackgroundWorkbench({
         setResultUrl(item.imageUrl);
         setStatus('completed');
         setNotice('');
+        if (session?.user?.id) {
+          clearGeneratorSession('white-background', session.user.id);
+        }
         return;
       }
       if (item.status === 'failed') {
         setStatus('failed');
         setNotice(item.errorMessage || copy.failed);
+        if (session?.user?.id) {
+          clearGeneratorSession('white-background', session.user.id);
+        }
         return;
       }
       setStatus('processing');
+    }
+    if (batchId && session?.user?.id) {
+      saveGeneratorSession({
+        mode: 'white-background',
+        userId: session.user.id,
+        batchId,
+        createdAt: Date.now(),
+        tasks: [
+          {
+            clientId: 'white-background-output',
+            serverTaskId: taskId,
+            name: sourceName || 'white-background.png',
+          },
+        ],
+      });
     }
   }
 
@@ -596,8 +655,16 @@ export function WhiteBackgroundWorkbench({
             disabled={!sourceImage || ['queued', 'processing'].includes(status)}
             onClick={() => void generate()}
           >
-            <IconPlayerPlay className="size-4" />
-            {copy.generate}
+            {['queued', 'processing'].includes(status) ? (
+              <IconLoader2 className="size-4 animate-spin" />
+            ) : (
+              <IconPlayerPlay className="size-4" />
+            )}
+            {status === 'queued'
+              ? copy.submitting
+              : status === 'processing'
+                ? copy.status.processing
+                : copy.generate}
           </Button>
         </section>
 
@@ -625,6 +692,11 @@ export function WhiteBackgroundWorkbench({
                     className="h-full w-full object-contain p-3"
                   />
                 </button>
+              ) : ['queued', 'processing'].includes(status) ? (
+                <div className="px-8 text-center text-[#8a9282] text-sm">
+                  <IconLoader2 className="mx-auto mb-3 size-7 animate-spin text-[#d83b01]" />
+                  <p>{copy.status[status]}</p>
+                </div>
               ) : (
                 <p className="px-8 text-center text-[#8a9282] text-sm">
                   {copy.emptyResult}

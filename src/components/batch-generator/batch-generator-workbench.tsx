@@ -16,6 +16,11 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useGenerationCredits } from '@/hooks/use-generation-history';
 import { downloadFile } from '@/lib/download';
+import {
+  clearGeneratorSession,
+  loadGeneratorSession,
+  saveGeneratorSession,
+} from '@/lib/generator-session';
 import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
 import {
@@ -52,7 +57,7 @@ interface BatchImageTask {
   id: string;
   name: string;
   size: number;
-  sourceDataUrl: string;
+  sourceDataUrl?: string;
   resultDataUrl?: string;
   serverTaskId?: string;
   providerTaskId?: string | null;
@@ -439,6 +444,7 @@ export function BatchGeneratorWorkbench({
   const signedIn = !!session?.user;
   const creditQuery = useGenerationCredits();
   const inputRef = useRef<HTMLInputElement>(null);
+  const restoredSessionRef = useRef(false);
   const [tasks, setTasks] = useState<BatchImageTask[]>([]);
   const [selectedTaskId, setSelectedTaskId] = useState<string>('');
   const [model, setModel] = useState<KieModelId>(DEFAULT_MODEL as KieModelId);
@@ -472,7 +478,11 @@ export function BatchGeneratorWorkbench({
   );
   const hasTasks = tasks.length > 0;
   const hasSubmittedTasks = tasks.some((task) => task.status !== 'uploaded');
-  const canStart = hasTasks && runningCount === 0;
+  const canStart =
+    hasTasks &&
+    runningCount === 0 &&
+    !hasSubmittedTasks &&
+    tasks.every((task) => !!task.sourceDataUrl);
 
   function handleLocaleChange(next: ProductLocale) {
     setLocale(next);
@@ -498,6 +508,32 @@ export function BatchGeneratorWorkbench({
       setResolution(nextConfig.resolutions[0]);
     }
   }, [aspectRatio, model, resolution]);
+
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId || restoredSessionRef.current || tasks.length > 0) return;
+    const saved = loadGeneratorSession('batch', userId);
+    if (!saved || saved.tasks.length === 0) return;
+
+    restoredSessionRef.current = true;
+    setTasks(
+      saved.tasks.map((task) => ({
+        id: task.clientId,
+        name: task.name,
+        size: 0,
+        serverTaskId: task.serverTaskId,
+        status: 'processing' as const,
+        progress: 42,
+      }))
+    );
+    setSelectedTaskId(saved.tasks[0]?.clientId ?? '');
+    setBatchNotice(copy.polling);
+    void pollGenerationTasks(
+      saved.tasks.map((task) => task.serverTaskId),
+      new Map(saved.tasks.map((task) => [task.serverTaskId, task.clientId])),
+      saved.batchId
+    );
+  }, [copy.polling, session?.user?.id, tasks.length]);
 
   async function addFiles(fileList: FileList | File[]) {
     const files = Array.from(fileList)
@@ -600,7 +636,7 @@ export function BatchGeneratorWorkbench({
           productDescription:
             prompt.trim() ||
             `${modelConfig.label} batch image edit for ${tasks.length} product images`,
-          sourceImageDataUrl: sourceImage.sourceDataUrl,
+          sourceImageDataUrl: sourceImage.sourceDataUrl!,
           sourceName: sourceImage.name,
           tasks: plannedTasks,
         },
@@ -622,6 +658,21 @@ export function BatchGeneratorWorkbench({
 
       setCredits(batch.balance);
       setBatchNotice(copy.polling);
+      if (session?.user?.id) {
+        saveGeneratorSession({
+          mode: 'batch',
+          userId: session.user.id,
+          batchId: batch.batchId,
+          createdAt: Date.now(),
+          tasks: batch.tasks.map((task) => ({
+            clientId: task.id,
+            serverTaskId: task.taskId,
+            name:
+              tasks.find((item) => item.id === task.id)?.name ??
+              `${task.id}.png`,
+          })),
+        });
+      }
 
       setTasks((current) =>
         current.map((task) => {
@@ -640,7 +691,8 @@ export function BatchGeneratorWorkbench({
 
       await pollGenerationTasks(
         batch.tasks.map((task) => task.taskId),
-        new Map(batch.tasks.map((task) => [task.taskId, task.id]))
+        new Map(batch.tasks.map((task) => [task.taskId, task.id])),
+        batch.batchId
       );
       void creditQuery.refetch();
     } catch (error) {
@@ -660,7 +712,8 @@ export function BatchGeneratorWorkbench({
 
   async function pollGenerationTasks(
     serverTaskIds: string[],
-    clientTaskByServerTask: Map<string, string>
+    clientTaskByServerTask: Map<string, string>,
+    batchId?: string
   ) {
     const pending = new Set(serverTaskIds);
     for (let attempt = 0; attempt < 90 && pending.size > 0; attempt += 1) {
@@ -713,6 +766,25 @@ export function BatchGeneratorWorkbench({
           );
         }
       }
+    }
+    if (pending.size === 0 && session?.user?.id) {
+      clearGeneratorSession('batch', session.user.id);
+      setBatchNotice('');
+    } else if (batchId && session?.user?.id) {
+      saveGeneratorSession({
+        mode: 'batch',
+        userId: session.user.id,
+        batchId,
+        createdAt: Date.now(),
+        tasks: Array.from(pending).map((serverTaskId) => ({
+          serverTaskId,
+          clientId: clientTaskByServerTask.get(serverTaskId) ?? serverTaskId,
+          name:
+            tasks.find(
+              (task) => task.id === clientTaskByServerTask.get(serverTaskId)
+            )?.name ?? `${serverTaskId}.png`,
+        })),
+      });
     }
   }
 
@@ -1046,11 +1118,17 @@ function SourcePreviewSection({
               onClick={() => onSelect(task.id)}
             >
               <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[#eef1e8]">
-                <img
-                  src={task.sourceDataUrl}
-                  alt={task.name}
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
-                />
+                {task.sourceDataUrl ? (
+                  <img
+                    src={task.sourceDataUrl}
+                    alt={task.name}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#eef1e8] text-[#7c8476] text-xs">
+                    {copy.processing}
+                  </div>
+                )}
               </div>
             </button>
             <div className="p-3">

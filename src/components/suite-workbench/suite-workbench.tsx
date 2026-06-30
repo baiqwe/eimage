@@ -24,6 +24,11 @@ import { GeneratorWorkbenchHeader } from '@/components/generator/generator-workb
 import { Label } from '@/components/ui/label';
 import { useGenerationBatches } from '@/hooks/use-generation-history';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
+import {
+  clearGeneratorSession,
+  loadGeneratorSession,
+  saveGeneratorSession,
+} from '@/lib/generator-session';
 import { KIE_MODELS } from '@/lib/kie-models';
 import {
   getLocalizedPublicPath,
@@ -467,6 +472,7 @@ export function SuiteWorkbench({
   const { locale, setLocale } = useProductLocale(initialLocale);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const restoredSessionRef = useRef(false);
   const promptSyncRef = useRef({
     locale,
     description: DEFAULT_DESCRIPTION,
@@ -501,6 +507,35 @@ export function SuiteWorkbench({
     }
     void refreshCredits();
   }, [signedIn]);
+
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (!userId || restoredSessionRef.current) return;
+    const saved = loadGeneratorSession('photo-set', userId);
+    if (!saved || saved.tasks.length === 0) return;
+
+    restoredSessionRef.current = true;
+    setBatchNotice(t.polling);
+    setTasks((current) =>
+      current.map((task) => {
+        const savedTask = saved.tasks.find((item) => item.clientId === task.id);
+        return savedTask
+          ? {
+              ...task,
+              serverTaskId: savedTask.serverTaskId,
+              status: 'rendering',
+              expanded: true,
+            }
+          : task;
+      })
+    );
+    setSelectedTaskId(saved.tasks[0]?.clientId ?? selectedTaskId);
+    void pollGenerationTasks(
+      saved.tasks.map((task) => task.serverTaskId),
+      new Map(saved.tasks.map((task) => [task.serverTaskId, task.clientId])),
+      saved.batchId
+    );
+  }, [session?.user?.id, selectedTaskId, t.polling]);
 
   useEffect(() => {
     const previous = promptSyncRef.current;
@@ -749,6 +784,21 @@ export function SuiteWorkbench({
         `${t.batchReady(batch.totalCreditCost, batch.tasks.length)} ${t.polling}`
       );
       void refetchHistory();
+      if (session?.user?.id) {
+        saveGeneratorSession({
+          mode: 'photo-set',
+          userId: session.user.id,
+          batchId: batch.batchId,
+          createdAt: Date.now(),
+          tasks: batch.tasks.map((task) => ({
+            clientId: task.id,
+            serverTaskId: task.taskId,
+            name:
+              tasks.find((item) => item.id === task.id)?.style ??
+              `${task.id}.png`,
+          })),
+        });
+      }
 
       setTasks((current) =>
         current.map((task) => {
@@ -771,7 +821,8 @@ export function SuiteWorkbench({
       setSelectedTaskId(runnable[0]?.id ?? selectedTaskId);
       await pollGenerationTasks(
         batch.tasks.map((task) => task.taskId),
-        new Map(batch.tasks.map((task) => [task.taskId, task.id]))
+        new Map(batch.tasks.map((task) => [task.taskId, task.id])),
+        batch.batchId
       );
     } catch (error) {
       setBatchNotice(
@@ -790,7 +841,8 @@ export function SuiteWorkbench({
 
   async function pollGenerationTasks(
     serverTaskIds: string[],
-    clientTaskByServerTask: Map<string, string>
+    clientTaskByServerTask: Map<string, string>,
+    batchId?: string
   ) {
     const pending = new Set(serverTaskIds);
     for (let attempt = 0; attempt < 90 && pending.size > 0; attempt += 1) {
@@ -816,6 +868,25 @@ export function SuiteWorkbench({
           updateTask(clientTaskId, { status: 'rendering' });
         }
       }
+    }
+    if (pending.size === 0 && session?.user?.id) {
+      clearGeneratorSession('photo-set', session.user.id);
+      void refetchHistory();
+    } else if (batchId && session?.user?.id) {
+      saveGeneratorSession({
+        mode: 'photo-set',
+        userId: session.user.id,
+        batchId,
+        createdAt: Date.now(),
+        tasks: Array.from(pending).map((serverTaskId) => ({
+          serverTaskId,
+          clientId: clientTaskByServerTask.get(serverTaskId) ?? serverTaskId,
+          name:
+            tasks.find(
+              (task) => task.id === clientTaskByServerTask.get(serverTaskId)
+            )?.style ?? `${serverTaskId}.png`,
+        })),
+      });
     }
   }
 
@@ -901,11 +972,20 @@ export function SuiteWorkbench({
             type="button"
             className="mt-6 h-11 w-full bg-[#20231e] text-base hover:bg-[#30352d]"
             disabled={
-              !sourceImage || tasks.some((task) => task.status === 'rendering')
+              !sourceImage ||
+              tasks.some((task) =>
+                ['queued', 'rendering'].includes(task.status)
+              )
             }
             onClick={() => void generateAll()}
           >
-            <IconWand className="size-4" />
+            {tasks.some((task) =>
+              ['queued', 'rendering'].includes(task.status)
+            ) ? (
+              <IconLoader2 className="size-4 animate-spin" />
+            ) : (
+              <IconWand className="size-4" />
+            )}
             {t.generateAll}
           </Button>
           {!signedIn ? (

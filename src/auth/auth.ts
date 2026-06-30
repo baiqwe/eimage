@@ -19,6 +19,11 @@ import { grantSignupCredits } from '@/lib/credits';
  */
 export const auth = betterAuth({
   baseURL: getBaseUrl(),
+  trustedOrigins: [
+    getBaseUrl(),
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+  ],
   appName: websiteConfig.metadata?.name,
   database: drizzleAdapter(getDb(), {
     provider: 'sqlite',

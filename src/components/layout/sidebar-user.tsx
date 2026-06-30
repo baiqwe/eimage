@@ -20,6 +20,7 @@ import { websiteConfig } from '@/config/website';
 import type { SessionUser } from '@/auth/types';
 import {
   IconDeviceDesktop,
+  IconLoader2,
   IconLogout,
   IconMoon,
   IconSelector,
@@ -28,10 +29,8 @@ import {
 import { useState } from 'react';
 import { useTheme } from '@/components/theme/theme-provider';
 import { UserAvatar } from '@/components/shared/user-avatar';
-import { authClient } from '@/auth/client';
 import { messages } from '@/messages';
-import { useRouter } from '@tanstack/react-router';
-import { toast } from 'sonner';
+import { useReliableSignOut } from '@/hooks/use-reliable-sign-out';
 
 const m = messages.common;
 
@@ -41,11 +40,11 @@ interface SidebarUserProps {
 }
 
 export function SidebarUser({ user }: SidebarUserProps) {
-  const router = useRouter();
   const { setTheme, theme } = useTheme();
   const { isMobile } = useSidebar();
   const showModeSwitch = websiteConfig.ui?.mode?.enableSwitch ?? false;
   const [open, setOpen] = useState(false);
+  const { isSigningOut, signOut } = useReliableSignOut();
 
   const ThemeIcon =
     theme === 'system'
@@ -53,20 +52,6 @@ export function SidebarUser({ user }: SidebarUserProps) {
       : theme === 'dark'
         ? IconMoon
         : IconSun;
-
-  const handleSignOut = async () => {
-    await authClient.signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.navigate({ to: '/' });
-        },
-        onError: (err) => {
-          toast.error(messages.auth.common.logoutFailed);
-          console.error('sign out error:', err);
-        },
-      },
-    });
-  };
 
   return (
     <SidebarMenu className="border-t pt-4">
@@ -146,13 +131,18 @@ export function SidebarUser({ user }: SidebarUserProps) {
 
               <DropdownMenuSeparator />
               <DropdownMenuItem
+                disabled={isSigningOut}
                 onClick={async (event) => {
                   event.preventDefault();
                   setOpen(false);
-                  await handleSignOut();
+                  await signOut();
                 }}
               >
-                <IconLogout className="mr-2 size-4" />
+                {isSigningOut ? (
+                  <IconLoader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <IconLogout className="mr-2 size-4" />
+                )}
                 {messages.auth.common.logout}
               </DropdownMenuItem>
             </DropdownMenuGroup>
