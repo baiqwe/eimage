@@ -5,6 +5,7 @@ import {
 import { authClient } from '@/auth/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { GeneratorWorkbenchHeader } from '@/components/generator/generator-workbench-header';
 import {
   Select,
   SelectContent,
@@ -18,27 +19,22 @@ import { downloadFile } from '@/lib/download';
 import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
 import {
-  getProductBatchGeneratorPath,
-  getProductGeneratorPath,
-  getProductHomePath,
+  getLocalizedPublicPath,
+  useProductLocale,
 } from '@/components/product/product-locale';
 import type { ProductLocale } from '@/components/product/product-locale';
-import { Routes } from '@/lib/routes';
 import {
-  IconArrowLeft,
   IconCloudUpload,
   IconDownload,
   IconEye,
-  IconLayoutDashboard,
   IconPackageExport,
   IconPhotoScan,
   IconPlayerPlay,
-  IconRefresh,
   IconTrash,
   IconWand,
   IconX,
 } from '@tabler/icons-react';
-import { Link } from '@tanstack/react-router';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent } from 'react';
 
@@ -434,9 +430,12 @@ export function BatchGeneratorWorkbench({
 }: {
   locale?: BatchGeneratorLocale;
 }) {
-  const copy = COPY[locale];
-  const typedLocale = locale as ProductLocale;
-  const { data: session, isPending: sessionPending } = authClient.useSession();
+  const { locale: currentLocale, setLocale } = useProductLocale(locale);
+  const copy = COPY[currentLocale];
+  const typedLocale = currentLocale as ProductLocale;
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { data: session } = authClient.useSession();
   const signedIn = !!session?.user;
   const creditQuery = useGenerationCredits();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -474,6 +473,14 @@ export function BatchGeneratorWorkbench({
   const hasTasks = tasks.length > 0;
   const hasSubmittedTasks = tasks.some((task) => task.status !== 'uploaded');
   const canStart = hasTasks && runningCount === 0;
+
+  function handleLocaleChange(next: ProductLocale) {
+    setLocale(next);
+    const nextPath = getLocalizedPublicPath(pathname, next);
+    if (nextPath !== pathname) {
+      navigate({ to: nextPath });
+    }
+  }
 
   useEffect(() => {
     if (creditQuery.data) {
@@ -589,7 +596,7 @@ export function BatchGeneratorWorkbench({
 
       const batch = await createGenerationBatch({
         data: {
-          locale,
+          locale: currentLocale,
           productDescription:
             prompt.trim() ||
             `${modelConfig.label} batch image edit for ${tasks.length} product images`,
@@ -742,72 +749,15 @@ export function BatchGeneratorWorkbench({
 
   return (
     <main className="min-h-screen bg-[#f7f8f4] text-[#20231e]">
-      <header className="sticky top-0 z-20 border-[#dfe3d8] border-b bg-[#fbfcf7]/95 backdrop-blur">
-        <div className="flex h-16 items-center justify-between gap-3 px-4 md:px-6">
-          <Button
-            type="button"
-            variant="ghost"
-            render={<Link to={getProductHomePath(typedLocale)} />}
-          >
-            <IconArrowLeft className="size-4" />
-            {copy.back}
-          </Button>
-          <div className="hidden rounded-full border border-[#dfe3d8] px-3 py-1 text-[#74796d] text-sm md:block">
-            {copy.localOnly}
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="hidden rounded-lg border border-[#dfe3d8] bg-white p-1 shadow-sm md:flex">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                render={<Link to={getProductGeneratorPath(typedLocale)} />}
-              >
-                {copy.generatorSet}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                className="bg-[#20231e]"
-                render={<Link to={getProductBatchGeneratorPath(typedLocale)} />}
-              >
-                {copy.batchEditor}
-              </Button>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              className="hidden bg-white md:inline-flex"
-              render={<Link to={Routes.Dashboard} />}
-            >
-              <IconLayoutDashboard className="size-4" />
-              {copy.openDashboard}
-            </Button>
-            {!sessionPending && !signedIn ? (
-              <Button
-                type="button"
-                className="bg-[#20231e]"
-                render={<Link to={Routes.Login} />}
-              >
-                {copy.login}
-              </Button>
-            ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              className="hidden bg-white md:inline-flex"
-              disabled={!signedIn || creditQuery.isFetching}
-              onClick={() => void creditQuery.refetch()}
-            >
-              <IconRefresh className="size-4" />
-              {copy.refreshCredits}
-            </Button>
-            <div className="rounded-lg border border-[#dfe3d8] bg-white px-3 py-2 text-sm shadow-sm">
-              {copy.credits}: <strong>{credits}</strong>
-            </div>
-          </div>
-        </div>
-      </header>
+      <GeneratorWorkbenchHeader
+        locale={typedLocale}
+        active="batch"
+        credits={credits}
+        refreshDisabled={!signedIn || creditQuery.isFetching}
+        refreshing={creditQuery.isFetching}
+        onRefresh={() => void creditQuery.refetch()}
+        onLocaleChange={handleLocaleChange}
+      />
 
       <section className="grid min-h-[calc(100vh-4rem)] grid-cols-1 xl:grid-cols-[400px_minmax(0,0.8fr)_460px]">
         <aside className="border-[#dfe3d8] border-b bg-[#fbfcf7] p-4 lg:border-r lg:border-b-0">

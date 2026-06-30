@@ -2,6 +2,10 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 import { IconArrowRight, IconSparkles } from '@tabler/icons-react';
 import Container from '@/components/layout/container';
 import { Button } from '@/components/ui/button';
+import {
+  getProductGeneratorPath,
+  useProductLocale,
+} from '@/components/product/product-locale';
 import { PublicBreadcrumb } from '@/components/seo/public-breadcrumb';
 import { PRODUCT_TOOLS, PRODUCT_TOOL_NAV_GROUPS } from '@/lib/product-tools';
 import {
@@ -51,6 +55,8 @@ export const Route = createFileRoute('/tools/')({
 });
 
 function ToolsIndexPage() {
+  const { locale } = useProductLocale();
+
   return (
     <Container className="px-4 py-16">
       <div className="mx-auto max-w-6xl">
@@ -73,7 +79,7 @@ function ToolsIndexPage() {
               listing images, or category-specific product photography.
             </p>
             <div className="mt-6">
-              <Button render={<Link to={Routes.Generator} />}>
+              <Button render={<Link to={getProductGeneratorPath(locale)} />}>
                 <IconSparkles className="size-4" />
                 Open generator
               </Button>

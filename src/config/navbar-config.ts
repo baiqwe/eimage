@@ -3,6 +3,7 @@ import type { ProductLocale } from '@/components/product/product-locale';
 import {
   getProductBatchGeneratorPath,
   getProductGeneratorPath,
+  getWhiteBackgroundGeneratorPath,
 } from '@/components/product/product-locale';
 import {
   PRODUCT_TOOLS,
@@ -21,6 +22,8 @@ const NAV_COPY: Record<
     singleGeneratorDescription: string;
     batchGenerator: string;
     batchGeneratorDescription: string;
+    whiteBackgroundGenerator: string;
+    whiteBackgroundGeneratorDescription: string;
     gallery: string;
     tools: string;
     pricing: string;
@@ -34,6 +37,9 @@ const NAV_COPY: Record<
     singleGeneratorDescription: '上传一张商品图，生成主图和详情场景图。',
     batchGenerator: '批量图片编辑',
     batchGeneratorDescription: '多张商品图共用一套指令，独立生成结果。',
+    whiteBackgroundGenerator: '白底图生成器',
+    whiteBackgroundGeneratorDescription:
+      '生成干净白底、自然阴影和平台主图留白。',
     gallery: '画廊',
     tools: '工具',
     pricing: '定价',
@@ -48,6 +54,9 @@ const NAV_COPY: Record<
     batchGenerator: 'Batch image editor',
     batchGeneratorDescription:
       'Apply one instruction to many product images as independent tasks.',
+    whiteBackgroundGenerator: 'White background',
+    whiteBackgroundGeneratorDescription:
+      'Create clean white-background listing images with natural shadows.',
     gallery: 'Gallery',
     tools: 'Tools',
     pricing: 'Pricing',
@@ -62,6 +71,9 @@ const NAV_COPY: Record<
     batchGenerator: '一括画像編集',
     batchGeneratorDescription:
       '複数の商品画像に共通指示を適用し、個別に処理します。',
+    whiteBackgroundGenerator: '白背景生成',
+    whiteBackgroundGeneratorDescription:
+      '白背景、自然な影、EC 向け余白の主画像を作成します。',
     gallery: 'ギャラリー',
     tools: 'ツール',
     pricing: '料金',
@@ -76,6 +88,9 @@ const NAV_COPY: Record<
     batchGenerator: '배치 이미지 편집',
     batchGeneratorDescription:
       '여러 상품 이미지에 하나의 지시를 적용해 개별 처리합니다.',
+    whiteBackgroundGenerator: '흰 배경 생성',
+    whiteBackgroundGeneratorDescription:
+      '흰 배경과 자연스러운 그림자의 대표 이미지를 생성합니다.',
     gallery: '갤러리',
     tools: '도구',
     pricing: '요금',
@@ -90,6 +105,9 @@ const NAV_COPY: Record<
     batchGenerator: 'Editor por lotes',
     batchGeneratorDescription:
       'Aplica una instruccion a muchas imagenes como tareas independientes.',
+    whiteBackgroundGenerator: 'Fondo blanco',
+    whiteBackgroundGeneratorDescription:
+      'Crea imagenes limpias con fondo blanco y sombra natural.',
     gallery: 'Galería',
     tools: 'Herramientas',
     pricing: 'Precios',
@@ -147,6 +165,12 @@ export function getNavbarLinks(locale: ProductLocale = 'en'): MenuItemConfig[] {
       title: copy.batchGenerator,
       description: copy.batchGeneratorDescription,
       href: localizedPath(Routes.BatchGenerator),
+      external: false,
+    },
+    {
+      title: copy.whiteBackgroundGenerator,
+      description: copy.whiteBackgroundGeneratorDescription,
+      href: getWhiteBackgroundGeneratorPath(locale),
       external: false,
     },
   ];

@@ -158,7 +158,8 @@ export function getLocalizedPublicPath(
 
   const supportsAllLocales =
     pathWithoutLocale === '/generator' ||
-    pathWithoutLocale === '/batch-generator';
+    pathWithoutLocale === '/batch-generator' ||
+    pathWithoutLocale === '/white-background-generator';
   const supportsZhOnly =
     pathWithoutLocale === '/gallery' ||
     pathWithoutLocale === '/tools' ||
@@ -187,6 +188,12 @@ export function getProductGeneratorPath(locale: ProductLocale) {
 
 export function getProductBatchGeneratorPath(locale: ProductLocale) {
   return locale === 'en' ? '/batch-generator' : `/${locale}/batch-generator`;
+}
+
+export function getWhiteBackgroundGeneratorPath(locale: ProductLocale) {
+  return locale === 'en'
+    ? '/white-background-generator'
+    : `/${locale}/white-background-generator`;
 }
 
 export function ProductLanguageSelect({

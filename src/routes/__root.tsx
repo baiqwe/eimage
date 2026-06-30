@@ -117,7 +117,9 @@ function RootComponent() {
     pathname === Routes.Generator ||
     pathname === Routes.BatchGenerator ||
     /^\/(zh|ja|ko|es)\/generator\/?$/.test(pathname) ||
-    /^\/(zh|ja|ko|es)\/batch-generator\/?$/.test(pathname);
+    /^\/(zh|ja|ko|es)\/batch-generator\/?$/.test(pathname) ||
+    /^\/(zh|ja|ko|es)\/white-background-generator\/?$/.test(pathname) ||
+    pathname === '/white-background-generator';
   // When no child route matches (e.g. /hello), only root is in matches; use minimal layout
   const isNotFound =
     pathname !== Routes.Root && pathname !== '' && matches.length <= 1;

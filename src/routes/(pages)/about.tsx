@@ -7,6 +7,7 @@ import {
 import Container from '@/components/layout/container';
 import { PublicBreadcrumb } from '@/components/seo/public-breadcrumb';
 import {
+  getProductGeneratorPath,
   ProductLanguageSelect,
   useProductLocale,
 } from '@/components/product/product-locale';
@@ -184,7 +185,9 @@ function AboutPage() {
           {copy.description}
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Button render={<Link to={Routes.Generator} />}>{copy.cta}</Button>
+          <Button render={<Link to={getProductGeneratorPath(locale)} />}>
+            {copy.cta}
+          </Button>
           <Button variant="outline" render={<Link to={Routes.Gallery} />}>
             {copy.gallery}
           </Button>

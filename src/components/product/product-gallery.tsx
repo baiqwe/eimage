@@ -2,6 +2,7 @@ import { IconArrowRight, IconSparkles } from '@tabler/icons-react';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { getProductGeneratorPath } from '@/components/product/product-locale';
 import {
   PRODUCT_GALLERY,
   getGalleryCopy,
@@ -49,7 +50,7 @@ export function ProductGallerySection({
                 {copy.viewAll}
                 <IconArrowRight className="size-4" />
               </Button>
-              <Button render={<Link to={Routes.Generator} />}>
+              <Button render={<Link to={getProductGeneratorPath(locale)} />}>
                 <IconSparkles className="size-4" />
                 {copy.openGenerator}
               </Button>

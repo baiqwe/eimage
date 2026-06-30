@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ZhRouteImport } from './routes/zh'
+import { Route as WhiteBackgroundGeneratorRouteImport } from './routes/white-background-generator'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
@@ -31,6 +32,7 @@ import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as ZhWhiteBackgroundGeneratorRouteImport } from './routes/zh/white-background-generator'
 import { Route as ZhGeneratorRouteImport } from './routes/zh/generator'
 import { Route as ZhGalleryRouteImport } from './routes/zh/gallery'
 import { Route as ZhBatchGeneratorRouteImport } from './routes/zh/batch-generator'
@@ -42,10 +44,13 @@ import { Route as SettingsNotificationsRouteImport } from './routes/settings/not
 import { Route as SettingsFilesRouteImport } from './routes/settings/files'
 import { Route as SettingsBillingRouteImport } from './routes/settings/billing'
 import { Route as SettingsApikeysRouteImport } from './routes/settings/apikeys'
+import { Route as KoWhiteBackgroundGeneratorRouteImport } from './routes/ko/white-background-generator'
 import { Route as KoGeneratorRouteImport } from './routes/ko/generator'
 import { Route as KoBatchGeneratorRouteImport } from './routes/ko/batch-generator'
+import { Route as JaWhiteBackgroundGeneratorRouteImport } from './routes/ja/white-background-generator'
 import { Route as JaGeneratorRouteImport } from './routes/ja/generator'
 import { Route as JaBatchGeneratorRouteImport } from './routes/ja/batch-generator'
+import { Route as EsWhiteBackgroundGeneratorRouteImport } from './routes/es/white-background-generator'
 import { Route as EsGeneratorRouteImport } from './routes/es/generator'
 import { Route as EsBatchGeneratorRouteImport } from './routes/es/batch-generator'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
@@ -80,6 +85,12 @@ const ZhRoute = ZhRouteImport.update({
   path: '/zh',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WhiteBackgroundGeneratorRoute =
+  WhiteBackgroundGeneratorRouteImport.update({
+    id: '/white-background-generator',
+    path: '/white-background-generator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -185,6 +196,12 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const ZhWhiteBackgroundGeneratorRoute =
+  ZhWhiteBackgroundGeneratorRouteImport.update({
+    id: '/white-background-generator',
+    path: '/white-background-generator',
+    getParentRoute: () => ZhRoute,
+  } as any)
 const ZhGeneratorRoute = ZhGeneratorRouteImport.update({
   id: '/generator',
   path: '/generator',
@@ -240,6 +257,12 @@ const SettingsApikeysRoute = SettingsApikeysRouteImport.update({
   path: '/apikeys',
   getParentRoute: () => SettingsRoute,
 } as any)
+const KoWhiteBackgroundGeneratorRoute =
+  KoWhiteBackgroundGeneratorRouteImport.update({
+    id: '/white-background-generator',
+    path: '/white-background-generator',
+    getParentRoute: () => KoRoute,
+  } as any)
 const KoGeneratorRoute = KoGeneratorRouteImport.update({
   id: '/generator',
   path: '/generator',
@@ -250,6 +273,12 @@ const KoBatchGeneratorRoute = KoBatchGeneratorRouteImport.update({
   path: '/batch-generator',
   getParentRoute: () => KoRoute,
 } as any)
+const JaWhiteBackgroundGeneratorRoute =
+  JaWhiteBackgroundGeneratorRouteImport.update({
+    id: '/white-background-generator',
+    path: '/white-background-generator',
+    getParentRoute: () => JaRoute,
+  } as any)
 const JaGeneratorRoute = JaGeneratorRouteImport.update({
   id: '/generator',
   path: '/generator',
@@ -260,6 +289,12 @@ const JaBatchGeneratorRoute = JaBatchGeneratorRouteImport.update({
   path: '/batch-generator',
   getParentRoute: () => JaRoute,
 } as any)
+const EsWhiteBackgroundGeneratorRoute =
+  EsWhiteBackgroundGeneratorRouteImport.update({
+    id: '/white-background-generator',
+    path: '/white-background-generator',
+    getParentRoute: () => EsRoute,
+  } as any)
 const EsGeneratorRoute = EsGeneratorRouteImport.update({
   id: '/generator',
   path: '/generator',
@@ -417,6 +452,7 @@ export interface FileRoutesByFullPath {
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/white-background-generator': typeof WhiteBackgroundGeneratorRoute
   '/zh': typeof ZhRouteWithChildren
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
@@ -440,10 +476,13 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/es/batch-generator': typeof EsBatchGeneratorRoute
   '/es/generator': typeof EsGeneratorRoute
+  '/es/white-background-generator': typeof EsWhiteBackgroundGeneratorRoute
   '/ja/batch-generator': typeof JaBatchGeneratorRoute
   '/ja/generator': typeof JaGeneratorRoute
+  '/ja/white-background-generator': typeof JaWhiteBackgroundGeneratorRoute
   '/ko/batch-generator': typeof KoBatchGeneratorRoute
   '/ko/generator': typeof KoGeneratorRoute
+  '/ko/white-background-generator': typeof KoWhiteBackgroundGeneratorRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -455,6 +494,7 @@ export interface FileRoutesByFullPath {
   '/zh/batch-generator': typeof ZhBatchGeneratorRoute
   '/zh/gallery': typeof ZhGalleryRoute
   '/zh/generator': typeof ZhGeneratorRoute
+  '/zh/white-background-generator': typeof ZhWhiteBackgroundGeneratorRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -481,6 +521,7 @@ export interface FileRoutesByTo {
   '/manifest.json': typeof ManifestDotjsonRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/white-background-generator': typeof WhiteBackgroundGeneratorRoute
   '/cookie': typeof legalsCookieRoute
   '/privacy': typeof legalsPrivacyRoute
   '/terms': typeof legalsTermsRoute
@@ -503,10 +544,13 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/es/batch-generator': typeof EsBatchGeneratorRoute
   '/es/generator': typeof EsGeneratorRoute
+  '/es/white-background-generator': typeof EsWhiteBackgroundGeneratorRoute
   '/ja/batch-generator': typeof JaBatchGeneratorRoute
   '/ja/generator': typeof JaGeneratorRoute
+  '/ja/white-background-generator': typeof JaWhiteBackgroundGeneratorRoute
   '/ko/batch-generator': typeof KoBatchGeneratorRoute
   '/ko/generator': typeof KoGeneratorRoute
+  '/ko/white-background-generator': typeof KoWhiteBackgroundGeneratorRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -518,6 +562,7 @@ export interface FileRoutesByTo {
   '/zh/batch-generator': typeof ZhBatchGeneratorRoute
   '/zh/gallery': typeof ZhGalleryRoute
   '/zh/generator': typeof ZhGeneratorRoute
+  '/zh/white-background-generator': typeof ZhWhiteBackgroundGeneratorRoute
   '/admin': typeof AdminIndexRoute
   '/blog': typeof BlogIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -548,6 +593,7 @@ export interface FileRoutesById {
   '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/white-background-generator': typeof WhiteBackgroundGeneratorRoute
   '/zh': typeof ZhRouteWithChildren
   '/(legals)/cookie': typeof legalsCookieRoute
   '/(legals)/privacy': typeof legalsPrivacyRoute
@@ -571,10 +617,13 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/es/batch-generator': typeof EsBatchGeneratorRoute
   '/es/generator': typeof EsGeneratorRoute
+  '/es/white-background-generator': typeof EsWhiteBackgroundGeneratorRoute
   '/ja/batch-generator': typeof JaBatchGeneratorRoute
   '/ja/generator': typeof JaGeneratorRoute
+  '/ja/white-background-generator': typeof JaWhiteBackgroundGeneratorRoute
   '/ko/batch-generator': typeof KoBatchGeneratorRoute
   '/ko/generator': typeof KoGeneratorRoute
+  '/ko/white-background-generator': typeof KoWhiteBackgroundGeneratorRoute
   '/settings/apikeys': typeof SettingsApikeysRoute
   '/settings/billing': typeof SettingsBillingRoute
   '/settings/files': typeof SettingsFilesRoute
@@ -586,6 +635,7 @@ export interface FileRoutesById {
   '/zh/batch-generator': typeof ZhBatchGeneratorRoute
   '/zh/gallery': typeof ZhGalleryRoute
   '/zh/generator': typeof ZhGeneratorRoute
+  '/zh/white-background-generator': typeof ZhWhiteBackgroundGeneratorRoute
   '/admin/': typeof AdminIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -617,6 +667,7 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/settings'
     | '/sitemap.xml'
+    | '/white-background-generator'
     | '/zh'
     | '/cookie'
     | '/privacy'
@@ -640,10 +691,13 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/es/batch-generator'
     | '/es/generator'
+    | '/es/white-background-generator'
     | '/ja/batch-generator'
     | '/ja/generator'
+    | '/ja/white-background-generator'
     | '/ko/batch-generator'
     | '/ko/generator'
+    | '/ko/white-background-generator'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -655,6 +709,7 @@ export interface FileRouteTypes {
     | '/zh/batch-generator'
     | '/zh/gallery'
     | '/zh/generator'
+    | '/zh/white-background-generator'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
@@ -681,6 +736,7 @@ export interface FileRouteTypes {
     | '/manifest.json'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/white-background-generator'
     | '/cookie'
     | '/privacy'
     | '/terms'
@@ -703,10 +759,13 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/es/batch-generator'
     | '/es/generator'
+    | '/es/white-background-generator'
     | '/ja/batch-generator'
     | '/ja/generator'
+    | '/ja/white-background-generator'
     | '/ko/batch-generator'
     | '/ko/generator'
+    | '/ko/white-background-generator'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -718,6 +777,7 @@ export interface FileRouteTypes {
     | '/zh/batch-generator'
     | '/zh/gallery'
     | '/zh/generator'
+    | '/zh/white-background-generator'
     | '/admin'
     | '/blog'
     | '/dashboard'
@@ -747,6 +807,7 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/settings'
     | '/sitemap.xml'
+    | '/white-background-generator'
     | '/zh'
     | '/(legals)/cookie'
     | '/(legals)/privacy'
@@ -770,10 +831,13 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/es/batch-generator'
     | '/es/generator'
+    | '/es/white-background-generator'
     | '/ja/batch-generator'
     | '/ja/generator'
+    | '/ja/white-background-generator'
     | '/ko/batch-generator'
     | '/ko/generator'
+    | '/ko/white-background-generator'
     | '/settings/apikeys'
     | '/settings/billing'
     | '/settings/files'
@@ -785,6 +849,7 @@ export interface FileRouteTypes {
     | '/zh/batch-generator'
     | '/zh/gallery'
     | '/zh/generator'
+    | '/zh/white-background-generator'
     | '/admin/'
     | '/blog/'
     | '/dashboard/'
@@ -815,6 +880,7 @@ export interface RootRouteChildren {
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SettingsRoute: typeof SettingsRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  WhiteBackgroundGeneratorRoute: typeof WhiteBackgroundGeneratorRoute
   ZhRoute: typeof ZhRouteWithChildren
   legalsCookieRoute: typeof legalsCookieRoute
   legalsPrivacyRoute: typeof legalsPrivacyRoute
@@ -846,6 +912,13 @@ declare module '@tanstack/react-router' {
       path: '/zh'
       fullPath: '/zh'
       preLoaderRoute: typeof ZhRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/white-background-generator': {
+      id: '/white-background-generator'
+      path: '/white-background-generator'
+      fullPath: '/white-background-generator'
+      preLoaderRoute: typeof WhiteBackgroundGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -995,6 +1068,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/zh/white-background-generator': {
+      id: '/zh/white-background-generator'
+      path: '/white-background-generator'
+      fullPath: '/zh/white-background-generator'
+      preLoaderRoute: typeof ZhWhiteBackgroundGeneratorRouteImport
+      parentRoute: typeof ZhRoute
+    }
     '/zh/generator': {
       id: '/zh/generator'
       path: '/generator'
@@ -1072,6 +1152,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsApikeysRouteImport
       parentRoute: typeof SettingsRoute
     }
+    '/ko/white-background-generator': {
+      id: '/ko/white-background-generator'
+      path: '/white-background-generator'
+      fullPath: '/ko/white-background-generator'
+      preLoaderRoute: typeof KoWhiteBackgroundGeneratorRouteImport
+      parentRoute: typeof KoRoute
+    }
     '/ko/generator': {
       id: '/ko/generator'
       path: '/generator'
@@ -1086,6 +1173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KoBatchGeneratorRouteImport
       parentRoute: typeof KoRoute
     }
+    '/ja/white-background-generator': {
+      id: '/ja/white-background-generator'
+      path: '/white-background-generator'
+      fullPath: '/ja/white-background-generator'
+      preLoaderRoute: typeof JaWhiteBackgroundGeneratorRouteImport
+      parentRoute: typeof JaRoute
+    }
     '/ja/generator': {
       id: '/ja/generator'
       path: '/generator'
@@ -1099,6 +1193,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ja/batch-generator'
       preLoaderRoute: typeof JaBatchGeneratorRouteImport
       parentRoute: typeof JaRoute
+    }
+    '/es/white-background-generator': {
+      id: '/es/white-background-generator'
+      path: '/white-background-generator'
+      fullPath: '/es/white-background-generator'
+      preLoaderRoute: typeof EsWhiteBackgroundGeneratorRouteImport
+      parentRoute: typeof EsRoute
     }
     '/es/generator': {
       id: '/es/generator'
@@ -1344,11 +1445,13 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 interface EsRouteChildren {
   EsBatchGeneratorRoute: typeof EsBatchGeneratorRoute
   EsGeneratorRoute: typeof EsGeneratorRoute
+  EsWhiteBackgroundGeneratorRoute: typeof EsWhiteBackgroundGeneratorRoute
 }
 
 const EsRouteChildren: EsRouteChildren = {
   EsBatchGeneratorRoute: EsBatchGeneratorRoute,
   EsGeneratorRoute: EsGeneratorRoute,
+  EsWhiteBackgroundGeneratorRoute: EsWhiteBackgroundGeneratorRoute,
 }
 
 const EsRouteWithChildren = EsRoute._addFileChildren(EsRouteChildren)
@@ -1356,11 +1459,13 @@ const EsRouteWithChildren = EsRoute._addFileChildren(EsRouteChildren)
 interface JaRouteChildren {
   JaBatchGeneratorRoute: typeof JaBatchGeneratorRoute
   JaGeneratorRoute: typeof JaGeneratorRoute
+  JaWhiteBackgroundGeneratorRoute: typeof JaWhiteBackgroundGeneratorRoute
 }
 
 const JaRouteChildren: JaRouteChildren = {
   JaBatchGeneratorRoute: JaBatchGeneratorRoute,
   JaGeneratorRoute: JaGeneratorRoute,
+  JaWhiteBackgroundGeneratorRoute: JaWhiteBackgroundGeneratorRoute,
 }
 
 const JaRouteWithChildren = JaRoute._addFileChildren(JaRouteChildren)
@@ -1368,11 +1473,13 @@ const JaRouteWithChildren = JaRoute._addFileChildren(JaRouteChildren)
 interface KoRouteChildren {
   KoBatchGeneratorRoute: typeof KoBatchGeneratorRoute
   KoGeneratorRoute: typeof KoGeneratorRoute
+  KoWhiteBackgroundGeneratorRoute: typeof KoWhiteBackgroundGeneratorRoute
 }
 
 const KoRouteChildren: KoRouteChildren = {
   KoBatchGeneratorRoute: KoBatchGeneratorRoute,
   KoGeneratorRoute: KoGeneratorRoute,
+  KoWhiteBackgroundGeneratorRoute: KoWhiteBackgroundGeneratorRoute,
 }
 
 const KoRouteWithChildren = KoRoute._addFileChildren(KoRouteChildren)
@@ -1407,6 +1514,7 @@ interface ZhRouteChildren {
   ZhBatchGeneratorRoute: typeof ZhBatchGeneratorRoute
   ZhGalleryRoute: typeof ZhGalleryRoute
   ZhGeneratorRoute: typeof ZhGeneratorRoute
+  ZhWhiteBackgroundGeneratorRoute: typeof ZhWhiteBackgroundGeneratorRoute
   ZhIndexRoute: typeof ZhIndexRoute
   ZhToolsSlugRoute: typeof ZhToolsSlugRoute
   ZhToolsIndexRoute: typeof ZhToolsIndexRoute
@@ -1416,6 +1524,7 @@ const ZhRouteChildren: ZhRouteChildren = {
   ZhBatchGeneratorRoute: ZhBatchGeneratorRoute,
   ZhGalleryRoute: ZhGalleryRoute,
   ZhGeneratorRoute: ZhGeneratorRoute,
+  ZhWhiteBackgroundGeneratorRoute: ZhWhiteBackgroundGeneratorRoute,
   ZhIndexRoute: ZhIndexRoute,
   ZhToolsSlugRoute: ZhToolsSlugRoute,
   ZhToolsIndexRoute: ZhToolsIndexRoute,
@@ -1439,6 +1548,7 @@ const rootRouteChildren: RootRouteChildren = {
   RobotsDottxtRoute: RobotsDottxtRoute,
   SettingsRoute: SettingsRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  WhiteBackgroundGeneratorRoute: WhiteBackgroundGeneratorRoute,
   ZhRoute: ZhRouteWithChildren,
   legalsCookieRoute: legalsCookieRoute,
   legalsPrivacyRoute: legalsPrivacyRoute,

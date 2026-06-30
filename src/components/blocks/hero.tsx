@@ -1,5 +1,9 @@
 import Container from '@/components/layout/container';
 import { buttonVariants } from '@/components/ui/button';
+import {
+  getProductGeneratorPath,
+  useProductLocale,
+} from '@/components/product/product-locale';
 import { cn } from '@/lib/utils';
 import { Link } from '@tanstack/react-router';
 import { IconArrowRight } from '@tabler/icons-react';
@@ -15,6 +19,8 @@ const m = {
 };
 
 export default function HeroSection() {
+  const { locale } = useProductLocale();
+
   return (
     <section id="hero" className="overflow-hidden">
       {/* background, warm-tinted light blobs on top of the hero section */}
@@ -32,7 +38,7 @@ export default function HeroSection() {
           <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
             {/* introduction */}
             <a
-              href="/generator"
+              href={getProductGeneratorPath(locale)}
               target="_blank"
               rel="noopener noreferrer"
               className="animate-fade-up delay-0 hover:bg-muted group mx-auto flex w-fit items-center gap-2 rounded-full border border-border p-1 pl-4 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:rounded-full"

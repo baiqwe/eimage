@@ -1,11 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  IconArrowLeft,
-  IconBolt,
   IconChevronDown,
   IconChevronUp,
   IconDownload,
-  IconHistory,
   IconLoader2,
   IconPhoto,
   IconPlus,
@@ -23,17 +20,13 @@ import {
 import { authClient } from '@/auth/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { GeneratorWorkbenchHeader } from '@/components/generator/generator-workbench-header';
 import { Label } from '@/components/ui/label';
 import { useGenerationBatches } from '@/hooks/use-generation-history';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
 import { KIE_MODELS } from '@/lib/kie-models';
-import { Routes } from '@/lib/routes';
 import {
   getLocalizedPublicPath,
-  getProductBatchGeneratorPath,
-  getProductGeneratorPath,
-  getProductHomePath,
-  ProductLanguageSelect,
   type ProductLocale,
   useProductLocale,
 } from '@/components/product/product-locale';
@@ -175,8 +168,6 @@ const WORKBENCH_COPY = {
     },
     globalBadge: '全局',
     sourceAlt: '商品素材图',
-    generatorSet: '套图生成器',
-    batchEditor: '批量生图',
   },
   en: {
     subtitle: 'Product image generation workbench',
@@ -249,8 +240,6 @@ const WORKBENCH_COPY = {
     },
     globalBadge: 'Global',
     sourceAlt: 'Source product image',
-    generatorSet: 'Photo set',
-    batchEditor: 'Batch editor',
   },
   ja: {
     subtitle: '商品画像生成ワークベンチ',
@@ -322,8 +311,6 @@ const WORKBENCH_COPY = {
     },
     globalBadge: '共通',
     sourceAlt: '商品素材画像',
-    generatorSet: 'セット生成',
-    batchEditor: '一括編集',
   },
   ko: {
     subtitle: '상품 이미지 생성 워크벤치',
@@ -396,8 +383,6 @@ const WORKBENCH_COPY = {
     },
     globalBadge: '전역',
     sourceAlt: '상품 소재 이미지',
-    generatorSet: '세트 생성',
-    batchEditor: '배치 편집',
   },
   es: {
     subtitle: 'Workbench de generación de imágenes de producto',
@@ -470,8 +455,6 @@ const WORKBENCH_COPY = {
     },
     globalBadge: 'Global',
     sourceAlt: 'Imagen fuente del producto',
-    generatorSet: 'Set de fotos',
-    batchEditor: 'Editor por lotes',
   },
 } as const;
 
@@ -488,7 +471,7 @@ export function SuiteWorkbench({
     locale,
     description: DEFAULT_DESCRIPTION,
   });
-  const { data: session, isPending: sessionPending } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const [sourceImage, setSourceImage] = useState<string>();
   const [sourceName, setSourceName] = useState('');
   const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
@@ -496,16 +479,12 @@ export function SuiteWorkbench({
   const [creditsLoading, setCreditsLoading] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState('task-main');
   const [batchNotice, setBatchNotice] = useState('');
-  const [historyOpen, setHistoryOpen] = useState(false);
   const [tasks, setTasks] = useState<WorkbenchTask[]>(() =>
     createInitialTasks(DEFAULT_DESCRIPTION, locale)
   );
   const t = WORKBENCH_COPY[locale];
   const signedIn = Boolean(session?.user);
-  const { data: historyData, refetch: refetchHistory } = useGenerationBatches(
-    0,
-    10
-  );
+  const { refetch: refetchHistory } = useGenerationBatches(0, 10);
 
   function handleLocaleChange(next: ProductLocale) {
     setLocale(next);
@@ -842,87 +821,15 @@ export function SuiteWorkbench({
 
   return (
     <main className="min-h-screen bg-[#f7f8f4] text-[#20231e]">
-      <header className="sticky top-0 z-30 border-[#dfe3d8] border-b bg-[#fbfcf7]/95 backdrop-blur">
-        <div className="flex h-16 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-3">
-            <Link to={getProductHomePath(locale)} className="hidden md:block">
-              <Button type="button" variant="ghost">
-                <IconArrowLeft className="size-4" />
-                {t.back}
-              </Button>
-            </Link>
-            <div className="flex size-9 items-center justify-center rounded-lg bg-[#22251f] text-[#f5f7ed]">
-              <IconSparkles className="size-5" />
-            </div>
-            <div>
-              <p className="font-bold text-lg leading-none">ProdList AI</p>
-              <p className="text-[#74796d] text-xs">{t.subtitle}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="hidden rounded-lg border border-[#dfe3d8] bg-white p-1 shadow-sm md:flex">
-              <Button
-                type="button"
-                size="sm"
-                className="bg-[#20231e]"
-                render={<Link to={getProductGeneratorPath(locale)} />}
-              >
-                {t.generatorSet}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                render={<Link to={getProductBatchGeneratorPath(locale)} />}
-              >
-                {t.batchEditor}
-              </Button>
-            </div>
-            <ProductLanguageSelect
-              locale={locale}
-              onLocaleChange={handleLocaleChange}
-              compact
-            />
-            {!sessionPending && !signedIn ? (
-              <Link to={Routes.Login}>
-                <Button type="button" className="bg-[#20231e]">
-                  {t.login}
-                </Button>
-              </Link>
-            ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              className="bg-white"
-              onClick={() => setHistoryOpen((value) => !value)}
-            >
-              <IconHistory className="size-4" />
-              {t.history}
-            </Button>
-            <div className="flex items-center gap-2 rounded-lg border border-[#dfe3d8] bg-white px-3 py-2 text-sm shadow-sm">
-              <IconBolt className="size-4 text-[#c9822f]" />
-              <span className="text-[#74796d]">{t.credits}</span>
-              <strong>{credits}</strong>
-            </div>
-            {signedIn ? (
-              <Button
-                type="button"
-                variant="outline"
-                className="hidden bg-white md:inline-flex"
-                disabled={creditsLoading}
-                onClick={() => void refreshCredits()}
-              >
-                {creditsLoading ? (
-                  <IconLoader2 className="size-4 animate-spin" />
-                ) : (
-                  <IconBolt className="size-4" />
-                )}
-                {t.refreshCredits}
-              </Button>
-            ) : null}
-          </div>
-        </div>
-      </header>
+      <GeneratorWorkbenchHeader
+        locale={locale}
+        active="photo-set"
+        credits={credits}
+        refreshDisabled={!signedIn || creditsLoading}
+        refreshing={creditsLoading}
+        onRefresh={() => void refreshCredits()}
+        onLocaleChange={handleLocaleChange}
+      />
 
       <div className="grid min-h-[calc(100vh-4rem)] grid-cols-1 lg:grid-cols-[320px_minmax(440px,1fr)_380px]">
         <aside className="border-[#dfe3d8] border-b bg-[#fbfcf7] p-4 lg:border-r lg:border-b-0">
@@ -1057,30 +964,6 @@ export function SuiteWorkbench({
               />
             ))}
           </div>
-          {historyOpen ? (
-            <div className="mt-5 rounded-lg border border-[#dfe3d8] bg-white p-4 shadow-sm">
-              <p className="mb-3 flex items-center gap-2 font-semibold text-sm">
-                <IconHistory className="size-4 text-[#2f5f4f]" />
-                {t.historyTitle}
-              </p>
-              {!historyData?.items || historyData.items.length === 0 ? (
-                <p className="text-[#74796d] text-sm">{t.emptyHistory}</p>
-              ) : (
-                <div className="space-y-2">
-                  {historyData.items.map((batch) => (
-                    <div
-                      key={batch.id}
-                      className="grid gap-2 rounded-lg border border-[#edf0e8] p-3 text-sm md:grid-cols-[1fr_auto_auto]"
-                    >
-                      <span className="truncate">{batch.id}</span>
-                      <span>{batch.taskCount} tasks</span>
-                      <span>{batch.spentCredits} credits</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : null}
         </section>
 
         <aside className="border-[#dfe3d8] border-t bg-[#fbfcf7] p-4 lg:border-t-0 lg:border-l">

@@ -14,7 +14,10 @@ import {
 import { websiteConfig } from '@/config/website';
 import { authClient } from '@/auth/client';
 import { Link } from '@tanstack/react-router';
-import { Routes } from '@/lib/routes';
+import {
+  getProductHomePath,
+  useProductLocale,
+} from '@/components/product/product-locale';
 import type * as React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -26,6 +29,7 @@ export function DashboardSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { data: session, isPending } = authClient.useSession();
   const currentUser = session?.user;
   const { isMobile, setOpenMobile } = useSidebar();
+  const { locale } = useProductLocale();
 
   useEffect(() => {
     setMounted(true);
@@ -42,7 +46,10 @@ export function DashboardSidebar(props: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               render={
-                <Link to={Routes.Root} onClick={closeMobileSidebar}>
+                <Link
+                  to={getProductHomePath(locale)}
+                  onClick={closeMobileSidebar}
+                >
                   <Logo className="size-5" />
                   <span className="truncate font-semibold text-base">
                     {websiteConfig.metadata?.name}

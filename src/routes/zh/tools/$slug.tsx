@@ -90,7 +90,9 @@ function ToolPage() {
     tool.slug === 'batch-image-editor' ||
     tool.slug === 'batch-product-photo-generator'
       ? '/zh/batch-generator'
-      : '/zh/generator';
+      : tool.slug === 'white-background-product-photo'
+        ? '/zh/white-background-generator'
+        : '/zh/generator';
 
   return (
     <Container className="px-4 py-16">

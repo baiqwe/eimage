@@ -8,6 +8,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { getSidebarLinks } from '@/config/sidebar-config';
+import { useProductLocale } from '@/components/product/product-locale';
 import type { MenuItemConfig } from '@/types';
 import { Link, useRouterState } from '@tanstack/react-router';
 import { authClient } from '@/auth/client';
@@ -17,7 +18,8 @@ import { useMemo } from 'react';
  * Filters sidebar links based on user role (authorizeOnly)
  */
 function useFilteredSidebarLinks(): MenuItemConfig[] {
-  const links = getSidebarLinks();
+  const { locale } = useProductLocale();
+  const links = getSidebarLinks(locale);
   const { data: session } = authClient.useSession();
   const userRole = session?.user?.role;
 

@@ -8,6 +8,7 @@ import Container from '@/components/layout/container';
 import {
   getProductBatchGeneratorPath,
   getProductGeneratorPath,
+  getWhiteBackgroundGeneratorPath,
   ProductLanguageSelect,
   useProductLocale,
 } from '@/components/product/product-locale';
@@ -97,7 +98,9 @@ function ToolPage() {
     tool.slug === 'batch-image-editor' ||
     tool.slug === 'batch-product-photo-generator'
       ? getProductBatchGeneratorPath(locale)
-      : getProductGeneratorPath(locale);
+      : tool.slug === 'white-background-product-photo'
+        ? getWhiteBackgroundGeneratorPath(locale)
+        : getProductGeneratorPath(locale);
 
   return (
     <Container className="px-4 py-16">

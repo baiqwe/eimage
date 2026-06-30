@@ -12,6 +12,10 @@ import {
   IconUsers,
 } from '@tabler/icons-react';
 import { Routes } from '@/lib/routes';
+import {
+  getProductGeneratorPath,
+  type ProductLocale,
+} from '@/components/product/product-locale';
 import type { MenuItemConfig } from '../types';
 import { messages } from '@/messages';
 import { websiteConfig } from './website';
@@ -22,7 +26,9 @@ const am = messages.admin;
 /**
  * Sidebar links
  */
-export function getSidebarLinks(): MenuItemConfig[] {
+export function getSidebarLinks(
+  locale: ProductLocale = 'en'
+): MenuItemConfig[] {
   return [
     {
       title: m.dashboard,
@@ -33,7 +39,7 @@ export function getSidebarLinks(): MenuItemConfig[] {
     {
       title: 'Generator',
       icon: IconSparkles,
-      href: Routes.Generator,
+      href: getProductGeneratorPath(locale),
       external: false,
     },
     {

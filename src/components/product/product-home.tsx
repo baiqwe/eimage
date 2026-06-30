@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { ProductGallerySection } from '@/components/product/product-gallery';
 import {
   getLocalizedPublicPath,
+  getProductGeneratorPath,
   ProductLanguageSelect,
   type ProductLocale,
   useProductLocale,
@@ -428,7 +429,7 @@ export function ProductHome({
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button
-                render={<Link to={Routes.Generator} />}
+                render={<Link to={getProductGeneratorPath(locale)} />}
                 className="h-10 bg-[#20231e] px-5 hover:bg-[#30352d]"
               >
                 <IconWand className="size-4" />
