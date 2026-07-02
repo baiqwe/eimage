@@ -17,17 +17,116 @@ export const Route = createFileRoute('/sitemap.xml')({
           path: string;
           changefreq?: string;
           priority?: string;
+          alternates?: Record<string, string>;
         }[] = [
-          { path: '/', changefreq: 'daily', priority: '1.0' },
-          { path: '/en', changefreq: 'daily', priority: '0.9' },
-          { path: '/zh', changefreq: 'daily', priority: '0.95' },
-          { path: '/ja', changefreq: 'weekly', priority: '0.85' },
-          { path: '/ko', changefreq: 'weekly', priority: '0.85' },
-          { path: '/es', changefreq: 'weekly', priority: '0.85' },
-          { path: '/gallery', changefreq: 'weekly', priority: '0.85' },
-          { path: '/zh/gallery', changefreq: 'weekly', priority: '0.82' },
-          { path: '/tools', changefreq: 'weekly', priority: '0.9' },
-          { path: '/zh/tools', changefreq: 'weekly', priority: '0.85' },
+          {
+            path: '/',
+            changefreq: 'daily',
+            priority: '1.0',
+            alternates: localeAlternates({
+              en: '/',
+              zh: '/zh',
+              ja: '/ja',
+              ko: '/ko',
+              es: '/es',
+            }),
+          },
+          {
+            path: '/en',
+            changefreq: 'daily',
+            priority: '0.9',
+            alternates: localeAlternates({
+              en: '/en',
+              zh: '/zh',
+              ja: '/ja',
+              ko: '/ko',
+              es: '/es',
+            }),
+          },
+          {
+            path: '/zh',
+            changefreq: 'daily',
+            priority: '0.95',
+            alternates: localeAlternates({
+              en: '/',
+              zh: '/zh',
+              ja: '/ja',
+              ko: '/ko',
+              es: '/es',
+            }),
+          },
+          {
+            path: '/ja',
+            changefreq: 'weekly',
+            priority: '0.85',
+            alternates: localeAlternates({
+              en: '/',
+              zh: '/zh',
+              ja: '/ja',
+              ko: '/ko',
+              es: '/es',
+            }),
+          },
+          {
+            path: '/ko',
+            changefreq: 'weekly',
+            priority: '0.85',
+            alternates: localeAlternates({
+              en: '/',
+              zh: '/zh',
+              ja: '/ja',
+              ko: '/ko',
+              es: '/es',
+            }),
+          },
+          {
+            path: '/es',
+            changefreq: 'weekly',
+            priority: '0.85',
+            alternates: localeAlternates({
+              en: '/',
+              zh: '/zh',
+              ja: '/ja',
+              ko: '/ko',
+              es: '/es',
+            }),
+          },
+          {
+            path: '/gallery',
+            changefreq: 'weekly',
+            priority: '0.85',
+            alternates: localeAlternates({
+              en: '/gallery',
+              zh: '/zh/gallery',
+            }),
+          },
+          {
+            path: '/zh/gallery',
+            changefreq: 'weekly',
+            priority: '0.82',
+            alternates: localeAlternates({
+              en: '/gallery',
+              zh: '/zh/gallery',
+            }),
+          },
+          {
+            path: '/tools',
+            changefreq: 'weekly',
+            priority: '0.9',
+            alternates: localeAlternates({
+              en: '/tools',
+              zh: '/zh/tools',
+            }),
+          },
+          {
+            path: '/zh/tools',
+            changefreq: 'weekly',
+            priority: '0.85',
+            alternates: localeAlternates({
+              en: '/tools',
+              zh: '/zh/tools',
+            }),
+          },
           { path: '/about', changefreq: 'monthly', priority: '0.7' },
           { path: '/contact', changefreq: 'monthly', priority: '0.6' },
           { path: '/terms', changefreq: 'monthly' },
@@ -55,18 +154,39 @@ export const Route = createFileRoute('/sitemap.xml')({
             path: `/tools/${tool.slug}`,
             changefreq: 'weekly',
             priority: '0.82',
+            alternates: localeAlternates({
+              en: `/tools/${tool.slug}`,
+              zh: `/zh/tools/${tool.slug}`,
+            }),
           });
           staticUrls.push({
             path: `/zh/tools/${tool.slug}`,
             changefreq: 'weekly',
             priority: '0.8',
+            alternates: localeAlternates({
+              en: `/tools/${tool.slug}`,
+              zh: `/zh/tools/${tool.slug}`,
+            }),
           });
         }
 
         const urlEntry = (
           path: string,
-          opts?: { changefreq?: string; priority?: string; lastmod?: string }
+          opts?: {
+            changefreq?: string;
+            priority?: string;
+            lastmod?: string;
+            alternates?: Record<string, string>;
+          }
         ) => {
+          const alternates = opts?.alternates
+            ? Object.entries(opts.alternates)
+                .map(
+                  ([hreflang, href]) =>
+                    `\n    <xhtml:link rel="alternate" hreflang="${hreflang}" href="${base}${href}" />`
+                )
+                .join('')
+            : '';
           const lastmod = opts?.lastmod
             ? `\n    <lastmod>${opts.lastmod}</lastmod>`
             : '';
@@ -76,12 +196,16 @@ export const Route = createFileRoute('/sitemap.xml')({
           const priority = opts?.priority
             ? `\n    <priority>${opts.priority}</priority>`
             : '';
-          return `  <url>\n    <loc>${base}${path}</loc>${lastmod}${changefreq}${priority}\n  </url>`;
+          return `  <url>\n    <loc>${base}${path}</loc>${alternates}${lastmod}${changefreq}${priority}\n  </url>`;
         };
 
         const staticPart = staticUrls
           .map((u) =>
-            urlEntry(u.path, { changefreq: u.changefreq, priority: u.priority })
+            urlEntry(u.path, {
+              changefreq: u.changefreq,
+              priority: u.priority,
+              alternates: u.alternates,
+            })
           )
           .join('\n');
 
@@ -99,7 +223,7 @@ export const Route = createFileRoute('/sitemap.xml')({
         }
 
         const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${staticPart}
 ${blogPart ? `\n${blogPart}` : ''}
 </urlset>`;
@@ -113,3 +237,10 @@ ${blogPart ? `\n${blogPart}` : ''}
     },
   },
 });
+
+function localeAlternates(paths: Record<string, string>) {
+  return {
+    ...paths,
+    'x-default': paths.en ?? paths.zh ?? '/',
+  };
+}

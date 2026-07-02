@@ -3,9 +3,14 @@ import {
   getGenerationTaskStatuses,
 } from '@/api/generation';
 import { authClient } from '@/auth/client';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { GeneratorWorkbenchHeader } from '@/components/generator/generator-workbench-header';
+import {
+  GeneratorActionBar,
+  GeneratorPanel,
+  GeneratorResultPanel,
+  GeneratorShell,
+} from '@/components/generator/generator-workbench-layout';
 import {
   Select,
   SelectContent,
@@ -831,20 +836,22 @@ export function BatchGeneratorWorkbench({
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f8f4] text-[#20231e]">
-      <GeneratorWorkbenchHeader
-        locale={typedLocale}
-        active="batch"
-        credits={credits}
-        refreshDisabled={!signedIn || creditQuery.isFetching}
-        refreshing={creditQuery.isFetching}
-        onRefresh={() => void creditQuery.refetch()}
-        onLocaleChange={handleLocaleChange}
-      />
-
-      <section className="grid min-h-[calc(100vh-4rem)] grid-cols-1 xl:grid-cols-[400px_minmax(0,0.8fr)_460px]">
-        <aside className="border-[#dfe3d8] border-b bg-[#fbfcf7] p-4 lg:border-r lg:border-b-0">
-          <div className="mb-5">
+    <GeneratorShell
+      header={
+        <GeneratorWorkbenchHeader
+          locale={typedLocale}
+          active="batch"
+          credits={credits}
+          refreshDisabled={!signedIn || creditQuery.isFetching}
+          refreshing={creditQuery.isFetching}
+          onRefresh={() => void creditQuery.refetch()}
+          onLocaleChange={handleLocaleChange}
+        />
+      }
+      columns="lg:grid-cols-[380px_minmax(0,1fr)_460px]"
+      source={
+        <div className="space-y-4">
+          <div>
             <p className="font-semibold text-[#2f5f4f] text-sm">
               {copy.eyebrow}
             </p>
@@ -856,180 +863,149 @@ export function BatchGeneratorWorkbench({
             </p>
           </div>
 
-          <div className="space-y-4">
-            <section className="rounded-lg border border-[#dfe3d8] bg-white p-4 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="font-semibold">{copy.uploadTitle}</h2>
-                  <p className="mt-1 text-[#74796d] text-sm">
-                    {copy.uploadDescription}
+          <GeneratorPanel
+            title={copy.uploadTitle}
+            description={copy.uploadDescription}
+            action={<IconCloudUpload className="size-5 text-[#d83b01]" />}
+          >
+            <div
+              className={`flex min-h-28 cursor-pointer items-center justify-center rounded-lg border border-dashed p-4 transition ${
+                isDragging
+                  ? 'border-[#d83b01] bg-[#fff4ec]'
+                  : 'border-[#cbd2c3] bg-[#f7f8f4]'
+              }`}
+              onClick={() => inputRef.current?.click()}
+              onDragEnter={(event) => {
+                event.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragOver={(event) => event.preventDefault()}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDrop}
+            >
+              <div className="flex w-full items-center gap-3 text-left">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-white text-[#6e7d67] shadow-sm">
+                  <IconPhotoScan className="size-6" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm">{copy.dropHint}</p>
+                  <p className="mt-1 text-[#8a9282] text-xs">
+                    {copy.limitHint}
                   </p>
                 </div>
-                <IconCloudUpload className="size-5 text-[#d83b01]" />
+                <Button type="button" size="sm" className="bg-[#20231e]">
+                  {copy.chooseFiles}
+                </Button>
               </div>
-
-              <div
-                className={`mt-3 flex min-h-28 cursor-pointer items-center justify-center rounded-lg border border-dashed p-4 transition ${
-                  isDragging
-                    ? 'border-[#d83b01] bg-[#fff4ec]'
-                    : 'border-[#cbd2c3] bg-[#f7f8f4]'
-                }`}
-                onClick={() => inputRef.current?.click()}
-                onDragEnter={(event) => {
-                  event.preventDefault();
-                  setIsDragging(true);
-                }}
-                onDragOver={(event) => event.preventDefault()}
-                onDragLeave={() => setIsDragging(false)}
-                onDrop={handleDrop}
-              >
-                <div className="flex w-full items-center gap-3 text-left">
-                  <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-white text-[#6e7d67] shadow-sm">
-                    <IconPhotoScan className="size-6" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm">{copy.dropHint}</p>
-                    <p className="mt-1 text-[#8a9282] text-xs">
-                      {copy.limitHint}
-                    </p>
-                  </div>
-                  <Button type="button" size="sm" className="bg-[#20231e]">
-                    {copy.chooseFiles}
-                  </Button>
-                </div>
-                <input
-                  ref={inputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  multiple
-                  className="sr-only"
-                  onChange={handleInputChange}
-                />
-              </div>
-            </section>
-
-            <section className="rounded-lg border-2 border-[#2f5f4f]/25 bg-white p-4 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="font-semibold">{copy.prompt}</h2>
-                  <p className="mt-1 text-[#74796d] text-sm">
-                    {copy.parameterHint}
-                  </p>
-                </div>
-                <IconWand className="size-5 text-[#d83b01]" />
-              </div>
-              <Textarea
-                id="batch-shared-prompt"
-                value={prompt}
-                placeholder={copy.promptPlaceholder}
-                className="mt-4 min-h-36 resize-none border-[#b7cbbd] bg-[#fbfcf7] text-base leading-7 shadow-inner focus-visible:ring-[#2f5f4f]"
-                onChange={(event) => setPrompt(event.target.value)}
+              <input
+                ref={inputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                multiple
+                className="sr-only"
+                onChange={handleInputChange}
               />
-            </section>
-
-            <section className="rounded-lg border border-[#dfe3d8] bg-white/85 p-4 shadow-sm shadow-black/0">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="font-semibold text-sm">{copy.configTitle}</h2>
-                  <p className="mt-1 text-[#74796d] text-sm">
-                    {copy.configDescription}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-4 grid gap-3">
-                <FieldSelect
-                  label={copy.model}
-                  value={model}
-                  options={KIE_MODELS.map((item) => item.id)}
-                  renderOption={(value) =>
-                    KIE_MODELS.find((item) => item.id === value)?.label ?? value
-                  }
-                  onChange={(value) => setModel(value as KieModelId)}
-                />
-                <div className="grid grid-cols-2 gap-3">
-                  <FieldSelect
-                    label={copy.ratio}
-                    value={aspectRatio}
-                    options={modelConfig.aspectRatios}
-                    renderOption={(value) => value}
-                    onChange={(value) =>
-                      setAspectRatio(value as KieAspectRatio)
-                    }
-                  />
-                  {modelConfig.outputParam ? (
-                    <FieldSelect
-                      label={copy.resolution}
-                      value={resolution}
-                      options={modelConfig.outputParam.options}
-                      renderOption={(value) =>
-                        `${value} · ${modelConfig.outputParam?.label}`
-                      }
-                      onChange={(value) =>
-                        setResolution(value as KieResolution)
-                      }
-                    />
-                  ) : null}
-                </div>
-              </div>
-            </section>
-          </div>
-        </aside>
-
-        <section className="min-w-0 p-4 md:p-6">
-          <div className="mb-5 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-bold text-3xl tracking-tight">
-                  {copy.gridTitle}
-                </h2>
-                <Badge variant="outline">
-                  {tasks.length}/{MAX_IMAGES} {copy.selected}
-                </Badge>
-              </div>
-              <p className="mt-2 text-[#6d7468]">{copy.gridDescription}</p>
-              {batchNotice ? (
-                <p className="mt-2 rounded-md border border-[#eadfca] bg-[#fff8ea] px-3 py-2 text-[#8a5a16] text-sm">
-                  {batchNotice}
-                </p>
-              ) : null}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="rounded-md border border-[#dfe3d8] bg-white px-3 py-2 text-sm">
-                {copy.credits}: <strong>{creditEstimate}</strong>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!hasTasks || runningCount > 0}
-                onClick={clearTasks}
-              >
-                <IconTrash className="size-4" />
-                {copy.clear}
-              </Button>
-              <Button
-                type="button"
-                className="bg-[#20231e]"
-                disabled={!canStart}
-                onClick={startBatch}
-              >
-                <IconPlayerPlay className="size-4" />
-                {copy.start}
-              </Button>
-            </div>
-          </div>
+          </GeneratorPanel>
 
           {hasTasks ? (
             <SourcePreviewSection
-              title={copy.sourcePreview}
+              title={`${copy.sourcePreview} · ${tasks.length}/${MAX_IMAGES} ${copy.selected}`}
               tasks={tasks}
               selectedTaskId={selectedTask?.id}
               copy={copy}
               onSelect={setSelectedTaskId}
               onRemove={removeTask}
             />
-          ) : (
-            <div className="flex min-h-[520px] items-center justify-center rounded-lg border border-dashed border-[#cbd2c3] bg-white">
+          ) : null}
+        </div>
+      }
+      config={
+        <div className="mx-auto flex max-w-3xl flex-col gap-4">
+          <div>
+            <h2 className="font-bold text-3xl tracking-tight">
+              {copy.gridTitle}
+            </h2>
+            <p className="mt-2 text-[#6d7468]">{copy.gridDescription}</p>
+          </div>
+
+          <GeneratorPanel
+            title={copy.prompt}
+            description={copy.parameterHint}
+            action={<IconWand className="size-5 text-[#d83b01]" />}
+            className="border-2 border-[#2f5f4f]/25"
+          >
+            <Textarea
+              id="batch-shared-prompt"
+              value={prompt}
+              placeholder={copy.promptPlaceholder}
+              className="min-h-40 resize-none border-[#b7cbbd] bg-[#fbfcf7] text-base leading-7 shadow-inner focus-visible:ring-[#2f5f4f]"
+              onChange={(event) => setPrompt(event.target.value)}
+            />
+          </GeneratorPanel>
+
+          <GeneratorPanel
+            title={copy.configTitle}
+            description={copy.configDescription}
+          >
+            <div className="grid gap-3">
+              <FieldSelect
+                label={copy.model}
+                value={model}
+                options={KIE_MODELS.map((item) => item.id)}
+                renderOption={(value) =>
+                  KIE_MODELS.find((item) => item.id === value)?.label ?? value
+                }
+                onChange={(value) => setModel(value as KieModelId)}
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <FieldSelect
+                  label={copy.ratio}
+                  value={aspectRatio}
+                  options={modelConfig.aspectRatios}
+                  renderOption={(value) => value}
+                  onChange={(value) => setAspectRatio(value as KieAspectRatio)}
+                />
+                {modelConfig.outputParam ? (
+                  <FieldSelect
+                    label={copy.resolution}
+                    value={resolution}
+                    options={modelConfig.outputParam.options}
+                    renderOption={(value) =>
+                      `${value} · ${modelConfig.outputParam?.label}`
+                    }
+                    onChange={(value) => setResolution(value as KieResolution)}
+                  />
+                ) : null}
+              </div>
+            </div>
+          </GeneratorPanel>
+
+          <GeneratorActionBar
+            creditLabel={copy.credits}
+            creditValue={creditEstimate}
+            primaryLabel={copy.start}
+            primaryDisabled={!canStart}
+            primaryLoading={runningCount > 0}
+            primaryIcon={<IconPlayerPlay className="size-4" />}
+            notice={batchNotice}
+            onPrimary={startBatch}
+            secondary={
+              <Button
+                type="button"
+                variant="outline"
+                className="bg-white"
+                disabled={!hasTasks || runningCount > 0}
+                onClick={clearTasks}
+              >
+                <IconTrash className="size-4" />
+                {copy.clear}
+              </Button>
+            }
+          />
+
+          {!hasTasks ? (
+            <div className="flex min-h-[240px] items-center justify-center rounded-lg border border-dashed border-[#cbd2c3] bg-white">
               <div className="max-w-sm text-center">
                 <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#edf5ef] text-[#2f5f4f]">
                   <IconCloudUpload className="size-7" />
@@ -1042,45 +1018,44 @@ export function BatchGeneratorWorkbench({
                 </p>
               </div>
             </div>
+          ) : null}
+        </div>
+      }
+      results={
+        <GeneratorResultPanel
+          title={copy.resultsPanel}
+          summary={
+            <>
+              {completedCount} {copy.completed} · {failedCount} {copy.failed} ·{' '}
+              {runningCount} {copy.processing}
+            </>
+          }
+          action={
+            <Button
+              type="button"
+              variant="outline"
+              className="bg-white"
+              disabled={completedCount === 0 || zipDownloading}
+              onClick={() => void downloadCompletedZip()}
+            >
+              <IconPackageExport className="size-4" />
+              {copy.batchDownload}
+            </Button>
+          }
+        >
+          {hasSubmittedTasks ? (
+            <ResultCardGrid
+              tasks={tasks}
+              copy={copy}
+              onPreview={setPreviewUrl}
+              onDownload={downloadTask}
+            />
+          ) : (
+            <div className="min-h-[520px] rounded-lg border border-dashed border-[#dfe3d8] bg-[#fbfcf7]" />
           )}
-        </section>
-
-        <aside className="border-[#dfe3d8] border-t bg-[#fbfcf7] p-4 lg:border-t-0 xl:border-l">
-          <section className="rounded-lg border border-[#dfe3d8] bg-white p-4 shadow-sm">
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <div>
-                <h2 className="font-semibold text-xl">{copy.resultsPanel}</h2>
-                <p className="mt-1 text-[#74796d] text-sm">
-                  {completedCount} {copy.completed} · {failedCount}{' '}
-                  {copy.failed} · {runningCount} {copy.processing}
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                className="bg-white"
-                disabled={completedCount === 0 || zipDownloading}
-                onClick={() => void downloadCompletedZip()}
-              >
-                <IconPackageExport className="size-4" />
-                {copy.batchDownload}
-              </Button>
-            </div>
-
-            {hasSubmittedTasks ? (
-              <ResultCardGrid
-                tasks={tasks}
-                copy={copy}
-                onPreview={setPreviewUrl}
-                onDownload={downloadTask}
-              />
-            ) : (
-              <div className="min-h-[520px] rounded-lg border border-dashed border-[#dfe3d8] bg-[#fbfcf7]" />
-            )}
-          </section>
-        </aside>
-      </section>
-
+        </GeneratorResultPanel>
+      }
+    >
       {previewUrl ? (
         <button
           type="button"
@@ -1095,7 +1070,7 @@ export function BatchGeneratorWorkbench({
           />
         </button>
       ) : null}
-    </main>
+    </GeneratorShell>
   );
 }
 

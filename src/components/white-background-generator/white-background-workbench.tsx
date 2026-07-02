@@ -5,6 +5,12 @@ import {
 import { authClient } from '@/auth/client';
 import { GeneratorWorkbenchHeader } from '@/components/generator/generator-workbench-header';
 import {
+  GeneratorActionBar,
+  GeneratorPanel,
+  GeneratorResultPanel,
+  GeneratorShell,
+} from '@/components/generator/generator-workbench-layout';
+import {
   getLocalizedPublicPath,
   type ProductLocale,
   useProductLocale,
@@ -515,30 +521,35 @@ export function WhiteBackgroundWorkbench({
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f8f4] text-[#20231e]">
-      <GeneratorWorkbenchHeader
-        locale={currentLocale}
-        active="white-background"
-        credits={credits}
-        refreshDisabled={!signedIn || creditQuery.isFetching}
-        refreshing={creditQuery.isFetching}
-        onRefresh={() => void creditQuery.refetch()}
-        onLocaleChange={handleLocaleChange}
-      />
-
-      <section className="grid min-h-[calc(100vh-4rem)] grid-cols-1 lg:grid-cols-[380px_minmax(0,1fr)_420px]">
-        <aside className="border-[#dfe3d8] border-b bg-[#fbfcf7] p-4 lg:border-r lg:border-b-0">
-          <p className="font-semibold text-[#2f5f4f] text-sm">{copy.eyebrow}</p>
-          <h1 className="mt-2 font-bold text-2xl tracking-tight">
-            {copy.title}
-          </h1>
-          <p className="mt-3 text-[#5f665b] text-sm leading-6">
-            {copy.description}
-          </p>
+    <GeneratorShell
+      header={
+        <GeneratorWorkbenchHeader
+          locale={currentLocale}
+          active="white-background"
+          credits={credits}
+          refreshDisabled={!signedIn || creditQuery.isFetching}
+          refreshing={creditQuery.isFetching}
+          onRefresh={() => void creditQuery.refetch()}
+          onLocaleChange={handleLocaleChange}
+        />
+      }
+      source={
+        <div className="space-y-4">
+          <div>
+            <p className="font-semibold text-[#2f5f4f] text-sm">
+              {copy.eyebrow}
+            </p>
+            <h1 className="mt-2 font-bold text-2xl tracking-tight">
+              {copy.title}
+            </h1>
+            <p className="mt-3 text-[#5f665b] text-sm leading-6">
+              {copy.description}
+            </p>
+          </div>
 
           <button
             type="button"
-            className={`mt-5 flex min-h-36 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed p-4 text-left transition ${
+            className={`flex min-h-32 w-full cursor-pointer items-center justify-center rounded-lg border border-dashed p-4 text-left transition ${
               isDragging
                 ? 'border-[#d83b01] bg-[#fff4ec]'
                 : 'border-[#cbd2c3] bg-white'
@@ -572,7 +583,34 @@ export function WhiteBackgroundWorkbench({
             />
           </button>
 
-          <div className="mt-4 grid gap-4">
+          <GeneratorPanel title={copy.source} description={sourceName}>
+            <div className="flex min-h-[360px] items-center justify-center rounded-lg border border-[#dfe3d8] bg-[#fbfcf7]">
+              {sourceImage ? (
+                <img
+                  src={sourceImage}
+                  alt={copy.source}
+                  className="max-h-[340px] max-w-full rounded-md object-contain p-3"
+                />
+              ) : (
+                <div className="text-center text-[#8a9282]">
+                  <IconCloudUpload className="mx-auto size-10" />
+                  <p className="mt-3">{copy.emptySource}</p>
+                </div>
+              )}
+            </div>
+          </GeneratorPanel>
+        </div>
+      }
+      config={
+        <div className="mx-auto flex max-w-3xl flex-col gap-4">
+          <div>
+            <h2 className="font-bold text-3xl tracking-tight">
+              {copy.productDescription}
+            </h2>
+            <p className="mt-2 text-[#74796d] text-sm">{copy.description}</p>
+          </div>
+
+          <GeneratorPanel>
             <div className="grid gap-2">
               <label className="font-medium text-sm" htmlFor="white-desc">
                 {copy.productDescription}
@@ -581,174 +619,141 @@ export function WhiteBackgroundWorkbench({
                 id="white-desc"
                 value={description}
                 placeholder={copy.productPlaceholder}
-                className="min-h-28 resize-none bg-white"
+                className="min-h-32 resize-none border-[#b7cbbd] bg-[#fbfcf7] text-base leading-7 shadow-inner focus-visible:ring-[#2f5f4f]"
                 onChange={(event) => setDescription(event.target.value)}
               />
             </div>
-            <FieldSelect
-              label={copy.platform}
-              value={platform}
-              options={PLATFORM_OPTIONS}
-              onChange={setPlatform}
-            />
-            <div className="grid grid-cols-2 gap-3">
+          </GeneratorPanel>
+
+          <GeneratorPanel title={copy.platform}>
+            <div className="grid gap-3">
               <FieldSelect
-                label={copy.shadow}
-                value={shadow}
-                options={SHADOW_OPTIONS}
-                onChange={setShadow}
+                label={copy.platform}
+                value={platform}
+                options={PLATFORM_OPTIONS}
+                onChange={setPlatform}
               />
-              <FieldSelect
-                label={copy.margin}
-                value={margin}
-                options={MARGIN_OPTIONS}
-                onChange={setMargin}
-              />
-            </div>
-            <FieldSelect
-              label={copy.model}
-              value={model}
-              options={KIE_MODELS.map((item) => item.id)}
-              renderOption={(value) =>
-                KIE_MODELS.find((item) => item.id === value)?.label ?? value
-              }
-              onChange={(value) => setModel(value as KieModelId)}
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <FieldSelect
-                label={copy.ratio}
-                value={aspectRatio}
-                options={modelConfig.aspectRatios}
-                onChange={(value) => setAspectRatio(value as KieAspectRatio)}
-              />
-              {modelConfig.outputParam ? (
+              <div className="grid grid-cols-2 gap-3">
                 <FieldSelect
-                  label={copy.resolution}
-                  value={resolution}
-                  options={modelConfig.outputParam.options}
-                  renderOption={(value) =>
-                    `${value} · ${modelConfig.outputParam?.label}`
-                  }
-                  onChange={(value) => setResolution(value as KieResolution)}
+                  label={copy.shadow}
+                  value={shadow}
+                  options={SHADOW_OPTIONS}
+                  onChange={setShadow}
                 />
-              ) : null}
-            </div>
-          </div>
-        </aside>
-
-        <section className="min-w-0 p-4 md:p-6">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div>
-              <h2 className="font-bold text-2xl">{copy.source}</h2>
-              <p className="mt-1 text-[#74796d] text-sm">{sourceName}</p>
-            </div>
-            <div className="rounded-md border border-[#dfe3d8] bg-white px-3 py-2 text-sm">
-              {copy.credits}: <strong>{requiredCredits}</strong>
-            </div>
-          </div>
-          <div className="flex min-h-[560px] items-center justify-center rounded-lg border border-[#dfe3d8] bg-white">
-            {sourceImage ? (
-              <img
-                src={sourceImage}
-                alt={copy.source}
-                className="max-h-[520px] max-w-full rounded-md object-contain p-4"
-              />
-            ) : (
-              <div className="text-center text-[#8a9282]">
-                <IconCloudUpload className="mx-auto size-10" />
-                <p className="mt-3">{copy.emptySource}</p>
+                <FieldSelect
+                  label={copy.margin}
+                  value={margin}
+                  options={MARGIN_OPTIONS}
+                  onChange={setMargin}
+                />
               </div>
-            )}
-          </div>
-          {notice ? (
-            <p className="mt-4 rounded-md border border-[#eadfca] bg-[#fff8ea] px-3 py-2 text-[#8a5a16] text-sm">
-              {notice}
-            </p>
-          ) : null}
-          <Button
-            type="button"
-            className="mt-4 h-11 w-full bg-[#20231e]"
-            disabled={!sourceImage || ['queued', 'processing'].includes(status)}
-            onClick={() => void generate()}
-          >
-            {['queued', 'processing'].includes(status) ? (
-              <IconLoader2 className="size-4 animate-spin" />
-            ) : (
-              <IconPlayerPlay className="size-4" />
-            )}
-            {status === 'queued'
-              ? copy.submitting
-              : status === 'processing'
-                ? copy.status.processing
-                : copy.generate}
-          </Button>
-        </section>
-
-        <aside className="border-[#dfe3d8] border-t bg-[#fbfcf7] p-4 lg:border-t-0 lg:border-l">
-          <div className="rounded-lg border border-[#dfe3d8] bg-white p-4 shadow-sm">
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <div>
-                <h2 className="font-semibold text-xl">{copy.result}</h2>
-                <p className="mt-1 text-[#74796d] text-sm">
-                  {copy.status[status]}
-                </p>
-              </div>
-              <IconWand className="size-5 text-[#d83b01]" />
-            </div>
-            <div className="flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-dashed border-[#dfe3d8] bg-[#fbfcf7]">
-              {resultUrl ? (
-                <button
-                  type="button"
-                  className="h-full w-full"
-                  onClick={() => setPreviewUrl(resultUrl)}
-                >
-                  <img
-                    src={resultUrl}
-                    alt={copy.result}
-                    className="h-full w-full object-contain p-3"
-                  />
-                </button>
-              ) : ['queued', 'processing'].includes(status) ? (
-                <div className="px-8 text-center text-[#8a9282] text-sm">
-                  <IconLoader2 className="mx-auto mb-3 size-7 animate-spin text-[#d83b01]" />
-                  <p>{copy.status[status]}</p>
-                </div>
-              ) : (
-                <p className="px-8 text-center text-[#8a9282] text-sm">
-                  {copy.emptyResult}
-                </p>
-              )}
-            </div>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                disabled={!resultUrl}
-                onClick={() => resultUrl && setPreviewUrl(resultUrl)}
-              >
-                <IconEye className="size-4" />
-                {copy.preview}
-              </Button>
-              <Button
-                type="button"
-                className="bg-[#d83b01]"
-                disabled={!resultUrl}
-                onClick={() =>
-                  resultUrl &&
-                  void downloadFile(
-                    resultUrl,
-                    `prodlist-white-${Date.now()}.png`
-                  )
+              <FieldSelect
+                label={copy.model}
+                value={model}
+                options={KIE_MODELS.map((item) => item.id)}
+                renderOption={(value) =>
+                  KIE_MODELS.find((item) => item.id === value)?.label ?? value
                 }
-              >
-                <IconDownload className="size-4" />
-                {copy.download}
-              </Button>
+                onChange={(value) => setModel(value as KieModelId)}
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <FieldSelect
+                  label={copy.ratio}
+                  value={aspectRatio}
+                  options={modelConfig.aspectRatios}
+                  onChange={(value) => setAspectRatio(value as KieAspectRatio)}
+                />
+                {modelConfig.outputParam ? (
+                  <FieldSelect
+                    label={copy.resolution}
+                    value={resolution}
+                    options={modelConfig.outputParam.options}
+                    renderOption={(value) =>
+                      `${value} · ${modelConfig.outputParam?.label}`
+                    }
+                    onChange={(value) => setResolution(value as KieResolution)}
+                  />
+                ) : null}
+              </div>
             </div>
-          </div>
-        </aside>
-      </section>
+          </GeneratorPanel>
 
+          <GeneratorActionBar
+            creditLabel={copy.credits}
+            creditValue={requiredCredits}
+            primaryLabel={
+              status === 'queued'
+                ? copy.submitting
+                : status === 'processing'
+                  ? copy.status.processing
+                  : copy.generate
+            }
+            primaryDisabled={
+              !sourceImage || ['queued', 'processing'].includes(status)
+            }
+            primaryLoading={['queued', 'processing'].includes(status)}
+            primaryIcon={<IconPlayerPlay className="size-4" />}
+            notice={notice}
+            onPrimary={() => void generate()}
+          />
+        </div>
+      }
+      results={
+        <GeneratorResultPanel
+          title={copy.result}
+          summary={copy.status[status]}
+          action={<IconWand className="size-5 text-[#d83b01]" />}
+        >
+          <div className="flex aspect-square items-center justify-center overflow-hidden rounded-lg border border-dashed border-[#dfe3d8] bg-[#fbfcf7]">
+            {resultUrl ? (
+              <button
+                type="button"
+                className="h-full w-full"
+                onClick={() => setPreviewUrl(resultUrl)}
+              >
+                <img
+                  src={resultUrl}
+                  alt={copy.result}
+                  className="h-full w-full object-contain p-3"
+                />
+              </button>
+            ) : ['queued', 'processing'].includes(status) ? (
+              <div className="px-8 text-center text-[#8a9282] text-sm">
+                <IconLoader2 className="mx-auto mb-3 size-7 animate-spin text-[#d83b01]" />
+                <p>{copy.status[status]}</p>
+              </div>
+            ) : (
+              <p className="px-8 text-center text-[#8a9282] text-sm">
+                {copy.emptyResult}
+              </p>
+            )}
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={!resultUrl}
+              onClick={() => resultUrl && setPreviewUrl(resultUrl)}
+            >
+              <IconEye className="size-4" />
+              {copy.preview}
+            </Button>
+            <Button
+              type="button"
+              className="bg-[#d83b01]"
+              disabled={!resultUrl}
+              onClick={() =>
+                resultUrl &&
+                void downloadFile(resultUrl, `prodlist-white-${Date.now()}.png`)
+              }
+            >
+              <IconDownload className="size-4" />
+              {copy.download}
+            </Button>
+          </div>
+        </GeneratorResultPanel>
+      }
+    >
       {previewUrl ? (
         <button
           type="button"
@@ -763,7 +768,7 @@ export function WhiteBackgroundWorkbench({
           />
         </button>
       ) : null}
-    </main>
+    </GeneratorShell>
   );
 }
 

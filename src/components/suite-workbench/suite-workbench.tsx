@@ -21,6 +21,10 @@ import { authClient } from '@/auth/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { GeneratorWorkbenchHeader } from '@/components/generator/generator-workbench-header';
+import {
+  GeneratorActionBar,
+  GeneratorShell,
+} from '@/components/generator/generator-workbench-layout';
 import { Label } from '@/components/ui/label';
 import { useGenerationBatches } from '@/hooks/use-generation-history';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
@@ -640,6 +644,13 @@ export function SuiteWorkbench({
     }),
     [tasks]
   );
+  const creditEstimate = useMemo(
+    () => tasks.reduce((sum, task) => sum + estimateTaskCreditCost(task), 0),
+    [tasks]
+  );
+  const running = tasks.some((task) =>
+    ['queued', 'rendering'].includes(task.status)
+  );
 
   function updateTask(id: string, patch: Partial<WorkbenchTask>) {
     setTasks((current) =>
@@ -943,20 +954,22 @@ export function SuiteWorkbench({
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f8f4] text-[#20231e]">
-      <GeneratorWorkbenchHeader
-        locale={locale}
-        active="photo-set"
-        credits={credits}
-        refreshDisabled={!signedIn || creditsLoading}
-        refreshing={creditsLoading}
-        onRefresh={() => void refreshCredits()}
-        onLocaleChange={handleLocaleChange}
-      />
-
-      <div className="grid min-h-[calc(100vh-4rem)] grid-cols-1 lg:grid-cols-[320px_minmax(440px,1fr)_380px]">
-        <aside className="border-[#dfe3d8] border-b bg-[#fbfcf7] p-4 lg:border-r lg:border-b-0">
-          <div className="mb-5 flex items-center justify-between">
+    <GeneratorShell
+      header={
+        <GeneratorWorkbenchHeader
+          locale={locale}
+          active="photo-set"
+          credits={credits}
+          refreshDisabled={!signedIn || creditsLoading}
+          refreshing={creditsLoading}
+          onRefresh={() => void refreshCredits()}
+          onLocaleChange={handleLocaleChange}
+        />
+      }
+      columns="lg:grid-cols-[340px_minmax(440px,1fr)_400px]"
+      source={
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-sm">{t.globalTitle}</p>
               <p className="text-[#74796d] text-xs">{t.globalSubtitle}</p>
@@ -973,7 +986,7 @@ export function SuiteWorkbench({
               void onFileChange(event.dataTransfer.files[0]);
             }}
             className={cn(
-              'mb-5 flex aspect-square w-full items-center justify-center',
+              'flex aspect-square w-full items-center justify-center',
               'overflow-hidden rounded-lg border border-[#d9ded1]',
               'border-dashed bg-white text-left shadow-sm hover:border-[#9aa48d]'
             )}
@@ -1017,36 +1030,17 @@ export function SuiteWorkbench({
               id="product-description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
-              className="min-h-36 resize-none bg-white"
+              className="min-h-36 resize-none border-[#b7cbbd] bg-white shadow-inner focus-visible:ring-[#2f5f4f]"
             />
           </div>
-          <Button
-            type="button"
-            className="mt-6 h-11 w-full bg-[#20231e] text-base text-white hover:bg-[#30352d] hover:text-white active:scale-[0.99]"
-            disabled={
-              !sourceImage ||
-              tasks.some((task) =>
-                ['queued', 'rendering'].includes(task.status)
-              )
-            }
-            onClick={() => void generateAll()}
-          >
-            {tasks.some((task) =>
-              ['queued', 'rendering'].includes(task.status)
-            ) ? (
-              <IconLoader2 className="size-4 animate-spin" />
-            ) : (
-              <IconWand className="size-4" />
-            )}
-            {t.generateAll}
-          </Button>
           {!signedIn ? (
             <p className="mt-3 text-[#72511f] text-sm">{t.authRequired}</p>
           ) : null}
-        </aside>
-
-        <section className="min-w-0 bg-[#f7f8f4] p-4 md:p-6">
-          <div className="mb-5 flex flex-col justify-between gap-3 md:flex-row md:items-center">
+        </div>
+      }
+      config={
+        <div className="space-y-4">
+          <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
             <div>
               <h1 className="font-bold text-2xl">{t.queueTitle}</h1>
               <p className="text-[#74796d] text-sm">{t.queueSubtitle}</p>
@@ -1078,6 +1072,16 @@ export function SuiteWorkbench({
             </div>
           </div>
 
+          <GeneratorActionBar
+            creditLabel={t.credits}
+            creditValue={creditEstimate}
+            primaryLabel={t.generateAll}
+            primaryDisabled={!sourceImage || running}
+            primaryLoading={running}
+            primaryIcon={<IconWand className="size-4" />}
+            onPrimary={() => void generateAll()}
+          />
+
           <div className="space-y-3">
             {tasks.map((task) => (
               <TaskCard
@@ -1101,20 +1105,19 @@ export function SuiteWorkbench({
               />
             ))}
           </div>
-        </section>
-
-        <aside className="border-[#dfe3d8] border-t bg-[#fbfcf7] p-4 lg:border-t-0 lg:border-l">
-          <Inspector
-            task={selectedTask}
-            tasks={tasks}
-            selectedTaskId={selectedTask?.id}
-            onSelectTask={setSelectedTaskId}
-            locale={locale}
-            t={t}
-          />
-        </aside>
-      </div>
-    </main>
+        </div>
+      }
+      results={
+        <Inspector
+          task={selectedTask}
+          tasks={tasks}
+          selectedTaskId={selectedTask?.id}
+          onSelectTask={setSelectedTaskId}
+          locale={locale}
+          t={t}
+        />
+      }
+    />
   );
 }
 
