@@ -15,7 +15,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useGenerationCredits } from '@/hooks/use-generation-history';
@@ -25,7 +24,13 @@ import {
   loadGeneratorSession,
   saveGeneratorSession,
 } from '@/lib/generator-session';
-import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
+import {
+  KIE_MODELS,
+  type KieModelId,
+  getDefaultKieAspectRatio,
+  getDefaultKieOutputValue,
+  supportsKieOutputParam,
+} from '@/lib/kie-models';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
 import {
   IconCloudUpload,
@@ -42,8 +47,8 @@ import type { ChangeEvent, DragEvent } from 'react';
 
 type Locale = ProductLocale;
 type Status = 'idle' | 'queued' | 'processing' | 'completed' | 'failed';
-type KieAspectRatio = (typeof KIE_MODELS)[number]['aspectRatios'][number];
-type KieResolution = (typeof KIE_MODELS)[number]['resolutions'][number];
+type KieAspectRatio = string;
+type KieResolution = string;
 
 const DEFAULT_MODEL = KIE_MODELS[0]?.id ?? 'gpt-image-2-image-to-image';
 const DEFAULT_MODEL_CONFIG = KIE_MODELS[0];
@@ -299,12 +304,12 @@ export function WhiteBackgroundWorkbench({
   const modelConfig =
     KIE_MODELS.find((item) => item.id === model) ?? DEFAULT_MODEL_CONFIG;
   const [aspectRatio, setAspectRatio] = useState<KieAspectRatio>(
-    modelConfig.aspectRatios.includes('1:1' as never)
+    modelConfig.aspectRatios.includes('1:1')
       ? '1:1'
-      : modelConfig.aspectRatios[0]
+      : getDefaultKieAspectRatio(DEFAULT_MODEL)
   );
   const [resolution, setResolution] = useState<KieResolution>(
-    modelConfig.resolutions[0]
+    getDefaultKieOutputValue(DEFAULT_MODEL)
   );
   const [credits, setCredits] = useState(creditQuery.data?.balance ?? 0);
   const [status, setStatus] = useState<Status>('idle');
@@ -327,8 +332,14 @@ export function WhiteBackgroundWorkbench({
     ) {
       setAspectRatio(modelConfig.aspectRatios[0]);
     }
-    if (!(modelConfig.resolutions as readonly string[]).includes(resolution)) {
-      setResolution(modelConfig.resolutions[0]);
+    if (
+      supportsKieOutputParam(modelConfig.id) &&
+      !modelConfig.outputParam?.options.includes(resolution)
+    ) {
+      setResolution(getDefaultKieOutputValue(modelConfig.id));
+    }
+    if (!supportsKieOutputParam(modelConfig.id) && resolution) {
+      setResolution('');
     }
   }, [aspectRatio, modelConfig, resolution]);
 
@@ -393,7 +404,7 @@ export function WhiteBackgroundWorkbench({
       shadow,
       margin,
       aspectRatio,
-      resolution,
+      resolution: supportsKieOutputParam(model) ? resolution : '',
     });
     try {
       const batch = await createGenerationBatch({
@@ -409,7 +420,7 @@ export function WhiteBackgroundWorkbench({
               kind: 'main',
               style: 'White background product photo',
               aspectRatio,
-              resolution,
+              resolution: supportsKieOutputParam(model) ? resolution : '',
               model,
               prompt,
               referenceName: sourceName,
@@ -610,12 +621,17 @@ export function WhiteBackgroundWorkbench({
                 options={modelConfig.aspectRatios}
                 onChange={(value) => setAspectRatio(value as KieAspectRatio)}
               />
-              <FieldSelect
-                label={copy.resolution}
-                value={resolution}
-                options={modelConfig.resolutions}
-                onChange={(value) => setResolution(value as KieResolution)}
-              />
+              {modelConfig.outputParam ? (
+                <FieldSelect
+                  label={copy.resolution}
+                  value={resolution}
+                  options={modelConfig.outputParam.options}
+                  renderOption={(value) =>
+                    `${value} · ${modelConfig.outputParam?.label}`
+                  }
+                  onChange={(value) => setResolution(value as KieResolution)}
+                />
+              ) : null}
             </div>
           </div>
         </aside>
@@ -769,7 +785,9 @@ function FieldSelect({
       <span className="font-medium text-sm">{label}</span>
       <Select value={value} onValueChange={(next) => next && onChange(next)}>
         <SelectTrigger className="w-full bg-white">
-          <SelectValue />
+          <span className="truncate">
+            {renderOption ? renderOption(value) : value}
+          </span>
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
@@ -804,11 +822,14 @@ function buildPrompt({
     `Product description: ${description.trim() || 'uploaded product'}.`,
     `Platform target: ${platform}.`,
     `Shadow treatment: ${shadow}. Product framing: ${margin}.`,
-    `Aspect ratio: ${aspectRatio}. Output quality: ${resolution}.`,
+    `Aspect ratio: ${aspectRatio}.`,
+    resolution ? `Output quality: ${resolution}.` : '',
     'Keep exact product identity, geometry, material, labels, logos, color, and silhouette.',
     'Do not invent extra products, do not change the product category, do not add props, text, hands, watermarks, or decorative backgrounds.',
     'Only clean background, exposure, edge cleanup, centered composition, natural contact shadow, and subtle retouching are allowed.',
-  ].join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
 function readFileAsDataUrl(file: File) {

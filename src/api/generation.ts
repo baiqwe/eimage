@@ -24,7 +24,13 @@ import {
   normalizeKieRecord,
   uploadBase64ToKie,
 } from '@/lib/kie';
-import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
+import {
+  KIE_MODELS,
+  type KieModelId,
+  getDefaultKieOutputValue,
+  getKieModelConfig,
+  supportsKieOutputParam,
+} from '@/lib/kie-models';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
 import { createServerFn } from '@tanstack/react-start';
 import { and, count, desc, eq, gte, inArray } from 'drizzle-orm';
@@ -35,7 +41,7 @@ const taskSchema = z.object({
   kind: z.enum(['main', 'detail']),
   style: z.string().min(2).max(120),
   aspectRatio: z.string().min(3).max(12),
-  resolution: z.string().min(2).max(20),
+  resolution: z.string().max(20).optional().default(''),
   prompt: z.string().min(10).max(20_000),
   model: z.string().min(2).max(120).optional(),
   referenceImageDataUrl: z.string().optional(),
@@ -94,10 +100,27 @@ export const createGenerationBatch = createServerFn({ method: 'POST' })
     await grantSignupCredits(userId);
 
     const projectId = createId('project');
+    const normalizedTasks = data.tasks.map((task) => {
+      const modelConfig = getKieModelConfig(task.model);
+      const aspectRatio = modelConfig.aspectRatios.includes(task.aspectRatio)
+        ? task.aspectRatio
+        : modelConfig.aspectRatios[0];
+      const resolution = supportsKieOutputParam(modelConfig.id)
+        ? modelConfig.outputParam?.options.includes(task.resolution)
+          ? task.resolution
+          : getDefaultKieOutputValue(modelConfig.id)
+        : 'model-default';
+      return {
+        ...task,
+        aspectRatio,
+        resolution,
+        model: modelConfig.id,
+      };
+    });
     const plan = createGenerationBatchPlan({
       userId,
       projectId,
-      tasks: data.tasks.map((task) => ({
+      tasks: normalizedTasks.map((task) => ({
         id: task.id,
         kind: task.kind,
         style: task.style,
@@ -166,7 +189,7 @@ export const createGenerationBatch = createServerFn({ method: 'POST' })
 
       const submittedTasks = await Promise.all(
         plan.tasks.map(async (task) => {
-          const inputTask = data.tasks.find((item) => item.id === task.id);
+          const inputTask = normalizedTasks.find((item) => item.id === task.id);
           const model = getKieModel(inputTask?.model ?? '').id as KieModelId;
           const startedAt = new Date();
           try {

@@ -11,7 +11,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useGenerationCredits } from '@/hooks/use-generation-history';
@@ -21,7 +20,13 @@ import {
   loadGeneratorSession,
   saveGeneratorSession,
 } from '@/lib/generator-session';
-import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
+import {
+  KIE_MODELS,
+  type KieModelId,
+  getDefaultKieAspectRatio,
+  getDefaultKieOutputValue,
+  supportsKieOutputParam,
+} from '@/lib/kie-models';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
 import {
   getLocalizedPublicPath,
@@ -44,8 +49,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent } from 'react';
 
 type BatchGeneratorLocale = 'zh' | 'en' | 'ja' | 'ko' | 'es';
-type KieAspectRatio = (typeof KIE_MODELS)[number]['aspectRatios'][number];
-type KieResolution = (typeof KIE_MODELS)[number]['resolutions'][number];
+type KieAspectRatio = string;
+type KieResolution = string;
 type BatchTaskStatus =
   | 'uploaded'
   | 'queued'
@@ -451,10 +456,10 @@ export function BatchGeneratorWorkbench({
   const modelConfig =
     KIE_MODELS.find((item) => item.id === model) ?? DEFAULT_MODEL_CONFIG;
   const [aspectRatio, setAspectRatio] = useState<KieAspectRatio>(
-    DEFAULT_MODEL_CONFIG.aspectRatios[0]
+    getDefaultKieAspectRatio(DEFAULT_MODEL)
   );
   const [resolution, setResolution] = useState<KieResolution>(
-    DEFAULT_MODEL_CONFIG.resolutions[0]
+    getDefaultKieOutputValue(DEFAULT_MODEL)
   );
   const [prompt, setPrompt] = useState('');
   const [credits, setCredits] = useState(creditQuery.data?.balance ?? 0);
@@ -504,8 +509,14 @@ export function BatchGeneratorWorkbench({
     if (!(nextConfig.aspectRatios as readonly string[]).includes(aspectRatio)) {
       setAspectRatio(nextConfig.aspectRatios[0]);
     }
-    if (!(nextConfig.resolutions as readonly string[]).includes(resolution)) {
-      setResolution(nextConfig.resolutions[0]);
+    if (
+      supportsKieOutputParam(nextConfig.id) &&
+      !nextConfig.outputParam?.options.includes(resolution)
+    ) {
+      setResolution(getDefaultKieOutputValue(nextConfig.id));
+    }
+    if (!supportsKieOutputParam(nextConfig.id) && resolution) {
+      setResolution('');
     }
   }, [aspectRatio, model, resolution]);
 
@@ -617,13 +628,13 @@ export function BatchGeneratorWorkbench({
         kind: 'detail' as const,
         style: modelConfig.label,
         aspectRatio,
-        resolution,
+        resolution: supportsKieOutputParam(model) ? resolution : '',
         model,
         prompt: buildBatchPrompt({
           prompt,
           modelLabel: modelConfig.label,
           aspectRatio,
-          resolution,
+          resolution: supportsKieOutputParam(model) ? resolution : '',
         }),
         referenceImageDataUrl:
           task.id === sourceImage.id ? undefined : task.sourceDataUrl,
@@ -946,15 +957,19 @@ export function BatchGeneratorWorkbench({
                       setAspectRatio(value as KieAspectRatio)
                     }
                   />
-                  <FieldSelect
-                    label={copy.resolution}
-                    value={resolution}
-                    options={modelConfig.resolutions}
-                    renderOption={(value) =>
-                      `${value} · ${modelConfig.resolutionLabel}`
-                    }
-                    onChange={(value) => setResolution(value as KieResolution)}
-                  />
+                  {modelConfig.outputParam ? (
+                    <FieldSelect
+                      label={copy.resolution}
+                      value={resolution}
+                      options={modelConfig.outputParam.options}
+                      renderOption={(value) =>
+                        `${value} · ${modelConfig.outputParam?.label}`
+                      }
+                      onChange={(value) =>
+                        setResolution(value as KieResolution)
+                      }
+                    />
+                  ) : null}
                 </div>
               </div>
             </section>
@@ -1271,7 +1286,9 @@ function FieldSelect({
       <span className="font-medium text-sm">{label}</span>
       <Select value={value} onValueChange={(next) => next && onChange(next)}>
         <SelectTrigger className="w-full bg-[#fbfcf7]">
-          <SelectValue />
+          <span className="truncate">
+            {renderOption ? renderOption(value) : value}
+          </span>
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
@@ -1349,11 +1366,14 @@ function buildBatchPrompt({
   return [
     'Use the uploaded image as the immutable source image.',
     `Generation model: ${modelLabel}.`,
-    `Aspect ratio: ${aspectRatio}. Output quality: ${resolution}.`,
+    `Aspect ratio: ${aspectRatio}.`,
+    resolution ? `Output quality: ${resolution}.` : '',
     instruction,
     'Preserve the exact product identity, geometry, material, logos, labels, and visible structure unless the user explicitly asks to translate visible text.',
     'Do not invent extra products. Do not change the product category. Keep the result suitable for ecommerce listing use.',
-  ].join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
 async function fetchImageBlob(url: string) {

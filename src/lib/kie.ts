@@ -1,12 +1,16 @@
 import { serverEnv } from '@/env/server';
-import { KIE_MODELS, type KieModelId } from '@/lib/kie-models';
+import {
+  KIE_MODELS,
+  type KieModelId,
+  getKieModelConfig,
+} from '@/lib/kie-models';
 
 type KieCreateTaskInput = {
   model: KieModelId;
   prompt: string;
   imageUrl: string;
   aspectRatio: string;
-  resolution: string;
+  resolution?: string;
 };
 
 type KieCreateTaskResponse = {
@@ -38,8 +42,7 @@ const KIE_UPLOAD_BASE_URL = 'https://kieai.redpandaai.co';
 export function getKieModel(model: string) {
   return (
     KIE_MODELS.find((item) => item.id === model) ??
-    KIE_MODELS.find((item) => item.id === serverEnv.KIE_DEFAULT_MODEL) ??
-    KIE_MODELS[0]
+    getKieModelConfig(serverEnv.KIE_DEFAULT_MODEL)
   );
 }
 
@@ -139,14 +142,14 @@ export function normalizeKieRecord(record: KieRecordInfoResponse) {
 
 function createModelInput(input: KieCreateTaskInput) {
   const model = getKieModel(input.model);
-  const quality = normalizeKieQuality(input.resolution);
+  const outputValue = normalizeModelOutputValue(input.resolution, model.id);
 
   if (model.adapter === 'seedream-4-5') {
     return {
       prompt: input.prompt,
       image_urls: [input.imageUrl],
       aspect_ratio: input.aspectRatio || 'match_input_image',
-      quality,
+      quality: outputValue || 'basic',
       max_images: 1,
     };
   }
@@ -156,7 +159,7 @@ function createModelInput(input: KieCreateTaskInput) {
       prompt: input.prompt,
       image_urls: [input.imageUrl],
       image_size: aspectRatioToSeedreamSize(input.aspectRatio),
-      image_resolution: quality === '4K' ? '2K' : quality,
+      image_resolution: outputValue === '4K' ? '2K' : outputValue || '1K',
       max_images: 1,
       nsfw_checker: true,
     };
@@ -166,19 +169,31 @@ function createModelInput(input: KieCreateTaskInput) {
     prompt: input.prompt,
     input_urls: [input.imageUrl],
     aspect_ratio: input.aspectRatio || 'auto',
-    resolution: quality,
   };
 }
 
-function normalizeKieQuality(resolution: string) {
+function normalizeModelOutputValue(
+  resolution: string | undefined,
+  modelId: string
+) {
+  const options = getKieModelConfig(modelId).outputParam?.options ?? [];
+  if (!options.length) return '';
+  if (resolution && options.includes(resolution)) return resolution;
+  if (resolution && options.every((item) => /K$/.test(item))) {
+    return normalizeKieResolutionTier(resolution, options);
+  }
+  return options[0] ?? '';
+}
+
+function normalizeKieResolutionTier(resolution: string, options: string[]) {
   if (resolution === '4K' || resolution === '2K' || resolution === '1K') {
-    return resolution;
+    return options.includes(resolution) ? resolution : options.at(-1) || '1K';
   }
   const [width, height] = resolution.split('x').map(Number);
   const longestSide = Math.max(width || 0, height || 0);
-  if (longestSide >= 3072) return '4K';
-  if (longestSide >= 1536) return '2K';
-  return '1K';
+  if (longestSide >= 3072 && options.includes('4K')) return '4K';
+  if (longestSide >= 1536 && options.includes('2K')) return '2K';
+  return options.includes('1K') ? '1K' : options[0] || '1K';
 }
 
 function aspectRatioToSeedreamSize(aspectRatio: string) {

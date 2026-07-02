@@ -14,7 +14,7 @@ export type ProductGenerationTaskInput = {
   kind: ProductImageKind;
   style: string;
   aspectRatio: string;
-  resolution: string;
+  resolution?: string;
   prompt: string;
   referenceName?: string;
 };
@@ -48,7 +48,7 @@ export const STORAGE_POLICY = {
   thumbnailWidth: 512,
 } as const;
 
-export function estimateTaskCreditCost(task: { resolution: string }) {
+export function estimateTaskCreditCost(task: { resolution?: string }) {
   const tier = getResolutionCreditTier(task.resolution);
   return {
     '1K': CREDIT_COST.oneK,
@@ -57,7 +57,10 @@ export function estimateTaskCreditCost(task: { resolution: string }) {
   }[tier];
 }
 
-export function getResolutionCreditTier(resolution: string) {
+export function getResolutionCreditTier(resolution?: string) {
+  if (!resolution || resolution === 'basic' || resolution === 'model-default') {
+    return '1K';
+  }
   if (resolution === '4K' || resolution === '2K' || resolution === '1K') {
     return resolution;
   }

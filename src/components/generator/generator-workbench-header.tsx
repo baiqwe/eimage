@@ -136,7 +136,7 @@ export function GeneratorWorkbenchHeader({
               type="button"
               size="sm"
               variant={active === 'photo-set' ? 'default' : 'ghost'}
-              className={active === 'photo-set' ? 'bg-[#20231e]' : undefined}
+              className={getToggleButtonClass(active === 'photo-set')}
               render={<Link to={getProductGeneratorPath(locale)} />}
             >
               {copy.photoSet}
@@ -145,7 +145,7 @@ export function GeneratorWorkbenchHeader({
               type="button"
               size="sm"
               variant={active === 'batch' ? 'default' : 'ghost'}
-              className={active === 'batch' ? 'bg-[#20231e]' : undefined}
+              className={getToggleButtonClass(active === 'batch')}
               render={<Link to={getProductBatchGeneratorPath(locale)} />}
             >
               {copy.batch}
@@ -154,9 +154,7 @@ export function GeneratorWorkbenchHeader({
               type="button"
               size="sm"
               variant={active === 'white-background' ? 'default' : 'ghost'}
-              className={
-                active === 'white-background' ? 'bg-[#20231e]' : undefined
-              }
+              className={getToggleButtonClass(active === 'white-background')}
               render={<Link to={getWhiteBackgroundGeneratorPath(locale)} />}
             >
               {copy.whiteBackground}
@@ -201,4 +199,10 @@ export function GeneratorWorkbenchHeader({
       </div>
     </header>
   );
+}
+
+function getToggleButtonClass(active: boolean) {
+  return active
+    ? 'bg-[#20231e] text-white hover:bg-[#20231e] hover:text-white active:scale-[0.98]'
+    : 'text-[#20231e] hover:bg-[#eef1e8] hover:text-[#20231e] active:scale-[0.98]';
 }

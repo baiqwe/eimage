@@ -29,7 +29,12 @@ import {
   loadGeneratorSession,
   saveGeneratorSession,
 } from '@/lib/generator-session';
-import { KIE_MODELS } from '@/lib/kie-models';
+import {
+  KIE_MODELS,
+  getDefaultKieAspectRatio,
+  getDefaultKieOutputValue,
+  getKieModelConfig,
+} from '@/lib/kie-models';
 import {
   getLocalizedPublicPath,
   type ProductLocale,
@@ -40,7 +45,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { downloadFile } from '@/lib/download';
@@ -93,13 +97,53 @@ const DETAIL_STYLES = [
   'Neon Retail Showcase',
 ] as const;
 
-const ASPECT_RATIOS = ['1:1', '4:5', '3:4', '16:9', '9:16'] as const;
-const RESOLUTIONS = [
-  '1024x1024',
-  '1536x1920',
-  '1024x1536',
-  '1920x1080',
-] as const;
+const STYLE_LABELS: Record<Locale, Record<string, string>> = {
+  zh: {
+    'Pure Studio Key Light': '纯净棚拍主光',
+    'Minimal Reflection Plinth': '极简反射展台',
+    'Soft Shadow Marketplace': '柔和阴影商城图',
+    'Color Block Premium': '高级色块主图',
+    'Morning Window Lifestyle': '清晨窗边生活场景',
+    'Cozy Coffee Counter': '温暖咖啡吧台',
+    'Premium Dark Editorial': '高级暗调杂志风',
+    'Outdoor Natural Tabletop': '户外自然桌面',
+    'Neon Retail Showcase': '霓虹零售展示',
+  },
+  en: {},
+  ja: {
+    'Pure Studio Key Light': 'クリーンなスタジオ主光',
+    'Minimal Reflection Plinth': 'ミニマル反射台',
+    'Soft Shadow Marketplace': '柔らかな影のマーケット画像',
+    'Color Block Premium': '上質なカラーブロック',
+    'Morning Window Lifestyle': '朝の窓辺ライフスタイル',
+    'Cozy Coffee Counter': '居心地のよいカフェカウンター',
+    'Premium Dark Editorial': '上質なダーク編集風',
+    'Outdoor Natural Tabletop': '屋外ナチュラル卓上',
+    'Neon Retail Showcase': 'ネオン小売ショーケース',
+  },
+  ko: {
+    'Pure Studio Key Light': '깔끔한 스튜디오 키라이트',
+    'Minimal Reflection Plinth': '미니멀 반사 받침대',
+    'Soft Shadow Marketplace': '부드러운 그림자 마켓 이미지',
+    'Color Block Premium': '프리미엄 컬러 블록',
+    'Morning Window Lifestyle': '아침 창가 라이프스타일',
+    'Cozy Coffee Counter': '포근한 커피 카운터',
+    'Premium Dark Editorial': '프리미엄 다크 에디토리얼',
+    'Outdoor Natural Tabletop': '야외 내추럴 테이블',
+    'Neon Retail Showcase': '네온 리테일 쇼케이스',
+  },
+  es: {
+    'Pure Studio Key Light': 'Luz principal de estudio limpio',
+    'Minimal Reflection Plinth': 'Pedestal minimalista con reflejo',
+    'Soft Shadow Marketplace': 'Marketplace con sombra suave',
+    'Color Block Premium': 'Bloques de color premium',
+    'Morning Window Lifestyle': 'Lifestyle junto a ventana matinal',
+    'Cozy Coffee Counter': 'Mostrador de cafe acogedor',
+    'Premium Dark Editorial': 'Editorial oscuro premium',
+    'Outdoor Natural Tabletop': 'Mesa natural al aire libre',
+    'Neon Retail Showcase': 'Escaparate retail neon',
+  },
+};
 
 const DEFAULT_DESCRIPTION = '一款极简白色的陶瓷咖啡杯，带有原木底座，哑光质感';
 
@@ -120,8 +164,8 @@ const WORKBENCH_COPY = {
     authRequired: '请先登录或注册，系统会自动赠送试用生图点数。',
     refreshCredits: '刷新点数',
     model: '生图模型',
-    polling: '任务已提交到 Kie，正在轮询生成结果。',
-    providerTask: 'Kie 任务',
+    polling: '任务已提交，正在轮询生成结果。',
+    providerTask: 'AI 任务',
     batch: '批次',
     batchReady: (credits: number, count: number) =>
       `已创建批次，${count} 个单图任务并发执行，预扣 ${credits} 点。`,
@@ -140,7 +184,8 @@ const WORKBENCH_COPY = {
     detail: '详情图',
     style: '风格预设',
     ratio: '尺寸比例',
-    resolution: '分辨率',
+    resolution: '输出质量',
+    modelDefault: '模型默认',
     prompt: '提示词',
     draft: '智能撰写',
     reference: '参考图',
@@ -191,8 +236,8 @@ const WORKBENCH_COPY = {
       'Please log in or create an account first. Trial credits are granted automatically.',
     refreshCredits: 'Refresh credits',
     model: 'Generation model',
-    polling: 'Task submitted to Kie. Polling for the generated asset.',
-    providerTask: 'Kie task',
+    polling: 'Task submitted. Polling for the generated asset.',
+    providerTask: 'AI task',
     batch: 'Batch',
     batchReady: (credits: number, count: number) =>
       `Batch created. ${count} single-image tasks are running in parallel, reserving ${credits} credits.`,
@@ -212,7 +257,8 @@ const WORKBENCH_COPY = {
     detail: 'Detail',
     style: 'Style preset',
     ratio: 'Aspect ratio',
-    resolution: 'Resolution',
+    resolution: 'Output quality',
+    modelDefault: 'Model default',
     prompt: 'Prompt',
     draft: 'Smart draft',
     reference: 'Reference image',
@@ -263,8 +309,8 @@ const WORKBENCH_COPY = {
       '先にログインまたは登録してください。試用クレジットは自動付与されます。',
     refreshCredits: 'クレジット更新',
     model: '生成モデル',
-    polling: 'Kie にタスクを送信しました。結果を確認しています。',
-    providerTask: 'Kie タスク',
+    polling: 'タスクを送信しました。結果を確認しています。',
+    providerTask: 'AI タスク',
     batch: 'バッチ',
     batchReady: (credits: number, count: number) =>
       `バッチを作成しました。${count} 件の単画像タスクを並列実行し、${credits} クレジットを予約します。`,
@@ -283,7 +329,8 @@ const WORKBENCH_COPY = {
     detail: '詳細画像',
     style: 'スタイル',
     ratio: '比率',
-    resolution: '解像度',
+    resolution: '出力品質',
+    modelDefault: 'モデル既定',
     prompt: 'Prompt',
     draft: 'AI 下書き',
     reference: '参照画像',
@@ -334,8 +381,8 @@ const WORKBENCH_COPY = {
       '먼저 로그인하거나 가입해 주세요. 체험 크레딧이 자동 지급됩니다.',
     refreshCredits: '크레딧 새로고침',
     model: '생성 모델',
-    polling: 'Kie에 작업을 제출했습니다. 생성 결과를 확인 중입니다.',
-    providerTask: 'Kie 작업',
+    polling: '작업을 제출했습니다. 생성 결과를 확인 중입니다.',
+    providerTask: 'AI 작업',
     batch: '배치',
     batchReady: (credits: number, count: number) =>
       `배치가 생성되었습니다. ${count}개의 단일 이미지 작업을 병렬 실행하고 ${credits} 크레딧을 예약합니다.`,
@@ -355,7 +402,8 @@ const WORKBENCH_COPY = {
     detail: '상세',
     style: '스타일 프리셋',
     ratio: '화면 비율',
-    resolution: '해상도',
+    resolution: '출력 품질',
+    modelDefault: '모델 기본값',
     prompt: '프롬프트',
     draft: 'AI 작성',
     reference: '참조 이미지',
@@ -406,8 +454,8 @@ const WORKBENCH_COPY = {
       'Inicia sesión o crea una cuenta primero. Los créditos de prueba se conceden automáticamente.',
     refreshCredits: 'Actualizar créditos',
     model: 'Modelo de generación',
-    polling: 'Tarea enviada a Kie. Consultando el resultado generado.',
-    providerTask: 'Tarea Kie',
+    polling: 'Tarea enviada. Consultando el resultado generado.',
+    providerTask: 'Tarea AI',
     batch: 'Lote',
     batchReady: (credits: number, count: number) =>
       `Lote creado. ${count} tareas de imagen se ejecutan en paralelo y reservan ${credits} créditos.`,
@@ -427,7 +475,8 @@ const WORKBENCH_COPY = {
     detail: 'Detalle',
     style: 'Preset de estilo',
     ratio: 'Proporción',
-    resolution: 'Resolución',
+    resolution: 'Calidad de salida',
+    modelDefault: 'Predeterminado',
     prompt: 'Prompt',
     draft: 'Redactar con IA',
     reference: 'Imagen de referencia',
@@ -612,21 +661,24 @@ export function SuiteWorkbench({
 
   function addTask(kind: TaskKind) {
     const id = `task-${kind}-${Date.now()}`;
+    const defaultModel = KIE_MODELS[0].id;
+    const defaultAspectRatio = getDefaultKieAspectRatio(defaultModel);
+    const defaultResolution = getDefaultKieOutputValue(defaultModel);
     const task: WorkbenchTask = {
       id,
       kind,
       style: kind === 'main' ? MAIN_STYLES[0] : DETAIL_STYLES[0],
-      model: KIE_MODELS[0].id,
-      aspectRatio: kind === 'main' ? '1:1' : '3:4',
-      resolution: kind === 'main' ? '1024x1024' : '1024x1536',
+      model: defaultModel,
+      aspectRatio: defaultAspectRatio,
+      resolution: defaultResolution,
       ...createClientPrompt(
         {
           id,
           kind,
           style: kind === 'main' ? MAIN_STYLES[0] : DETAIL_STYLES[0],
-          aspectRatio: kind === 'main' ? '1:1' : '3:4',
-          resolution: kind === 'main' ? '1024x1024' : '1024x1536',
-          model: KIE_MODELS[0].id,
+          aspectRatio: defaultAspectRatio,
+          resolution: defaultResolution,
+          model: defaultModel,
           prompt: '',
           reasoning: '',
           keywords: [],
@@ -970,7 +1022,7 @@ export function SuiteWorkbench({
           </div>
           <Button
             type="button"
-            className="mt-6 h-11 w-full bg-[#20231e] text-base hover:bg-[#30352d]"
+            className="mt-6 h-11 w-full bg-[#20231e] text-base text-white hover:bg-[#30352d] hover:text-white active:scale-[0.99]"
             disabled={
               !sourceImage ||
               tasks.some((task) =>
@@ -1009,12 +1061,17 @@ export function SuiteWorkbench({
               <Button
                 type="button"
                 variant="outline"
+                className="bg-white text-[#20231e] hover:bg-[#eef1e8] hover:text-[#20231e] active:scale-[0.98]"
                 onClick={() => addTask('main')}
               >
                 <IconPlus className="size-4" />
                 {t.addMain}
               </Button>
-              <Button type="button" onClick={() => addTask('detail')}>
+              <Button
+                type="button"
+                className="bg-[#d23b00] text-white hover:bg-[#a82f00] hover:text-white active:scale-[0.98]"
+                onClick={() => addTask('detail')}
+              >
                 <IconPlus className="size-4" />
                 {t.addDetail}
               </Button>
@@ -1052,6 +1109,7 @@ export function SuiteWorkbench({
             tasks={tasks}
             selectedTaskId={selectedTask?.id}
             onSelectTask={setSelectedTaskId}
+            locale={locale}
             t={t}
           />
         </aside>
@@ -1092,6 +1150,9 @@ function TaskCard({
   onRender: () => void;
 }) {
   const styles = task.kind === 'main' ? MAIN_STYLES : DETAIL_STYLES;
+  const modelConfig = getKieModelConfig(task.model);
+  const styleLabels = getStyleLabels(locale);
+  const resolutionLabel = task.resolution || t.modelDefault;
 
   return (
     <article
@@ -1113,9 +1174,11 @@ function TaskCard({
             {task.kind === 'main' ? t.main : t.detail}
           </Badge>
           <div className="min-w-0">
-            <p className="truncate font-semibold text-sm">{task.style}</p>
+            <p className="truncate font-semibold text-sm">
+              {getStyleLabel(task.style, locale)}
+            </p>
             <p className="text-[#74796d] text-xs">
-              {task.aspectRatio} · {task.resolution} · {t.statuses[task.status]}
+              {task.aspectRatio} · {resolutionLabel} · {t.statuses[task.status]}
             </p>
           </div>
         </div>
@@ -1150,7 +1213,12 @@ function TaskCard({
 
       {task.expanded ? (
         <div className="space-y-4 p-4">
-          <div className="grid gap-3 md:grid-cols-4">
+          <div
+            className={cn(
+              'grid gap-3',
+              modelConfig.outputParam ? 'md:grid-cols-4' : 'md:grid-cols-3'
+            )}
+          >
             <FieldSelect
               label={t.model}
               value={task.model}
@@ -1158,18 +1226,21 @@ function TaskCard({
               labels={Object.fromEntries(
                 KIE_MODELS.map((model) => [model.id, model.label])
               )}
-              onChange={(model) =>
+              onChange={(model) => {
                 onUpdate({
                   model,
+                  aspectRatio: getDefaultKieAspectRatio(model),
+                  resolution: getDefaultKieOutputValue(model),
                   imageUrl: undefined,
                   status: 'ready',
-                })
-              }
+                });
+              }}
             />
             <FieldSelect
               label={t.style}
               value={task.style}
               values={[...styles]}
+              labels={styleLabels}
               onChange={(style) =>
                 onUpdate({
                   style,
@@ -1186,15 +1257,23 @@ function TaskCard({
             <FieldSelect
               label={t.ratio}
               value={task.aspectRatio}
-              values={[...ASPECT_RATIOS]}
+              values={modelConfig.aspectRatios}
               onChange={(aspectRatio) => onUpdate({ aspectRatio })}
             />
-            <FieldSelect
-              label={t.resolution}
-              value={task.resolution}
-              values={[...RESOLUTIONS]}
-              onChange={(resolution) => onUpdate({ resolution })}
-            />
+            {modelConfig.outputParam ? (
+              <FieldSelect
+                label={t.resolution}
+                value={task.resolution}
+                values={modelConfig.outputParam.options}
+                labels={Object.fromEntries(
+                  modelConfig.outputParam.options.map((option) => [
+                    option,
+                    `${option} · ${modelConfig.outputParam?.label}`,
+                  ])
+                )}
+                onChange={(resolution) => onUpdate({ resolution })}
+              />
+            ) : null}
           </div>
 
           <div className="rounded-lg border border-[#dfe3d8] bg-[#fbfcf7] p-3">
@@ -1234,6 +1313,7 @@ function TaskCard({
                 type="button"
                 size="sm"
                 variant="outline"
+                className="bg-white text-[#20231e] hover:bg-[#eef1e8] hover:text-[#20231e] active:scale-[0.98]"
                 disabled={!descriptionReady || task.status === 'drafting'}
                 onClick={(event) => {
                   event.stopPropagation();
@@ -1261,7 +1341,7 @@ function TaskCard({
 
           <Button
             type="button"
-            className="w-full bg-[#20231e] hover:bg-[#30352d]"
+            className="w-full bg-[#20231e] text-white hover:bg-[#30352d] hover:text-white active:scale-[0.99]"
             disabled={!sourceReady || task.status === 'rendering'}
             onClick={(event) => {
               event.stopPropagation();
@@ -1299,7 +1379,7 @@ function FieldSelect({
       <Label>{label}</Label>
       <Select value={value} onValueChange={(next) => next && onChange(next)}>
         <SelectTrigger className="w-full bg-[#fbfcf7]">
-          <SelectValue />
+          <span className="truncate">{labels?.[value] ?? value}</span>
         </SelectTrigger>
         <SelectContent>
           {values.map((item) => (
@@ -1318,12 +1398,14 @@ function Inspector({
   tasks,
   selectedTaskId,
   onSelectTask,
+  locale,
   t,
 }: {
   task?: WorkbenchTask;
   tasks: WorkbenchTask[];
   selectedTaskId?: string;
   onSelectTask: (id: string) => void;
+  locale: Locale;
   t: (typeof WORKBENCH_COPY)[Locale];
 }) {
   const completedTasks = tasks.filter((item) => item.imageUrl);
@@ -1340,7 +1422,7 @@ function Inspector({
       <div>
         <p className="font-semibold text-sm">{t.inspector}</p>
         <p className="text-[#74796d] text-xs">
-          {t.currentTask}: {task.style}
+          {t.currentTask}: {getStyleLabel(task.style, locale)}
         </p>
       </div>
 
@@ -1368,7 +1450,7 @@ function Inspector({
               >
                 <img
                   src={item.imageUrl}
-                  alt={`${item.style} generated asset`}
+                  alt={`${getStyleLabel(item.style, locale)} generated asset`}
                   className="h-full w-full object-cover"
                 />
                 <span className="absolute inset-x-1 bottom-1 truncate rounded bg-[#20231e]/80 px-1.5 py-0.5 text-[10px] text-white">
@@ -1425,7 +1507,7 @@ function Inspector({
           <dt className="text-[#74796d]">{t.ratio}</dt>
           <dd className="text-right">{task.aspectRatio}</dd>
           <dt className="text-[#74796d]">{t.resolution}</dt>
-          <dd className="text-right">{task.resolution}</dd>
+          <dd className="text-right">{task.resolution || t.modelDefault}</dd>
           <dt className="text-[#74796d]">{t.model}</dt>
           <dd className="truncate text-right">{getModelLabel(task.model)}</dd>
           {task.providerTaskId ? (
@@ -1478,13 +1560,16 @@ function createInitialTasks(
   description: string,
   locale: Locale = 'zh'
 ): WorkbenchTask[] {
+  const defaultModel = KIE_MODELS[0].id;
+  const defaultAspectRatio = getDefaultKieAspectRatio(defaultModel);
+  const defaultResolution = getDefaultKieOutputValue(defaultModel);
   const mainTask: WorkbenchTask = {
     id: 'task-main',
     kind: 'main',
     style: MAIN_STYLES[0],
-    model: KIE_MODELS[0].id,
-    aspectRatio: ASPECT_RATIOS[0],
-    resolution: RESOLUTIONS[0],
+    model: defaultModel,
+    aspectRatio: defaultAspectRatio,
+    resolution: defaultResolution,
     prompt: '',
     reasoning: '',
     keywords: [],
@@ -1495,9 +1580,9 @@ function createInitialTasks(
     id: 'task-detail',
     kind: 'detail',
     style: DETAIL_STYLES[0],
-    model: KIE_MODELS[0].id,
-    aspectRatio: ASPECT_RATIOS[2],
-    resolution: RESOLUTIONS[2],
+    model: defaultModel,
+    aspectRatio: defaultAspectRatio,
+    resolution: defaultResolution,
     prompt: '',
     reasoning: '',
     keywords: [],
@@ -1513,6 +1598,19 @@ function createInitialTasks(
 
 function getModelLabel(modelId: string) {
   return KIE_MODELS.find((model) => model.id === modelId)?.label ?? modelId;
+}
+
+function getStyleLabels(locale: Locale) {
+  return Object.fromEntries(
+    [...MAIN_STYLES, ...DETAIL_STYLES].map((style) => [
+      style,
+      getStyleLabel(style, locale),
+    ])
+  );
+}
+
+function getStyleLabel(style: string, locale: Locale) {
+  return STYLE_LABELS[locale][style] ?? style;
 }
 
 function getClientReasoning(locale: Locale, isMain: boolean) {
