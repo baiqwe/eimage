@@ -15,12 +15,36 @@ export type KieModelConfig = {
   docs: string;
 };
 
+const GPT_IMAGE_2_ASPECT_RATIOS = [
+  'auto',
+  '1:1',
+  '3:2',
+  '2:3',
+  '4:3',
+  '3:4',
+  '5:4',
+  '4:5',
+  '16:9',
+  '9:16',
+  '2:1',
+  '1:2',
+  '3:1',
+  '1:3',
+  '21:9',
+  '9:21',
+] as const;
+
 export const KIE_MODELS: KieModelConfig[] = [
   {
     id: 'gpt-image-2-image-to-image',
     label: 'GPT Image 2',
     adapter: 'gpt-image-2',
-    aspectRatios: ['auto', '1:1', '3:2', '2:3'],
+    aspectRatios: [...GPT_IMAGE_2_ASPECT_RATIOS],
+    outputParam: {
+      apiName: 'resolution',
+      label: 'resolution',
+      options: ['1K', '2K', '4K'],
+    },
     docs: 'https://docs.kie.ai/market/gpt/gpt-image-2-image-to-image',
   },
   {
@@ -81,4 +105,33 @@ export function getKieOutputOptions(model?: string) {
 
 export function supportsKieOutputParam(model?: string) {
   return getKieOutputOptions(model).length > 0;
+}
+
+export function getKieOutputOptionsForAspectRatio(
+  model?: string,
+  aspectRatio?: string
+) {
+  const config = getKieModelConfig(model);
+  const options = config.outputParam?.options ?? [];
+  if (config.adapter !== 'gpt-image-2') return options;
+  if (!options.length) return options;
+
+  if (!aspectRatio || aspectRatio === 'auto') return ['1K'];
+  if (aspectRatio === '5:4' || aspectRatio === '4:5') return ['1K'];
+  if (aspectRatio === '1:1') return options.filter((item) => item !== '4K');
+  return options;
+}
+
+export function normalizeKieOutputForAspectRatio({
+  model,
+  aspectRatio,
+  resolution,
+}: {
+  model?: string;
+  aspectRatio?: string;
+  resolution?: string;
+}) {
+  const options = getKieOutputOptionsForAspectRatio(model, aspectRatio);
+  if (!options.length) return '';
+  return resolution && options.includes(resolution) ? resolution : options[0];
 }

@@ -37,6 +37,7 @@ import {
   KIE_MODELS,
   getDefaultKieAspectRatio,
   getDefaultKieOutputValue,
+  getKieOutputOptionsForAspectRatio,
   getKieModelConfig,
 } from '@/lib/kie-models';
 import {
@@ -1154,6 +1155,10 @@ function TaskCard({
 }) {
   const styles = task.kind === 'main' ? MAIN_STYLES : DETAIL_STYLES;
   const modelConfig = getKieModelConfig(task.model);
+  const outputOptions = getKieOutputOptionsForAspectRatio(
+    task.model,
+    task.aspectRatio
+  );
   const styleLabels = getStyleLabels(locale);
   const resolutionLabel = task.resolution || t.modelDefault;
 
@@ -1261,15 +1266,26 @@ function TaskCard({
               label={t.ratio}
               value={task.aspectRatio}
               values={modelConfig.aspectRatios}
-              onChange={(aspectRatio) => onUpdate({ aspectRatio })}
+              onChange={(aspectRatio) => {
+                const nextOutputOptions = getKieOutputOptionsForAspectRatio(
+                  task.model,
+                  aspectRatio
+                );
+                onUpdate({
+                  aspectRatio,
+                  resolution: nextOutputOptions.includes(task.resolution)
+                    ? task.resolution
+                    : (nextOutputOptions[0] ?? ''),
+                });
+              }}
             />
             {modelConfig.outputParam ? (
               <FieldSelect
                 label={t.resolution}
                 value={task.resolution}
-                values={modelConfig.outputParam.options}
+                values={outputOptions}
                 labels={Object.fromEntries(
-                  modelConfig.outputParam.options.map((option) => [
+                  outputOptions.map((option) => [
                     option,
                     `${option} · ${modelConfig.outputParam?.label}`,
                   ])

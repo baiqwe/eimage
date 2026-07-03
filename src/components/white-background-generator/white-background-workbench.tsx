@@ -35,6 +35,7 @@ import {
   type KieModelId,
   getDefaultKieAspectRatio,
   getDefaultKieOutputValue,
+  getKieOutputOptionsForAspectRatio,
   supportsKieOutputParam,
 } from '@/lib/kie-models';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
@@ -317,6 +318,7 @@ export function WhiteBackgroundWorkbench({
   const [resolution, setResolution] = useState<KieResolution>(
     getDefaultKieOutputValue(DEFAULT_MODEL)
   );
+  const outputOptions = getKieOutputOptionsForAspectRatio(model, aspectRatio);
   const [credits, setCredits] = useState(creditQuery.data?.balance ?? 0);
   const [status, setStatus] = useState<Status>('idle');
   const [notice, setNotice] = useState('');
@@ -340,9 +342,14 @@ export function WhiteBackgroundWorkbench({
     }
     if (
       supportsKieOutputParam(modelConfig.id) &&
-      !modelConfig.outputParam?.options.includes(resolution)
+      !getKieOutputOptionsForAspectRatio(modelConfig.id, aspectRatio).includes(
+        resolution
+      )
     ) {
-      setResolution(getDefaultKieOutputValue(modelConfig.id));
+      setResolution(
+        getKieOutputOptionsForAspectRatio(modelConfig.id, aspectRatio)[0] ??
+          getDefaultKieOutputValue(modelConfig.id)
+      );
     }
     if (!supportsKieOutputParam(modelConfig.id) && resolution) {
       setResolution('');
@@ -667,7 +674,7 @@ export function WhiteBackgroundWorkbench({
                   <FieldSelect
                     label={copy.resolution}
                     value={resolution}
-                    options={modelConfig.outputParam.options}
+                    options={outputOptions}
                     renderOption={(value) =>
                       `${value} · ${modelConfig.outputParam?.label}`
                     }

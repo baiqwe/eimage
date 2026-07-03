@@ -29,7 +29,9 @@ import {
   KIE_MODELS,
   type KieModelId,
   getDefaultKieOutputValue,
+  getKieOutputOptionsForAspectRatio,
   getKieModelConfig,
+  normalizeKieOutputForAspectRatio,
   supportsKieOutputParam,
 } from '@/lib/kie-models';
 import { authApiMiddleware } from '@/middlewares/auth-middleware';
@@ -107,9 +109,16 @@ export const createGenerationBatch = createServerFn({ method: 'POST' })
         ? task.aspectRatio
         : modelConfig.aspectRatios[0];
       const resolution = supportsKieOutputParam(modelConfig.id)
-        ? modelConfig.outputParam?.options.includes(task.resolution)
+        ? getKieOutputOptionsForAspectRatio(
+            modelConfig.id,
+            aspectRatio
+          ).includes(task.resolution)
           ? task.resolution
-          : getDefaultKieOutputValue(modelConfig.id)
+          : normalizeKieOutputForAspectRatio({
+              model: modelConfig.id,
+              aspectRatio,
+              resolution: getDefaultKieOutputValue(modelConfig.id),
+            })
         : 'model-default';
       return {
         ...task,

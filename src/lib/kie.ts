@@ -3,6 +3,7 @@ import {
   KIE_MODELS,
   type KieModelId,
   getKieModelConfig,
+  normalizeKieOutputForAspectRatio,
 } from '@/lib/kie-models';
 
 type KieCreateTaskInput = {
@@ -169,6 +170,12 @@ function createModelInput(input: KieCreateTaskInput) {
     prompt: input.prompt,
     input_urls: [input.imageUrl],
     aspect_ratio: input.aspectRatio || 'auto',
+    resolution:
+      normalizeKieOutputForAspectRatio({
+        model: model.id,
+        aspectRatio: input.aspectRatio,
+        resolution: input.resolution,
+      }) || '1K',
   };
 }
 

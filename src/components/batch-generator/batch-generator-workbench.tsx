@@ -30,6 +30,7 @@ import {
   type KieModelId,
   getDefaultKieAspectRatio,
   getDefaultKieOutputValue,
+  getKieOutputOptionsForAspectRatio,
   supportsKieOutputParam,
 } from '@/lib/kie-models';
 import { estimateTaskCreditCost } from '@/lib/product-generation';
@@ -466,6 +467,7 @@ export function BatchGeneratorWorkbench({
   const [resolution, setResolution] = useState<KieResolution>(
     getDefaultKieOutputValue(DEFAULT_MODEL)
   );
+  const outputOptions = getKieOutputOptionsForAspectRatio(model, aspectRatio);
   const [prompt, setPrompt] = useState('');
   const [credits, setCredits] = useState(creditQuery.data?.balance ?? 0);
   const [batchNotice, setBatchNotice] = useState('');
@@ -516,9 +518,14 @@ export function BatchGeneratorWorkbench({
     }
     if (
       supportsKieOutputParam(nextConfig.id) &&
-      !nextConfig.outputParam?.options.includes(resolution)
+      !getKieOutputOptionsForAspectRatio(nextConfig.id, aspectRatio).includes(
+        resolution
+      )
     ) {
-      setResolution(getDefaultKieOutputValue(nextConfig.id));
+      setResolution(
+        getKieOutputOptionsForAspectRatio(nextConfig.id, aspectRatio)[0] ??
+          getDefaultKieOutputValue(nextConfig.id)
+      );
     }
     if (!supportsKieOutputParam(nextConfig.id) && resolution) {
       setResolution('');
@@ -963,7 +970,7 @@ export function BatchGeneratorWorkbench({
                   <FieldSelect
                     label={copy.resolution}
                     value={resolution}
-                    options={modelConfig.outputParam.options}
+                    options={outputOptions}
                     renderOption={(value) =>
                       `${value} · ${modelConfig.outputParam?.label}`
                     }
