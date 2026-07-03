@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useRouter } from '@tanstack/react-router';
 import { AuthCard } from '@/components/auth/auth-card';
 import { FormError } from '@/components/shared/form-error';
 import { FormSuccess } from '@/components/shared/form-success';
@@ -50,6 +50,7 @@ export function LoginForm({
   const [success, setSuccess] = useState<string | undefined>(undefined);
   const [isPending, setIsPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const credentialLoginEnabled =
     websiteConfig.auth?.enableCredentialLogin ?? false;
@@ -83,8 +84,12 @@ export function LoginForm({
           setSuccess('');
         },
         onResponse: () => setIsPending(false),
-        onSuccess: () => {
-          onSuccess?.();
+        onSuccess: async () => {
+          if (onSuccess) {
+            onSuccess();
+            return;
+          }
+          await router.navigate({ to: callbackUrl });
         },
         onError: (ctx) => {
           const code = ctx.error.code;

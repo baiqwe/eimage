@@ -16,6 +16,7 @@ import {
   getCreditBalance,
   grantSignupCredits,
   refundCredits,
+  SIGNUP_BONUS_CREDITS,
 } from '@/lib/credits';
 import {
   createKieImageTask,
@@ -88,7 +89,7 @@ export const getGenerationCredits = createServerFn({ method: 'GET' })
     await grantSignupCredits(context.userId);
     return {
       balance: await getCreditBalance(context.userId),
-      signupBonus: 45,
+      signupBonus: SIGNUP_BONUS_CREDITS,
     };
   });
 

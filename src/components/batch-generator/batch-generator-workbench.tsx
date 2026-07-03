@@ -144,7 +144,7 @@ const COPY: Record<
     eyebrow: '批量改图工作台',
     title: '多张商品图，一套指令，独立生成结果',
     description:
-      '上传多张商品图后，每张图片会独立生成。中间专注预览原图，右侧集中展示生成结果、预览和下载。',
+      '上传多张商品图后，每张图片会独立生成。左侧管理原图，中间配置参数，右侧查看结果。',
     uploadTitle: '批量上传',
     uploadDescription: '支持 1-30 张商品图，单张不超过 12MB。',
     chooseFiles: '选择图片',
@@ -202,7 +202,7 @@ const COPY: Record<
     eyebrow: 'Batch image workbench',
     title: 'Many product images, one instruction set, independent outputs',
     description:
-      'Upload product images, apply one shared instruction, preview sources in the center, and review generated result cards on the right.',
+      'Upload product images, apply one shared instruction, manage sources on the left, and review generated result cards on the right.',
     uploadTitle: 'Batch upload',
     uploadDescription: 'Upload 1-30 product images, up to 12MB each.',
     chooseFiles: 'Choose images',
@@ -263,7 +263,7 @@ const COPY: Record<
     eyebrow: '一括画像ワークベンチ',
     title: '複数の商品画像を 1 つの指示で個別に処理',
     description:
-      '商品画像をまとめてアップロードし、中央で元画像を確認し、右側で生成結果カードを確認・保存できます。',
+      '商品画像をまとめてアップロードし、左側で元画像を管理し、中央で設定、右側で結果を確認します。',
     uploadTitle: '一括アップロード',
     uploadDescription: '1-30 枚の商品画像、1 枚 12MB まで対応。',
     chooseFiles: '画像を選択',
@@ -321,7 +321,7 @@ const COPY: Record<
     eyebrow: '배치 이미지 워크벤치',
     title: '여러 상품 이미지를 하나의 지시로 각각 처리',
     description:
-      '여러 상품 이미지를 업로드하고 중앙에서 원본을 확인한 뒤 오른쪽에서 생성 결과 카드를 확인하고 다운로드합니다.',
+      '여러 상품 이미지를 업로드하고 왼쪽에서 원본을 관리하며 가운데에서 설정하고 오른쪽에서 결과를 확인합니다.',
     uploadTitle: '일괄 업로드',
     uploadDescription: '1-30장, 이미지당 최대 12MB.',
     chooseFiles: '이미지 선택',
@@ -382,7 +382,7 @@ const COPY: Record<
     title:
       'Muchas imagenes de producto, una instruccion, resultados independientes',
     description:
-      'Sube varias imagenes, revisa las fuentes en el centro y descarga los resultados desde tarjetas a la derecha.',
+      'Sube varias imagenes, gestiona fuentes a la izquierda, configura en el centro y descarga resultados a la derecha.',
     uploadTitle: 'Carga por lotes',
     uploadDescription: 'Sube de 1 a 30 imagenes, hasta 12MB cada una.',
     chooseFiles: 'Elegir imagenes',
@@ -848,7 +848,7 @@ export function BatchGeneratorWorkbench({
           onLocaleChange={handleLocaleChange}
         />
       }
-      columns="lg:grid-cols-[380px_minmax(0,1fr)_460px]"
+      columns="lg:grid-cols-[420px_minmax(0,1fr)_460px]"
       source={
         <div className="space-y-4">
           <div>
@@ -922,13 +922,6 @@ export function BatchGeneratorWorkbench({
       }
       config={
         <div className="mx-auto flex max-w-3xl flex-col gap-4">
-          <div>
-            <h2 className="font-bold text-3xl tracking-tight">
-              {copy.gridTitle}
-            </h2>
-            <p className="mt-2 text-[#6d7468]">{copy.gridDescription}</p>
-          </div>
-
           <GeneratorPanel
             title={copy.prompt}
             description={copy.parameterHint}
@@ -1003,22 +996,6 @@ export function BatchGeneratorWorkbench({
               </Button>
             }
           />
-
-          {!hasTasks ? (
-            <div className="flex min-h-[240px] items-center justify-center rounded-lg border border-dashed border-[#cbd2c3] bg-white">
-              <div className="max-w-sm text-center">
-                <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#edf5ef] text-[#2f5f4f]">
-                  <IconCloudUpload className="size-7" />
-                </div>
-                <h3 className="mt-4 font-semibold text-xl">
-                  {copy.emptyTitle}
-                </h3>
-                <p className="mt-2 text-[#74796d] text-sm leading-6">
-                  {copy.emptyDescription}
-                </p>
-              </div>
-            </div>
-          ) : null}
         </div>
       }
       results={
@@ -1091,8 +1068,8 @@ function SourcePreviewSection({
 }) {
   return (
     <section>
-      <h3 className="mb-3 font-semibold text-xl">{title}</h3>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <h3 className="mb-3 font-semibold text-base">{title}</h3>
+      <div className="grid grid-cols-2 gap-2">
         {tasks.map((task) => (
           <article
             key={`source-${task.id}`}
@@ -1107,7 +1084,7 @@ function SourcePreviewSection({
               className="block w-full text-left"
               onClick={() => onSelect(task.id)}
             >
-              <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-[#eef1e8]">
+              <div className="relative flex aspect-square items-center justify-center overflow-hidden bg-[#eef1e8]">
                 {task.sourceDataUrl ? (
                   <img
                     src={task.sourceDataUrl}
@@ -1121,14 +1098,14 @@ function SourcePreviewSection({
                 )}
               </div>
             </button>
-            <div className="p-3">
+            <div className="p-2">
               <div className="flex items-start justify-between gap-2">
                 <button
                   type="button"
                   className="min-w-0 flex-1 text-left"
                   onClick={() => onSelect(task.id)}
                 >
-                  <p className="line-clamp-1 font-medium text-sm">
+                  <p className="line-clamp-1 font-medium text-xs">
                     {task.name}
                   </p>
                   <p className="mt-1 text-[#7c8476] text-xs">
