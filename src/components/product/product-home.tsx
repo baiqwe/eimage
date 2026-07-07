@@ -9,13 +9,11 @@ import {
   IconShoppingBag,
   IconWand,
 } from '@tabler/icons-react';
-import { Link, useLocation, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { ProductGallerySection } from '@/components/product/product-gallery';
 import {
-  getLocalizedPublicPath,
   getProductGeneratorPath,
-  ProductLanguageSelect,
   type ProductLocale,
   useProductLocale,
 } from '@/components/product/product-locale';
@@ -112,7 +110,7 @@ const COPY = {
     setTitle: 'Built for ecommerce photo sets, not single images',
     setBadge: 'Ecommerce photo sets',
     setDescription:
-      'A real product launch needs a consistent set of visuals for listings, product detail pages, campaigns, and store merchandising.',
+      'A real product launch needs a consistent set of visuals for listings, product detail pages, campaigns, and store merchandising. ProdList AI works as an AI ecommerce product photo generator for that complete launch kit.',
     setTypes: [
       'Marketplace hero images',
       'White-background product photos',
@@ -133,7 +131,7 @@ const COPY = {
         text: 'Redesign background, lighting, and scene mood around the uploaded product without randomly changing shape, color, labels, or silhouette.',
       },
     ],
-    workflowTitle: 'SaaS-ready product flow',
+    workflowTitle: 'AI ecommerce product photo generator workflow',
     workflow: [
       'Sign in',
       'Choose plan or credits',
@@ -393,18 +391,8 @@ export function ProductHome({
 }: {
   locale?: ProductLocale;
 }) {
-  const pathname = useLocation().pathname;
-  const navigate = useNavigate();
-  const { locale, setLocale } = useProductLocale(fixedLocale);
+  const { locale } = useProductLocale(fixedLocale);
   const t = COPY[locale];
-
-  function handleLocaleChange(next: ProductLocale) {
-    setLocale(next);
-    const nextPath = getLocalizedPublicPath(pathname, next);
-    if (nextPath !== pathname) {
-      navigate({ to: nextPath });
-    }
-  }
 
   return (
     <div className="bg-[#f7f8f4] text-[#20231e]">
@@ -416,10 +404,6 @@ export function ProductHome({
                 <IconCameraSpark className="size-4 text-[#2f5f4f]" />
                 {t.badge}
               </span>
-              <ProductLanguageSelect
-                locale={locale}
-                onLocaleChange={handleLocaleChange}
-              />
             </div>
             <h1 className="max-w-3xl text-balance font-bold text-4xl tracking-tight md:text-6xl">
               {t.title}

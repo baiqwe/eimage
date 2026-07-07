@@ -9,8 +9,6 @@ import {
   getProductBatchGeneratorPath,
   getProductGeneratorPath,
   getWhiteBackgroundGeneratorPath,
-  ProductLanguageSelect,
-  useProductLocale,
 } from '@/components/product/product-locale';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -92,7 +90,7 @@ function ToolPage() {
     throw notFound();
   }
   const { tool } = loaderData;
-  const { locale, setLocale } = useProductLocale();
+  const locale = 'en';
   const copy = getProductToolCopy(tool, locale);
   const generatorHref =
     tool.slug === 'batch-image-editor' ||
@@ -115,9 +113,6 @@ function ToolPage() {
       </div>
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
         <div>
-          <div className="mb-5">
-            <ProductLanguageSelect locale={locale} onLocaleChange={setLocale} />
-          </div>
           <Badge variant="outline" className="mb-5">
             {copy.category}
           </Badge>

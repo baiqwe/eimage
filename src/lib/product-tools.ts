@@ -126,7 +126,7 @@ export const PRODUCT_TOOLS: ProductTool[] = [
     navDescription: 'Run multiple product photo tasks from one upload.',
     navDescriptionZh: '一张商品图并行生成多张主图和详情图。',
     description:
-      'Upload one source product photo and create multiple ecommerce-ready images in parallel for launches, ads, and product pages.',
+      'Use a batch product photo generator to upload one source product photo and create multiple ecommerce-ready images in parallel for launches, ads, and product pages.',
     descriptionZh:
       '上传一张商品素材图，并行生成多张适合上新、广告和详情页的电商商品图。',
     h1: 'Batch product photo generator for ecommerce image sets',
@@ -242,7 +242,7 @@ export const PRODUCT_TOOLS: ProductTool[] = [
     navDescription: 'Clean studio, marketplace, and lifestyle backgrounds.',
     navDescriptionZh: '生成白底、棚拍和生活方式商品背景。',
     description:
-      'Create clean studio backgrounds and lifestyle scenes from one product image while preserving the original product shape.',
+      'Use a product background generator to create clean studio backgrounds and lifestyle scenes from one product image while preserving the original product shape.',
     descriptionZh:
       '上传一张商品图，生成白底、棚拍和生活方式场景背景，同时保持商品原始形貌。',
     h1: 'Product background generator for marketplace-ready images',
@@ -475,7 +475,7 @@ export const PRODUCT_TOOLS: ProductTool[] = [
     navDescription: 'Premium scenes for rings, necklaces, metal, and gems.',
     navDescriptionZh: '面向戒指、项链、金属和宝石的高级场景。',
     description:
-      'Generate refined jewelry product photography with controlled reflections, premium shadows, and close-up detail composition.',
+      'Use jewelry product photography AI to generate refined product visuals with controlled reflections, premium shadows, and close-up detail composition.',
     descriptionZh:
       '为珠宝首饰生成高级背景、可控反射和细节页场景，突出金属、宝石和材质质感。',
     h1: 'Jewelry product photography AI with premium light control',
@@ -584,17 +584,17 @@ export const PRODUCT_TOOLS: ProductTool[] = [
     slug: 'shoe-photography-ai',
     aliases: ['shoe-product-photography'],
     category: 'Shoe Photography',
-    title: 'AI Shoe Product Photography Generator',
+    title: 'Shoe Photography AI',
     titleZh: 'AI 鞋类商品摄影生成器',
-    navTitle: 'Shoe product photography',
+    navTitle: 'Shoe photography AI',
     navTitleZh: '鞋类商品摄影',
     navDescription: 'Sneaker hero shots, outdoor scenes, and ad crops.',
     navDescriptionZh: '生成运动鞋主图、户外场景和广告裁切。',
     description:
-      'Produce shoe hero shots and lifestyle detail scenes for ecommerce launches without changing the silhouette or material.',
+      'Use shoe photography AI to produce shoe hero shots and lifestyle detail scenes for ecommerce launches without changing the silhouette or material.',
     descriptionZh:
       '为鞋类商品生成主图和生活方式详情图，不改变鞋型轮廓、材质和品牌细节。',
-    h1: 'AI shoe product photography for faster ecommerce launches',
+    h1: 'Shoe photography AI for faster ecommerce launches',
     h1Zh: '更快上新的 AI 鞋类商品摄影',
     imageAlt:
       'AI shoe product photography examples for ecommerce main images and lifestyle scenes',

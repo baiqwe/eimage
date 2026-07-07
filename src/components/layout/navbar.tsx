@@ -28,7 +28,9 @@ import { websiteConfig } from '@/config/website';
 import { messages } from '@/messages';
 import {
   getLocalizedPublicPath,
+  getProductLocaleFromPathname,
   ProductLanguageSelect,
+  type ProductLocale,
   useProductLocale,
 } from '@/components/product/product-locale';
 
@@ -40,7 +42,9 @@ export function Navbar({ scroll = true }: NavbarProps) {
   const pathname = useLocation().pathname;
   const navigate = useNavigate();
   const scrolled = useScroll(50);
-  const { locale, setLocale } = useProductLocale();
+  const { locale, setLocale } = useProductLocale(
+    getNavbarInitialLocale(pathname)
+  );
   const menuLinks = getNavbarLinks(locale);
   const [mounted, setMounted] = useState(false);
   const [menuValue, setMenuValue] = useState<string | null>(null);
@@ -233,4 +237,21 @@ export function Navbar({ scroll = true }: NavbarProps) {
       </div>
     </header>
   );
+}
+
+function getNavbarInitialLocale(pathname: string): ProductLocale | undefined {
+  const pathLocale = getProductLocaleFromPathname(pathname);
+  if (pathLocale) return pathLocale;
+  if (
+    pathname === '/' ||
+    pathname === '/gallery' ||
+    pathname === '/tools' ||
+    pathname === '/generator' ||
+    pathname === '/batch-generator' ||
+    pathname === '/white-background-generator' ||
+    /^\/tools\/[^/]+$/.test(pathname)
+  ) {
+    return 'en';
+  }
+  return undefined;
 }
