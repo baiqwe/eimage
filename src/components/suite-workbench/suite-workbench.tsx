@@ -223,6 +223,9 @@ const WORKBENCH_COPY = {
     },
     globalBadge: '全局',
     sourceAlt: '商品素材图',
+    expandTask: '展开任务',
+    collapseTask: '收起任务',
+    removeTask: '删除任务',
   },
   en: {
     subtitle: 'Product image generation workbench',
@@ -296,6 +299,9 @@ const WORKBENCH_COPY = {
     },
     globalBadge: 'Global',
     sourceAlt: 'Source product image',
+    expandTask: 'Expand task',
+    collapseTask: 'Collapse task',
+    removeTask: 'Remove task',
   },
   ja: {
     subtitle: '商品画像生成ワークベンチ',
@@ -368,6 +374,9 @@ const WORKBENCH_COPY = {
     },
     globalBadge: '共通',
     sourceAlt: '商品素材画像',
+    expandTask: 'タスクを展開',
+    collapseTask: 'タスクを折りたたむ',
+    removeTask: 'タスクを削除',
   },
   ko: {
     subtitle: '상품 이미지 생성 워크벤치',
@@ -441,6 +450,9 @@ const WORKBENCH_COPY = {
     },
     globalBadge: '전역',
     sourceAlt: '상품 소재 이미지',
+    expandTask: '작업 펼치기',
+    collapseTask: '작업 접기',
+    removeTask: '작업 삭제',
   },
   es: {
     subtitle: 'Workbench de generación de imágenes de producto',
@@ -514,6 +526,9 @@ const WORKBENCH_COPY = {
     },
     globalBadge: 'Global',
     sourceAlt: 'Imagen fuente del producto',
+    expandTask: 'Expandir tarea',
+    collapseTask: 'Contraer tarea',
+    removeTask: 'Eliminar tarea',
   },
 } as const;
 
@@ -1197,7 +1212,9 @@ function TaskCard({
           <Button
             type="button"
             size="icon-sm"
-            variant="ghost"
+            variant="outline"
+            aria-label={task.expanded ? t.collapseTask : t.expandTask}
+            className="border-[#dfe3d8] bg-[#fbfcf7] text-[#2f352c] shadow-none hover:border-[#2f5f4f]/40 hover:bg-[#eef6f0] hover:text-[#2f5f4f]"
             onClick={(event) => {
               event.stopPropagation();
               onUpdate({ expanded: !task.expanded });
@@ -1208,7 +1225,9 @@ function TaskCard({
           <Button
             type="button"
             size="icon-sm"
-            variant="ghost"
+            variant="outline"
+            aria-label={t.removeTask}
+            className="border-[#dfe3d8] bg-[#fbfcf7] text-[#5f6759] shadow-none hover:border-[#d33b00]/30 hover:bg-[#fff1eb] hover:text-[#d33b00]"
             onClick={(event) => {
               event.stopPropagation();
               onRemove();
