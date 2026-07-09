@@ -85,6 +85,25 @@ type WorkbenchTask = {
   expanded: boolean;
 };
 
+type SourceAsset = {
+  id: string;
+  name: string;
+  dataUrl: string;
+};
+
+type GeneratedAsset = {
+  id: string;
+  taskId: string;
+  sourceId: string;
+  sourceName: string;
+  kind: TaskKind;
+  style: string;
+  imageUrl?: string;
+  serverTaskId?: string;
+  providerTaskId?: string;
+  status: TaskStatus;
+};
+
 type Locale = ProductLocale;
 
 const MAIN_STYLES = [
@@ -176,6 +195,8 @@ const WORKBENCH_COPY = {
       `已创建批次，${count} 个单图任务并发执行，预扣 ${credits} 点。`,
     insufficientCredits: (required: number, available: number) =>
       `点数不足：需要 ${required} 点，当前剩余 ${available} 点。`,
+    maxTasksExceeded: (count: number) =>
+      `本次会创建 ${count} 个输出任务，单批最多支持 30 个，请减少素材图或任务卡片。`,
     history: '历史',
     historyTitle: '最近批次',
     emptyHistory: '生成后会在这里看到批次、任务数和扣点记录。',
@@ -196,6 +217,7 @@ const WORKBENCH_COPY = {
     reference: '参考图',
     useGlobal: '默认使用全局商品图',
     changeReference: '修改参考图',
+    removeReference: '移除参考图',
     promptPlaceholder:
       '根据风格自动生成默认提示词，也可以点击智能撰写或手动修改。',
     render: '开始渲染',
@@ -251,6 +273,8 @@ const WORKBENCH_COPY = {
       `Batch created. ${count} single-image tasks are running in parallel, reserving ${credits} credits.`,
     insufficientCredits: (required: number, available: number) =>
       `Insufficient credits: ${required} required, ${available} available.`,
+    maxTasksExceeded: (count: number) =>
+      `This run would create ${count} output tasks. A single batch supports up to 30; remove some source images or task cards.`,
     history: 'History',
     historyTitle: 'Recent batches',
     emptyHistory: 'Batches, task counts, and credit usage will appear here.',
@@ -272,6 +296,7 @@ const WORKBENCH_COPY = {
     reference: 'Reference image',
     useGlobal: 'Uses global product image by default',
     changeReference: 'Change reference',
+    removeReference: 'Remove reference',
     promptPlaceholder:
       'A style-based prompt is prefilled. Draft with AI or edit manually.',
     render: 'Render',
@@ -327,6 +352,8 @@ const WORKBENCH_COPY = {
       `バッチを作成しました。${count} 件の単画像タスクを並列実行し、${credits} クレジットを予約します。`,
     insufficientCredits: (required: number, available: number) =>
       `クレジット不足：必要 ${required}、残高 ${available}。`,
+    maxTasksExceeded: (count: number) =>
+      `この実行では ${count} 件の出力タスクが作成されます。1 バッチは最大 30 件までです。素材画像またはタスクカードを減らしてください。`,
     history: '履歴',
     historyTitle: '最近のバッチ',
     emptyHistory: '生成後、バッチ、タスク数、クレジット消費が表示されます。',
@@ -347,6 +374,7 @@ const WORKBENCH_COPY = {
     reference: '参照画像',
     useGlobal: '通常は共通の商品画像を使用',
     changeReference: '参照画像を変更',
+    removeReference: '参照画像を削除',
     promptPlaceholder:
       'スタイルに基づく Prompt を自動生成できます。AI 下書き後に手動編集も可能です。',
     render: 'レンダリング開始',
@@ -402,6 +430,8 @@ const WORKBENCH_COPY = {
       `배치가 생성되었습니다. ${count}개의 단일 이미지 작업을 병렬 실행하고 ${credits} 크레딧을 예약합니다.`,
     insufficientCredits: (required: number, available: number) =>
       `크레딧 부족: ${required} 필요, 현재 ${available}.`,
+    maxTasksExceeded: (count: number) =>
+      `이번 실행은 ${count}개의 출력 작업을 만듭니다. 단일 배치는 최대 30개까지 지원하므로 이미지나 작업 카드를 줄여 주세요.`,
     history: '기록',
     historyTitle: '최근 배치',
     emptyHistory: '생성 후 배치, 작업 수, 크레딧 사용량이 여기에 표시됩니다.',
@@ -423,6 +453,7 @@ const WORKBENCH_COPY = {
     reference: '참조 이미지',
     useGlobal: '기본적으로 전역 상품 이미지 사용',
     changeReference: '참조 변경',
+    removeReference: '참조 삭제',
     promptPlaceholder:
       '스타일 기반 Prompt가 자동으로 채워집니다. AI 작성 후 직접 수정할 수 있습니다.',
     render: '렌더링 시작',
@@ -478,6 +509,8 @@ const WORKBENCH_COPY = {
       `Lote creado. ${count} tareas de imagen se ejecutan en paralelo y reservan ${credits} créditos.`,
     insufficientCredits: (required: number, available: number) =>
       `Créditos insuficientes: se necesitan ${required}, tienes ${available}.`,
+    maxTasksExceeded: (count: number) =>
+      `Esta ejecución crearía ${count} tareas de salida. Un lote admite hasta 30; elimina imágenes fuente o tarjetas de tarea.`,
     history: 'Historial',
     historyTitle: 'Lotes recientes',
     emptyHistory: 'Aquí aparecerán lotes, tareas y consumo de créditos.',
@@ -499,6 +532,7 @@ const WORKBENCH_COPY = {
     reference: 'Imagen de referencia',
     useGlobal: 'Usa la imagen global por defecto',
     changeReference: 'Cambiar referencia',
+    removeReference: 'Quitar referencia',
     promptPlaceholder:
       'Se completa un Prompt según el estilo. Puedes redactarlo con IA o editarlo manualmente.',
     render: 'Renderizar',
@@ -547,13 +581,13 @@ export function SuiteWorkbench({
     description: DEFAULT_DESCRIPTION,
   });
   const { data: session } = authClient.useSession();
-  const [sourceImage, setSourceImage] = useState<string>();
-  const [sourceName, setSourceName] = useState('');
+  const [sourceAssets, setSourceAssets] = useState<SourceAsset[]>([]);
   const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
   const [credits, setCredits] = useState(0);
   const [creditsLoading, setCreditsLoading] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState('task-main');
   const [batchNotice, setBatchNotice] = useState('');
+  const [generatedAssets, setGeneratedAssets] = useState<GeneratedAsset[]>([]);
   const [tasks, setTasks] = useState<WorkbenchTask[]>(() =>
     createInitialTasks(DEFAULT_DESCRIPTION, locale)
   );
@@ -585,9 +619,29 @@ export function SuiteWorkbench({
 
     restoredSessionRef.current = true;
     setBatchNotice(t.polling);
+    setGeneratedAssets(
+      saved.tasks.map((savedTask) => {
+        const taskId = savedTask.clientId.split('__')[0] || savedTask.clientId;
+        const task = tasks.find((item) => item.id === taskId);
+        return {
+          id: savedTask.clientId,
+          taskId,
+          sourceId: savedTask.clientId.split('__')[1] || 'restored',
+          sourceName: savedTask.name,
+          kind: task?.kind ?? 'main',
+          style: task?.style ?? savedTask.name,
+          serverTaskId: savedTask.serverTaskId,
+          status: 'rendering' as TaskStatus,
+        };
+      })
+    );
     setTasks((current) =>
       current.map((task) => {
-        const savedTask = saved.tasks.find((item) => item.clientId === task.id);
+        const savedTask = saved.tasks.find(
+          (item) =>
+            item.clientId === task.id ||
+            item.clientId.startsWith(`${task.id}__`)
+        );
         return savedTask
           ? {
               ...task,
@@ -598,7 +652,9 @@ export function SuiteWorkbench({
           : task;
       })
     );
-    setSelectedTaskId(saved.tasks[0]?.clientId ?? selectedTaskId);
+    setSelectedTaskId(
+      saved.tasks[0]?.clientId.split('__')[0] ?? selectedTaskId
+    );
     void pollGenerationTasks(
       saved.tasks.map((task) => task.serverTaskId),
       new Map(saved.tasks.map((task) => [task.serverTaskId, task.clientId])),
@@ -661,8 +717,13 @@ export function SuiteWorkbench({
     [tasks]
   );
   const creditEstimate = useMemo(
-    () => tasks.reduce((sum, task) => sum + estimateTaskCreditCost(task), 0),
-    [tasks]
+    () =>
+      tasks.reduce(
+        (sum, task) =>
+          sum + estimateTaskCreditCost(task) * getTaskRunCount(task),
+        0
+      ),
+    [tasks, sourceAssets.length]
   );
   const running = tasks.some((task) =>
     ['queued', 'rendering'].includes(task.status)
@@ -733,11 +794,42 @@ export function SuiteWorkbench({
     });
   }
 
-  async function onFileChange(file?: File) {
-    if (!file) return;
-    const dataUrl = await readFileAsDataUrl(file);
-    setSourceImage(dataUrl);
-    setSourceName(file.name);
+  function getTaskRunCount(task: WorkbenchTask) {
+    if (task.referenceImage) return 1;
+    return sourceAssets.length;
+  }
+
+  function getTaskSourceAssets(task: WorkbenchTask): SourceAsset[] {
+    if (task.referenceImage) {
+      return [
+        {
+          id: `reference-${task.id}`,
+          name: task.referenceName || 'task-reference.png',
+          dataUrl: task.referenceImage,
+        },
+      ];
+    }
+    return sourceAssets;
+  }
+
+  async function onFilesChange(fileList?: FileList | File[]) {
+    if (!fileList) return;
+    const files = Array.from(fileList).filter((file) =>
+      file.type.startsWith('image/')
+    );
+    if (files.length === 0) return;
+    const assets = await Promise.all(
+      files.map(async (file) => ({
+        id: `source-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: file.name,
+        dataUrl: await readFileAsDataUrl(file),
+      }))
+    );
+    setSourceAssets((current) => [...current, ...assets].slice(0, 30));
+  }
+
+  function removeSourceAsset(id: string) {
+    setSourceAssets((current) => current.filter((asset) => asset.id !== id));
   }
 
   async function onTaskFileChange(id: string, file?: File) {
@@ -748,6 +840,15 @@ export function SuiteWorkbench({
       referenceName: file.name,
       imageUrl: undefined,
       status: 'ready',
+    });
+  }
+
+  function removeTaskReference(id: string) {
+    updateTask(id, {
+      referenceImage: undefined,
+      referenceName: undefined,
+      imageUrl: undefined,
+      status: sourceAssets.length > 0 ? 'ready' : 'idle',
     });
   }
 
@@ -778,13 +879,13 @@ export function SuiteWorkbench({
   }
 
   async function renderTask(task: WorkbenchTask) {
-    const referenceImage = task.referenceImage ?? sourceImage;
-    if (!referenceImage) return;
+    const taskSources = getTaskSourceAssets(task);
+    if (taskSources.length === 0) return;
     if (!signedIn) {
       setBatchNotice(t.authRequired);
       return;
     }
-    const cost = estimateTaskCreditCost(task);
+    const cost = estimateTaskCreditCost(task) * taskSources.length;
     if (credits < cost) {
       setBatchNotice(t.insufficientCredits(cost, credits));
       return;
@@ -796,7 +897,9 @@ export function SuiteWorkbench({
   }
 
   async function generateAll() {
-    const runnable = tasks.filter((task) => task.referenceImage ?? sourceImage);
+    const runnable = tasks.filter(
+      (task) => getTaskSourceAssets(task).length > 0
+    );
     if (runnable.length === 0) return;
     if (!signedIn) {
       setBatchNotice(t.authRequired);
@@ -809,8 +912,21 @@ export function SuiteWorkbench({
     runnable: WorkbenchTask[],
     singlePromptPatch?: Partial<WorkbenchTask>
   ) {
-    const plannedTasks = runnable.map((task) => ({
-      id: task.id,
+    const generationUnits = runnable.flatMap((task) =>
+      getTaskSourceAssets(task).map((source, index) => ({
+        unitId: `${task.id}__${source.id}__${index}`,
+        task,
+        source,
+      }))
+    );
+    const fallbackSource = generationUnits[0]?.source ?? sourceAssets[0];
+    if (!fallbackSource) return;
+    if (generationUnits.length > 30) {
+      setBatchNotice(t.maxTasksExceeded(generationUnits.length));
+      return;
+    }
+    const plannedTasks = generationUnits.map(({ unitId, task, source }) => ({
+      id: unitId,
       kind: task.kind,
       style: task.style,
       aspectRatio: task.aspectRatio,
@@ -820,11 +936,23 @@ export function SuiteWorkbench({
         singlePromptPatch?.prompt ||
         task.prompt.trim() ||
         createClientPrompt(task, description, locale).prompt,
-      referenceImageDataUrl: task.referenceImage,
-      referenceName: task.referenceName ?? sourceName,
+      referenceImageDataUrl: source.dataUrl,
+      referenceName: source.name,
     }));
     try {
       setBatchNotice('');
+      setGeneratedAssets((current) => [
+        ...current,
+        ...generationUnits.map(({ unitId, task, source }) => ({
+          id: unitId,
+          taskId: task.id,
+          sourceId: source.id,
+          sourceName: source.name,
+          kind: task.kind,
+          style: task.style,
+          status: 'queued' as TaskStatus,
+        })),
+      ]);
       setTasks((current) =>
         current.map((task) =>
           runnable.some((item) => item.id === task.id)
@@ -837,13 +965,18 @@ export function SuiteWorkbench({
         data: {
           locale,
           productDescription: description,
-          sourceImageDataUrl: sourceImage!,
-          sourceName: sourceName || 'source-product.png',
+          sourceImageDataUrl: fallbackSource.dataUrl,
+          sourceName: fallbackSource.name || 'source-product.png',
           tasks: plannedTasks,
         },
       });
 
       if (!batch.ok) {
+        setGeneratedAssets((current) =>
+          current.filter(
+            (asset) => !generationUnits.some((unit) => unit.unitId === asset.id)
+          )
+        );
         setBatchNotice(
           t.insufficientCredits(batch.requiredCredits, batch.availableCredits)
         );
@@ -872,16 +1005,16 @@ export function SuiteWorkbench({
           tasks: batch.tasks.map((task) => ({
             clientId: task.id,
             serverTaskId: task.taskId,
-            name:
-              tasks.find((item) => item.id === task.id)?.style ??
-              `${task.id}.png`,
+            name: `${task.id}.png`,
           })),
         });
       }
 
       setTasks((current) =>
         current.map((task) => {
-          const submitted = batch.tasks.find((item) => item.id === task.id);
+          const submitted = batch.tasks.find((item) =>
+            item.id.startsWith(`${task.id}__`)
+          );
           if (!submitted) return task;
           const promptPatch = task.prompt.trim()
             ? {}
@@ -890,11 +1023,25 @@ export function SuiteWorkbench({
             ...task,
             ...promptPatch,
             prompt: submitted.prompt,
-            serverTaskId: submitted.taskId,
-            providerTaskId: submitted.providerTaskId ?? undefined,
             model: submitted.model,
             status: 'rendering',
           };
+        })
+      );
+      setGeneratedAssets((current) =>
+        current.map((asset) => {
+          const submitted = batch.tasks.find((item) => item.id === asset.id);
+          return submitted
+            ? {
+                ...asset,
+                serverTaskId: submitted.taskId,
+                providerTaskId: submitted.providerTaskId ?? undefined,
+                status:
+                  submitted.status === 'failed'
+                    ? ('failed' as TaskStatus)
+                    : ('rendering' as TaskStatus),
+              }
+            : asset;
         })
       );
       setSelectedTaskId(runnable[0]?.id ?? selectedTaskId);
@@ -906,6 +1053,13 @@ export function SuiteWorkbench({
     } catch (error) {
       setBatchNotice(
         error instanceof Error ? error.message : 'Generation failed.'
+      );
+      setGeneratedAssets((current) =>
+        current.map((asset) =>
+          generationUnits.some((unit) => unit.unitId === asset.id)
+            ? { ...asset, status: 'failed' }
+            : asset
+        )
       );
       setTasks((current) =>
         current.map((task) =>
@@ -931,20 +1085,46 @@ export function SuiteWorkbench({
       });
       setCredits(result.balance);
       for (const status of result.statuses) {
-        const clientTaskId = clientTaskByServerTask.get(status.id);
-        if (!clientTaskId) continue;
+        const assetId = clientTaskByServerTask.get(status.id);
+        if (!assetId) continue;
+        const taskId = assetId.split('__')[0];
         if (status.status === 'completed' && status.imageUrl) {
           pending.delete(status.id);
-          updateTask(clientTaskId, {
+          const taskStillRunning = Array.from(pending).some((serverTaskId) =>
+            clientTaskByServerTask.get(serverTaskId)?.startsWith(`${taskId}__`)
+          );
+          setGeneratedAssets((current) =>
+            current.map((asset) =>
+              asset.id === assetId
+                ? { ...asset, imageUrl: status.imageUrl, status: 'done' }
+                : asset
+            )
+          );
+          updateTask(taskId, {
             imageUrl: status.imageUrl,
-            status: 'done',
+            status: taskStillRunning ? 'rendering' : 'done',
           });
         } else if (status.status === 'failed') {
           pending.delete(status.id);
-          updateTask(clientTaskId, { status: 'failed' });
+          const taskStillRunning = Array.from(pending).some((serverTaskId) =>
+            clientTaskByServerTask.get(serverTaskId)?.startsWith(`${taskId}__`)
+          );
+          setGeneratedAssets((current) =>
+            current.map((asset) =>
+              asset.id === assetId ? { ...asset, status: 'failed' } : asset
+            )
+          );
+          updateTask(taskId, {
+            status: taskStillRunning ? 'rendering' : 'failed',
+          });
           if (status.errorMessage) setBatchNotice(status.errorMessage);
         } else {
-          updateTask(clientTaskId, { status: 'rendering' });
+          setGeneratedAssets((current) =>
+            current.map((asset) =>
+              asset.id === assetId ? { ...asset, status: 'rendering' } : asset
+            )
+          );
+          updateTask(taskId, { status: 'rendering' });
         }
       }
     }
@@ -960,10 +1140,7 @@ export function SuiteWorkbench({
         tasks: Array.from(pending).map((serverTaskId) => ({
           serverTaskId,
           clientId: clientTaskByServerTask.get(serverTaskId) ?? serverTaskId,
-          name:
-            tasks.find(
-              (task) => task.id === clientTaskByServerTask.get(serverTaskId)
-            )?.style ?? `${serverTaskId}.png`,
+          name: `${serverTaskId}.png`,
         })),
       });
     }
@@ -999,20 +1176,30 @@ export function SuiteWorkbench({
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault();
-              void onFileChange(event.dataTransfer.files[0]);
+              void onFilesChange(event.dataTransfer.files);
             }}
             className={cn(
-              'flex aspect-square w-full items-center justify-center',
+              'relative flex aspect-square w-full items-center justify-center',
               'overflow-hidden rounded-lg border border-[#d9ded1]',
               'border-dashed bg-white text-left shadow-sm hover:border-[#9aa48d]'
             )}
           >
-            {sourceImage ? (
-              <img
-                src={sourceImage}
-                alt={t.sourceAlt}
-                className="h-full w-full object-contain p-4"
-              />
+            {sourceAssets.length > 0 ? (
+              <div className="grid h-full w-full grid-cols-2 gap-2 p-3">
+                {sourceAssets.slice(0, 4).map((asset) => (
+                  <img
+                    key={asset.id}
+                    src={asset.dataUrl}
+                    alt={asset.name}
+                    className="h-full min-h-0 w-full rounded-md object-cover"
+                  />
+                ))}
+                {sourceAssets.length > 4 ? (
+                  <span className="absolute right-3 bottom-3 rounded-full bg-[#20231e]/80 px-2 py-1 font-medium text-white text-xs">
+                    +{sourceAssets.length - 4}
+                  </span>
+                ) : null}
+              </div>
             ) : (
               <div className="flex flex-col items-center gap-3 text-[#74796d]">
                 <span className="flex size-12 items-center justify-center rounded-lg bg-[#eef1e8]">
@@ -1027,7 +1214,11 @@ export function SuiteWorkbench({
             className="hidden"
             type="file"
             accept="image/*"
-            onChange={(event) => void onFileChange(event.target.files?.[0])}
+            multiple
+            onChange={(event) => {
+              void onFilesChange(event.target.files);
+              event.currentTarget.value = '';
+            }}
           />
 
           <div className="mb-5 rounded-lg border border-[#dfe3d8] bg-white p-3">
@@ -1035,9 +1226,21 @@ export function SuiteWorkbench({
               <span className="text-[#74796d] text-xs">{t.file}</span>
               <IconPhoto className="size-4 text-[#9aa48d]" />
             </div>
-            <p className="truncate font-medium text-sm">
-              {sourceName || t.noFile}
-            </p>
+            {sourceAssets.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2">
+                {sourceAssets.map((asset, index) => (
+                  <ImageAssetChip
+                    key={asset.id}
+                    asset={asset}
+                    code={getAssetCode('G', index)}
+                    onRemove={() => removeSourceAsset(asset.id)}
+                    removeLabel={t.removeTask}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="truncate font-medium text-sm">{t.noFile}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -1092,7 +1295,10 @@ export function SuiteWorkbench({
             creditLabel={t.credits}
             creditValue={creditEstimate}
             primaryLabel={t.generateAll}
-            primaryDisabled={!sourceImage || running}
+            primaryDisabled={
+              !tasks.some((task) => getTaskSourceAssets(task).length > 0) ||
+              running
+            }
             primaryLoading={running}
             primaryIcon={<IconWand className="size-4" />}
             onPrimary={() => void generateAll()}
@@ -1106,8 +1312,13 @@ export function SuiteWorkbench({
                 t={t}
                 locale={locale}
                 selected={task.id === selectedTask?.id}
-                sourceReady={Boolean(task.referenceImage ?? sourceImage)}
-                globalSourceName={sourceName || t.noFile}
+                sourceReady={getTaskSourceAssets(task).length > 0}
+                globalSourceName={
+                  task.referenceName ||
+                  (sourceAssets.length > 0
+                    ? sourceAssets.map((asset) => asset.name).join(', ')
+                    : t.noFile)
+                }
                 baseDescription={description}
                 descriptionReady={description.trim().length > 0}
                 onSelect={() => setSelectedTaskId(task.id)}
@@ -1116,6 +1327,7 @@ export function SuiteWorkbench({
                 onTaskFileChange={(file) =>
                   void onTaskFileChange(task.id, file)
                 }
+                onRemoveTaskReference={() => removeTaskReference(task.id)}
                 onDraft={() => void draftPrompt(task)}
                 onRender={() => void renderTask(task)}
               />
@@ -1127,6 +1339,7 @@ export function SuiteWorkbench({
         <Inspector
           task={selectedTask}
           tasks={tasks}
+          assets={generatedAssets}
           selectedTaskId={selectedTask?.id}
           onSelectTask={setSelectedTaskId}
           locale={locale}
@@ -1150,6 +1363,7 @@ function TaskCard({
   onRemove,
   onUpdate,
   onTaskFileChange,
+  onRemoveTaskReference,
   onDraft,
   onRender,
 }: {
@@ -1165,6 +1379,7 @@ function TaskCard({
   onRemove: () => void;
   onUpdate: (patch: Partial<WorkbenchTask>) => void;
   onTaskFileChange: (file?: File) => void;
+  onRemoveTaskReference: () => void;
   onDraft: () => void;
   onRender: () => void;
 }) {
@@ -1322,25 +1537,58 @@ function TaskCard({
                   {task.referenceName ?? t.useGlobal}
                 </p>
               </div>
-              <label
-                htmlFor={`${task.id}-reference`}
-                className="inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[#dfe3d8] bg-white px-2.5 font-medium text-sm hover:bg-[#eef1e8]"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <IconUpload className="size-4" />
-                {t.changeReference}
-              </label>
+              <div className="flex items-center gap-2">
+                {task.referenceImage ? (
+                  <button
+                    type="button"
+                    className="inline-flex h-8 items-center justify-center rounded-lg border border-[#dfe3d8] bg-white px-2.5 text-[#74796d] hover:border-[#d33b00]/30 hover:bg-[#fff1eb] hover:text-[#d33b00]"
+                    aria-label={t.removeReference}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onRemoveTaskReference();
+                    }}
+                  >
+                    <IconTrash className="size-4" />
+                  </button>
+                ) : null}
+                <label
+                  htmlFor={`${task.id}-reference`}
+                  className="inline-flex h-8 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-[#dfe3d8] bg-white px-2.5 font-medium text-sm hover:bg-[#eef1e8]"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <IconUpload className="size-4" />
+                  {t.changeReference}
+                </label>
+              </div>
             </div>
-            <p className="truncate text-[#74796d] text-xs">
-              {task.referenceName ?? globalSourceName}
-            </p>
+            {task.referenceImage ? (
+              <div className="max-w-28">
+                <ImageAssetChip
+                  asset={{
+                    id: `reference-${task.id}`,
+                    name: task.referenceName || 'reference.png',
+                    dataUrl: task.referenceImage,
+                  }}
+                  code="R01"
+                  onRemove={onRemoveTaskReference}
+                  removeLabel={t.removeReference}
+                />
+              </div>
+            ) : (
+              <p className="truncate text-[#74796d] text-xs">
+                {globalSourceName}
+              </p>
+            )}
             <input
               id={`${task.id}-reference`}
               className="hidden"
               type="file"
               accept="image/*"
               onClick={(event) => event.stopPropagation()}
-              onChange={(event) => onTaskFileChange(event.target.files?.[0])}
+              onChange={(event) => {
+                onTaskFileChange(event.target.files?.[0]);
+                event.currentTarget.value = '';
+              }}
             />
           </div>
 
@@ -1431,9 +1679,47 @@ function FieldSelect({
   );
 }
 
+function ImageAssetChip({
+  asset,
+  code,
+  onRemove,
+  removeLabel,
+}: {
+  asset: SourceAsset;
+  code: string;
+  onRemove: () => void;
+  removeLabel: string;
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-lg border border-[#dfe3d8] bg-[#f7f8f4] shadow-sm">
+      <img
+        src={asset.dataUrl}
+        alt={asset.name}
+        className="aspect-square w-full object-cover"
+      />
+      <div className="absolute inset-x-1 bottom-1 flex items-center justify-between gap-1 rounded bg-[#20231e]/80 px-1.5 py-0.5 text-white">
+        <span className="font-semibold text-[10px] leading-4">{code}</span>
+        <button
+          type="button"
+          className="rounded text-white/80 hover:bg-white/15 hover:text-white"
+          aria-label={removeLabel}
+          title={asset.name}
+          onClick={(event) => {
+            event.stopPropagation();
+            onRemove();
+          }}
+        >
+          <IconTrash className="size-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Inspector({
   task,
   tasks,
+  assets,
   selectedTaskId,
   onSelectTask,
   locale,
@@ -1441,12 +1727,17 @@ function Inspector({
 }: {
   task?: WorkbenchTask;
   tasks: WorkbenchTask[];
+  assets: GeneratedAsset[];
   selectedTaskId?: string;
   onSelectTask: (id: string) => void;
   locale: Locale;
   t: (typeof WORKBENCH_COPY)[Locale];
 }) {
-  const completedTasks = tasks.filter((item) => item.imageUrl);
+  const completedAssets = assets.filter((item) => item.imageUrl);
+  const selectedAsset =
+    completedAssets.find((item) => item.taskId === task?.id) ??
+    completedAssets[0];
+  const totalAssets = Math.max(assets.length, tasks.length);
   if (!task) {
     return (
       <div className="flex h-full items-center justify-center text-[#74796d] text-sm">
@@ -1468,20 +1759,20 @@ function Inspector({
         <div className="mb-3 flex items-center justify-between gap-3">
           <p className="font-semibold text-sm">{t.resultAssets}</p>
           <span className="text-[#74796d] text-xs">
-            {completedTasks.length}/{tasks.length}
+            {completedAssets.length}/{totalAssets}
           </span>
         </div>
-        {completedTasks.length > 0 ? (
+        {completedAssets.length > 0 ? (
           <div className="grid grid-cols-3 gap-2">
-            {completedTasks.map((item) => (
+            {completedAssets.map((item) => (
               <button
                 key={item.id}
                 type="button"
-                onClick={() => onSelectTask(item.id)}
+                onClick={() => onSelectTask(item.taskId)}
                 className={cn(
                   'group relative aspect-square overflow-hidden rounded-md border bg-[#f7f8f4]',
                   'transition hover:border-[#2f5f4f] focus:outline-none focus:ring-2 focus:ring-[#2f5f4f]/30',
-                  selectedTaskId === item.id
+                  selectedTaskId === item.taskId
                     ? 'border-[#2f5f4f] ring-2 ring-[#2f5f4f]/20'
                     : 'border-[#dfe3d8]'
                 )}
@@ -1492,7 +1783,7 @@ function Inspector({
                   className="h-full w-full object-cover"
                 />
                 <span className="absolute inset-x-1 bottom-1 truncate rounded bg-[#20231e]/80 px-1.5 py-0.5 text-[10px] text-white">
-                  {item.kind === 'main' ? t.main : t.detail}
+                  {item.kind === 'main' ? t.main : t.detail} · {item.sourceName}
                 </span>
               </button>
             ))}
@@ -1508,9 +1799,9 @@ function Inspector({
             <IconLoader2 className="size-8 animate-spin text-[#2f5f4f]" />
             <span className="text-sm">{t.rendering}</span>
           </div>
-        ) : task.imageUrl ? (
+        ) : selectedAsset?.imageUrl ? (
           <img
-            src={task.imageUrl}
+            src={selectedAsset.imageUrl}
             alt="Generated product asset"
             className="h-full w-full object-cover"
           />
@@ -1522,12 +1813,15 @@ function Inspector({
         )}
       </div>
 
-      {task.imageUrl ? (
+      {selectedAsset?.imageUrl ? (
         <Button
           type="button"
           className="w-full"
           onClick={() =>
-            void downloadFile(task.imageUrl!, `suite-workbench-${task.id}.png`)
+            void downloadFile(
+              selectedAsset.imageUrl!,
+              `suite-workbench-${selectedAsset.id}.png`
+            )
           }
         >
           <IconDownload className="size-4" />
@@ -1649,6 +1943,10 @@ function getStyleLabels(locale: Locale) {
 
 function getStyleLabel(style: string, locale: Locale) {
   return STYLE_LABELS[locale][style] ?? style;
+}
+
+function getAssetCode(prefix: string, index: number) {
+  return `${prefix}${String(index + 1).padStart(2, '0')}`;
 }
 
 function getClientReasoning(locale: Locale, isMain: boolean) {
