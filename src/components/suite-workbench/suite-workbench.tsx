@@ -1212,45 +1212,49 @@ export function SuiteWorkbench({
             <Badge variant="outline">{t.globalBadge}</Badge>
           </div>
 
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
+          <div
             onDragOver={(event) => event.preventDefault()}
             onDrop={(event) => {
               event.preventDefault();
               void onFilesChange(event.dataTransfer.files);
             }}
             className={cn(
-              'relative flex h-44 w-full items-center justify-center',
+              'relative flex min-h-44 w-full items-center justify-center',
               'overflow-hidden rounded-lg border border-[#d9ded1]',
               'border-dashed bg-white text-left shadow-sm hover:border-[#9aa48d]'
             )}
           >
-            {sourceAssets.length > 0 ? (
-              <div className="grid h-full w-full grid-cols-4 gap-2 p-3">
-                {sourceAssets.slice(0, 8).map((asset) => (
-                  <img
-                    key={asset.id}
-                    src={asset.dataUrl}
-                    alt={asset.name}
-                    className="h-full min-h-0 w-full rounded-md object-cover"
-                  />
-                ))}
-                {sourceAssets.length > 8 ? (
-                  <span className="absolute right-3 bottom-3 rounded-full bg-[#20231e]/80 px-2 py-1 font-medium text-white text-xs">
-                    +{sourceAssets.length - 8}
-                  </span>
-                ) : null}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-3 text-[#74796d]">
-                <span className="flex size-12 items-center justify-center rounded-lg bg-[#eef1e8]">
-                  <IconUpload className="size-6" />
+            <div className="flex w-full flex-col gap-3 p-3">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-3 rounded-md text-left text-[#74796d] transition hover:text-[#20231e]"
+              >
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#eef1e8]">
+                  <IconUpload className="size-5" />
                 </span>
                 <span className="font-medium text-sm">{t.upload}</span>
-              </div>
-            )}
-          </button>
+              </button>
+              {sourceAssets.length > 0 ? (
+                <div className="grid grid-cols-3 gap-2">
+                  {sourceAssets.slice(0, 9).map((asset, index) => (
+                    <ImageAssetChip
+                      key={asset.id}
+                      asset={asset}
+                      code={getAssetCode('G', index)}
+                      onRemove={() => removeSourceAsset(asset.id)}
+                      removeLabel={t.removeTask}
+                    />
+                  ))}
+                  {sourceAssets.length > 9 ? (
+                    <span className="flex aspect-square items-center justify-center rounded-lg border border-[#dfe3d8] bg-[#f7f8f4] font-semibold text-[#74796d] text-xs">
+                      +{sourceAssets.length - 9}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          </div>
           <input
             ref={fileInputRef}
             className="hidden"

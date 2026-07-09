@@ -111,11 +111,11 @@ export function GeneratorWorkbenchHeader({
           <Button
             type="button"
             variant="ghost"
-            className="hidden shrink-0 md:inline-flex"
+            className="shrink-0 text-[#2f352c] hover:bg-[#eef1e8] hover:text-[#20231e]"
             render={<Link to={getProductHomePath(locale)} />}
           >
             <IconArrowLeft className="size-4" />
-            {copy.back}
+            <span className="hidden sm:inline">{copy.back}</span>
           </Button>
           <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#22251f] text-[#f5f7ed]">
             <IconSparkles className="size-5" />
