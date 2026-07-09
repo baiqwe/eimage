@@ -49,6 +49,15 @@ const taskSchema = z.object({
   model: z.string().min(2).max(120).optional(),
   referenceImageDataUrl: z.string().optional(),
   referenceName: z.string().max(255).optional(),
+  referenceImages: z
+    .array(
+      z.object({
+        dataUrl: z.string().min(40),
+        name: z.string().max(255).optional(),
+      })
+    )
+    .max(15)
+    .optional(),
 });
 
 const createBatchSchema = z.object({
@@ -209,10 +218,20 @@ export const createGenerationBatch = createServerFn({ method: 'POST' })
                   fileName: inputTask.referenceName || `${task.id}.png`,
                 })
               : sourceImageUrl;
+            const taskReferenceUrls = await Promise.all(
+              (inputTask?.referenceImages ?? []).map((reference, index) =>
+                uploadBase64ToKie({
+                  dataUrl: reference.dataUrl,
+                  fileName:
+                    reference.name || `${task.id}-reference-${index + 1}.png`,
+                })
+              )
+            );
+            const inputUrls = [taskImageUrl, ...taskReferenceUrls].slice(0, 16);
             const provider = await createKieImageTask({
               model,
               prompt: task.prompt,
-              imageUrl: taskImageUrl,
+              imageUrls: inputUrls,
               aspectRatio: task.aspectRatio,
               resolution: task.resolution,
             });
@@ -235,6 +254,7 @@ export const createGenerationBatch = createServerFn({ method: 'POST' })
                 provider: 'kie',
                 model,
                 sourceImageUrl: taskImageUrl,
+                referenceImageUrls: taskReferenceUrls,
                 createResponse: provider.raw,
               }),
               creditCost: task.creditCost,

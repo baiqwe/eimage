@@ -76,8 +76,7 @@ type WorkbenchTask = {
   model: string;
   reasoning: string;
   keywords: string[];
-  referenceImage?: string;
-  referenceName?: string;
+  referenceAssets: SourceAsset[];
   imageUrl?: string;
   serverTaskId?: string;
   providerTaskId?: string;
@@ -216,7 +215,8 @@ const WORKBENCH_COPY = {
     draft: '智能撰写',
     reference: '参考图',
     useGlobal: '默认使用全局商品图',
-    changeReference: '修改参考图',
+    globalSources: '全局商品图',
+    addReference: '添加参考图',
     removeReference: '移除参考图',
     promptPlaceholder:
       '根据风格自动生成默认提示词，也可以点击智能撰写或手动修改。',
@@ -295,7 +295,8 @@ const WORKBENCH_COPY = {
     draft: 'Smart draft',
     reference: 'Reference image',
     useGlobal: 'Uses global product image by default',
-    changeReference: 'Change reference',
+    globalSources: 'Global product images',
+    addReference: 'Add reference',
     removeReference: 'Remove reference',
     promptPlaceholder:
       'A style-based prompt is prefilled. Draft with AI or edit manually.',
@@ -373,7 +374,8 @@ const WORKBENCH_COPY = {
     draft: 'AI 下書き',
     reference: '参照画像',
     useGlobal: '通常は共通の商品画像を使用',
-    changeReference: '参照画像を変更',
+    globalSources: '共通の商品画像',
+    addReference: '参照画像を追加',
     removeReference: '参照画像を削除',
     promptPlaceholder:
       'スタイルに基づく Prompt を自動生成できます。AI 下書き後に手動編集も可能です。',
@@ -452,7 +454,8 @@ const WORKBENCH_COPY = {
     draft: 'AI 작성',
     reference: '참조 이미지',
     useGlobal: '기본적으로 전역 상품 이미지 사용',
-    changeReference: '참조 변경',
+    globalSources: '전역 상품 이미지',
+    addReference: '참조 추가',
     removeReference: '참조 삭제',
     promptPlaceholder:
       '스타일 기반 Prompt가 자동으로 채워집니다. AI 작성 후 직접 수정할 수 있습니다.',
@@ -531,7 +534,8 @@ const WORKBENCH_COPY = {
     draft: 'Redactar con IA',
     reference: 'Imagen de referencia',
     useGlobal: 'Usa la imagen global por defecto',
-    changeReference: 'Cambiar referencia',
+    globalSources: 'Imagenes globales del producto',
+    addReference: 'Agregar referencia',
     removeReference: 'Quitar referencia',
     promptPlaceholder:
       'Se completa un Prompt según el estilo. Puedes redactarlo con IA o editarlo manualmente.',
@@ -770,12 +774,14 @@ export function SuiteWorkbench({
           prompt: '',
           reasoning: '',
           keywords: [],
+          referenceAssets: [],
           status: 'idle',
           expanded: true,
         },
         description,
         locale
       ),
+      referenceAssets: [],
       status: 'idle',
       expanded: true,
     };
@@ -794,22 +800,16 @@ export function SuiteWorkbench({
     });
   }
 
-  function getTaskRunCount(task: WorkbenchTask) {
-    if (task.referenceImage) return 1;
+  function getTaskRunCount(_task: WorkbenchTask) {
     return sourceAssets.length;
   }
 
-  function getTaskSourceAssets(task: WorkbenchTask): SourceAsset[] {
-    if (task.referenceImage) {
-      return [
-        {
-          id: `reference-${task.id}`,
-          name: task.referenceName || 'task-reference.png',
-          dataUrl: task.referenceImage,
-        },
-      ];
-    }
+  function getTaskSourceAssets(_task: WorkbenchTask): SourceAsset[] {
     return sourceAssets;
+  }
+
+  function getTaskReferenceAssets(task: WorkbenchTask): SourceAsset[] {
+    return task.referenceAssets ?? [];
   }
 
   async function onFilesChange(fileList?: FileList | File[]) {
@@ -832,21 +832,56 @@ export function SuiteWorkbench({
     setSourceAssets((current) => current.filter((asset) => asset.id !== id));
   }
 
-  async function onTaskFileChange(id: string, file?: File) {
-    if (!file) return;
-    const dataUrl = await readFileAsDataUrl(file);
-    updateTask(id, {
-      referenceImage: dataUrl,
-      referenceName: file.name,
-      imageUrl: undefined,
-      status: 'ready',
-    });
+  async function onTaskFilesChange(id: string, fileList?: FileList | File[]) {
+    if (!fileList) return;
+    const files = Array.from(fileList).filter((file) =>
+      file.type.startsWith('image/')
+    );
+    if (files.length === 0) return;
+    const assets = await Promise.all(
+      files.map(async (file) => ({
+        id: `reference-${id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: file.name,
+        dataUrl: await readFileAsDataUrl(file),
+      }))
+    );
+    setTasks((current) =>
+      current.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              referenceAssets: [
+                ...getTaskReferenceAssets(task),
+                ...assets,
+              ].slice(0, 15),
+              imageUrl: undefined,
+              status: sourceAssets.length > 0 ? 'ready' : 'idle',
+            }
+          : task
+      )
+    );
   }
 
-  function removeTaskReference(id: string) {
+  function removeTaskReference(id: string, referenceId: string) {
+    setTasks((current) =>
+      current.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              referenceAssets: getTaskReferenceAssets(task).filter(
+                (asset) => asset.id !== referenceId
+              ),
+              imageUrl: undefined,
+              status: sourceAssets.length > 0 ? 'ready' : 'idle',
+            }
+          : task
+      )
+    );
+  }
+
+  function clearTaskReferences(id: string) {
     updateTask(id, {
-      referenceImage: undefined,
-      referenceName: undefined,
+      referenceAssets: [],
       imageUrl: undefined,
       status: sourceAssets.length > 0 ? 'ready' : 'idle',
     });
@@ -917,6 +952,7 @@ export function SuiteWorkbench({
         unitId: `${task.id}__${source.id}__${index}`,
         task,
         source,
+        references: getTaskReferenceAssets(task),
       }))
     );
     const fallbackSource = generationUnits[0]?.source ?? sourceAssets[0];
@@ -925,20 +961,26 @@ export function SuiteWorkbench({
       setBatchNotice(t.maxTasksExceeded(generationUnits.length));
       return;
     }
-    const plannedTasks = generationUnits.map(({ unitId, task, source }) => ({
-      id: unitId,
-      kind: task.kind,
-      style: task.style,
-      aspectRatio: task.aspectRatio,
-      resolution: task.resolution,
-      model: task.model,
-      prompt:
-        singlePromptPatch?.prompt ||
-        task.prompt.trim() ||
-        createClientPrompt(task, description, locale).prompt,
-      referenceImageDataUrl: source.dataUrl,
-      referenceName: source.name,
-    }));
+    const plannedTasks = generationUnits.map(
+      ({ unitId, task, source, references }) => ({
+        id: unitId,
+        kind: task.kind,
+        style: task.style,
+        aspectRatio: task.aspectRatio,
+        resolution: task.resolution,
+        model: task.model,
+        prompt:
+          singlePromptPatch?.prompt ||
+          task.prompt.trim() ||
+          createClientPrompt(task, description, locale).prompt,
+        referenceImageDataUrl: source.dataUrl,
+        referenceName: source.name,
+        referenceImages: references.map((asset) => ({
+          dataUrl: asset.dataUrl,
+          name: asset.name,
+        })),
+      })
+    );
     try {
       setBatchNotice('');
       setGeneratedAssets((current) => [
@@ -1179,14 +1221,14 @@ export function SuiteWorkbench({
               void onFilesChange(event.dataTransfer.files);
             }}
             className={cn(
-              'relative flex aspect-square w-full items-center justify-center',
+              'relative flex h-44 w-full items-center justify-center',
               'overflow-hidden rounded-lg border border-[#d9ded1]',
               'border-dashed bg-white text-left shadow-sm hover:border-[#9aa48d]'
             )}
           >
             {sourceAssets.length > 0 ? (
-              <div className="grid h-full w-full grid-cols-2 gap-2 p-3">
-                {sourceAssets.slice(0, 4).map((asset) => (
+              <div className="grid h-full w-full grid-cols-4 gap-2 p-3">
+                {sourceAssets.slice(0, 8).map((asset) => (
                   <img
                     key={asset.id}
                     src={asset.dataUrl}
@@ -1194,9 +1236,9 @@ export function SuiteWorkbench({
                     className="h-full min-h-0 w-full rounded-md object-cover"
                   />
                 ))}
-                {sourceAssets.length > 4 ? (
+                {sourceAssets.length > 8 ? (
                   <span className="absolute right-3 bottom-3 rounded-full bg-[#20231e]/80 px-2 py-1 font-medium text-white text-xs">
-                    +{sourceAssets.length - 4}
+                    +{sourceAssets.length - 8}
                   </span>
                 ) : null}
               </div>
@@ -1313,21 +1355,21 @@ export function SuiteWorkbench({
                 locale={locale}
                 selected={task.id === selectedTask?.id}
                 sourceReady={getTaskSourceAssets(task).length > 0}
-                globalSourceName={
-                  task.referenceName ||
-                  (sourceAssets.length > 0
-                    ? sourceAssets.map((asset) => asset.name).join(', ')
-                    : t.noFile)
-                }
+                globalSourceCodes={sourceAssets.map((_, index) =>
+                  getAssetCode('G', index)
+                )}
                 baseDescription={description}
                 descriptionReady={description.trim().length > 0}
                 onSelect={() => setSelectedTaskId(task.id)}
                 onRemove={() => removeTask(task.id)}
                 onUpdate={(patch) => updateTask(task.id, patch)}
-                onTaskFileChange={(file) =>
-                  void onTaskFileChange(task.id, file)
+                onTaskFilesChange={(files) =>
+                  void onTaskFilesChange(task.id, files)
                 }
-                onRemoveTaskReference={() => removeTaskReference(task.id)}
+                onRemoveTaskReference={(referenceId) =>
+                  removeTaskReference(task.id, referenceId)
+                }
+                onClearTaskReferences={() => clearTaskReferences(task.id)}
                 onDraft={() => void draftPrompt(task)}
                 onRender={() => void renderTask(task)}
               />
@@ -1356,14 +1398,15 @@ function TaskCard({
   locale,
   selected,
   sourceReady,
-  globalSourceName,
+  globalSourceCodes,
   baseDescription,
   descriptionReady,
   onSelect,
   onRemove,
   onUpdate,
-  onTaskFileChange,
+  onTaskFilesChange,
   onRemoveTaskReference,
+  onClearTaskReferences,
   onDraft,
   onRender,
 }: {
@@ -1372,14 +1415,15 @@ function TaskCard({
   locale: Locale;
   selected: boolean;
   sourceReady: boolean;
-  globalSourceName: string;
+  globalSourceCodes: string[];
   baseDescription: string;
   descriptionReady: boolean;
   onSelect: () => void;
   onRemove: () => void;
   onUpdate: (patch: Partial<WorkbenchTask>) => void;
-  onTaskFileChange: (file?: File) => void;
-  onRemoveTaskReference: () => void;
+  onTaskFilesChange: (files?: FileList | File[]) => void;
+  onRemoveTaskReference: (referenceId: string) => void;
+  onClearTaskReferences: () => void;
   onDraft: () => void;
   onRender: () => void;
 }) {
@@ -1391,6 +1435,7 @@ function TaskCard({
   );
   const styleLabels = getStyleLabels(locale);
   const resolutionLabel = task.resolution || t.modelDefault;
+  const referenceAssets = task.referenceAssets ?? [];
 
   return (
     <article
@@ -1534,18 +1579,20 @@ function TaskCard({
               <div>
                 <p className="font-semibold text-sm">{t.reference}</p>
                 <p className="text-[#74796d] text-xs">
-                  {task.referenceName ?? t.useGlobal}
+                  {referenceAssets.length > 0
+                    ? `${t.useGlobal} + R${String(referenceAssets.length).padStart(2, '0')}`
+                    : t.useGlobal}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                {task.referenceImage ? (
+                {referenceAssets.length > 0 ? (
                   <button
                     type="button"
                     className="inline-flex h-8 items-center justify-center rounded-lg border border-[#dfe3d8] bg-white px-2.5 text-[#74796d] hover:border-[#d33b00]/30 hover:bg-[#fff1eb] hover:text-[#d33b00]"
                     aria-label={t.removeReference}
                     onClick={(event) => {
                       event.stopPropagation();
-                      onRemoveTaskReference();
+                      onClearTaskReferences();
                     }}
                   >
                     <IconTrash className="size-4" />
@@ -1557,36 +1604,49 @@ function TaskCard({
                   onClick={(event) => event.stopPropagation()}
                 >
                   <IconUpload className="size-4" />
-                  {t.changeReference}
+                  {t.addReference}
                 </label>
               </div>
             </div>
-            {task.referenceImage ? (
-              <div className="max-w-28">
-                <ImageAssetChip
-                  asset={{
-                    id: `reference-${task.id}`,
-                    name: task.referenceName || 'reference.png',
-                    dataUrl: task.referenceImage,
-                  }}
-                  code="R01"
-                  onRemove={onRemoveTaskReference}
-                  removeLabel={t.removeReference}
-                />
+            <div className="space-y-3">
+              <div>
+                <p className="mb-1 text-[#74796d] text-xs">{t.globalSources}</p>
+                {globalSourceCodes.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {globalSourceCodes.map((code) => (
+                      <AssetCodeBadge key={code}>{code}</AssetCodeBadge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[#74796d] text-xs">{t.noFile}</p>
+                )}
               </div>
-            ) : (
-              <p className="truncate text-[#74796d] text-xs">
-                {globalSourceName}
-              </p>
-            )}
+              {referenceAssets.length > 0 ? (
+                <div>
+                  <p className="mb-1 text-[#74796d] text-xs">{t.reference}</p>
+                  <div className="grid max-w-md grid-cols-4 gap-2">
+                    {referenceAssets.map((asset, index) => (
+                      <ImageAssetChip
+                        key={asset.id}
+                        asset={asset}
+                        code={getAssetCode('R', index)}
+                        onRemove={() => onRemoveTaskReference(asset.id)}
+                        removeLabel={t.removeReference}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
             <input
               id={`${task.id}-reference`}
               className="hidden"
               type="file"
               accept="image/*"
+              multiple
               onClick={(event) => event.stopPropagation()}
               onChange={(event) => {
-                onTaskFileChange(event.target.files?.[0]);
+                onTaskFilesChange(event.target.files);
                 event.currentTarget.value = '';
               }}
             />
@@ -1713,6 +1773,14 @@ function ImageAssetChip({
         </button>
       </div>
     </div>
+  );
+}
+
+function AssetCodeBadge({ children }: { children: string }) {
+  return (
+    <span className="rounded-md border border-[#dfe3d8] bg-white px-2 py-1 font-semibold text-[#2f352c] text-xs">
+      {children}
+    </span>
   );
 }
 
@@ -1905,6 +1973,7 @@ function createInitialTasks(
     prompt: '',
     reasoning: '',
     keywords: [],
+    referenceAssets: [],
     status: 'idle',
     expanded: true,
   };
@@ -1918,6 +1987,7 @@ function createInitialTasks(
     prompt: '',
     reasoning: '',
     keywords: [],
+    referenceAssets: [],
     status: 'idle',
     expanded: false,
   };
