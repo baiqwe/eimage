@@ -641,12 +641,16 @@ export function SuiteWorkbench({
     setBatchNotice(t.polling);
     setGeneratedAssets(
       saved.tasks.map((savedTask) => {
-        const taskId = savedTask.clientId.split('__')[0] || savedTask.clientId;
+        const taskId = savedTask.clientId.includes('__')
+          ? savedTask.clientId.split('__')[0]
+          : savedTask.clientId;
         const task = tasks.find((item) => item.id === taskId);
         return {
           id: savedTask.clientId,
           taskId,
-          sourceId: savedTask.clientId.split('__')[1] || 'restored',
+          sourceId: savedTask.clientId.includes('__')
+            ? (savedTask.clientId.split('__')[1] ?? 'restored')
+            : 'restored',
           sourceName: savedTask.name,
           kind: task?.kind ?? 'main',
           style: task?.style ?? savedTask.name,
@@ -673,7 +677,9 @@ export function SuiteWorkbench({
       })
     );
     setSelectedTaskId(
-      saved.tasks[0]?.clientId.split('__')[0] ?? selectedTaskId
+      saved.tasks[0]?.clientId.includes('__')
+        ? (saved.tasks[0]?.clientId.split('__')[0] ?? selectedTaskId)
+        : (saved.tasks[0]?.clientId ?? selectedTaskId)
     );
     void pollGenerationTasks(
       saved.tasks.map((task) => task.serverTaskId),
@@ -740,7 +746,10 @@ export function SuiteWorkbench({
     () =>
       tasks.reduce(
         (sum, task) =>
-          sum + estimateTaskCreditCost(task) * getTaskRunCount(task),
+          sum +
+          (getTaskSourceAssets(task).length > 0
+            ? estimateTaskCreditCost(task)
+            : 0),
         0
       ),
     [tasks, sourceAssets]
@@ -816,10 +825,6 @@ export function SuiteWorkbench({
       if (selectedTaskId === id) setSelectedTaskId(next[0]?.id ?? '');
       return next;
     });
-  }
-
-  function getTaskRunCount(task: WorkbenchTask) {
-    return getTaskSourceAssets(task).length;
   }
 
   function getTaskSourceAssets(task: WorkbenchTask): SourceAsset[] {
@@ -981,7 +986,7 @@ export function SuiteWorkbench({
       setBatchNotice(t.authRequired);
       return;
     }
-    const cost = estimateTaskCreditCost(task) * taskSources.length;
+    const cost = estimateTaskCreditCost(task);
     if (credits < cost) {
       setBatchNotice(t.insufficientCredits(cost, credits));
       return;
@@ -1008,14 +1013,18 @@ export function SuiteWorkbench({
     runnable: WorkbenchTask[],
     singlePromptPatch?: Partial<WorkbenchTask>
   ) {
-    const generationUnits = runnable.flatMap((task) =>
-      getTaskSourceAssets(task).map((source, index) => ({
-        unitId: `${task.id}__${source.id}__${index}`,
+    const generationUnits = runnable.flatMap((task) => {
+      const taskSources = getTaskSourceAssets(task);
+      const [primarySource, ...additionalSources] = taskSources;
+      if (!primarySource) return [];
+      return {
+        unitId: task.id,
         task,
-        source,
-        references: getTaskReferenceAssets(task),
-      }))
-    );
+        source: primarySource,
+        references: [...additionalSources, ...getTaskReferenceAssets(task)],
+        sourceCount: taskSources.length,
+      };
+    });
     const fallbackSource = generationUnits[0]?.source ?? sourceAssets[0];
     if (!fallbackSource) return;
     if (generationUnits.length > 30) {
@@ -1046,11 +1055,11 @@ export function SuiteWorkbench({
       setBatchNotice('');
       setGeneratedAssets((current) => [
         ...current,
-        ...generationUnits.map(({ unitId, task, source }) => ({
+        ...generationUnits.map(({ unitId, task, source, sourceCount }) => ({
           id: unitId,
           taskId: task.id,
           sourceId: source.id,
-          sourceName: source.name,
+          sourceName: `${sourceCount} ${t.file}`,
           kind: task.kind,
           style: task.style,
           status: 'queued' as TaskStatus,
@@ -1115,9 +1124,7 @@ export function SuiteWorkbench({
 
       setTasks((current) =>
         current.map((task) => {
-          const submitted = batch.tasks.find((item) =>
-            item.id.startsWith(`${task.id}__`)
-          );
+          const submitted = batch.tasks.find((item) => item.id === task.id);
           if (!submitted) return task;
           const promptPatch = task.prompt.trim()
             ? {}
@@ -1190,12 +1197,9 @@ export function SuiteWorkbench({
       for (const status of result.statuses) {
         const assetId = clientTaskByServerTask.get(status.id);
         if (!assetId) continue;
-        const taskId = assetId.split('__')[0];
+        const taskId = assetId;
         if (status.status === 'completed' && status.imageUrl) {
           pending.delete(status.id);
-          const taskStillRunning = Array.from(pending).some((serverTaskId) =>
-            clientTaskByServerTask.get(serverTaskId)?.startsWith(`${taskId}__`)
-          );
           setGeneratedAssets((current) =>
             current.map((asset) =>
               asset.id === assetId
@@ -1205,20 +1209,17 @@ export function SuiteWorkbench({
           );
           updateTask(taskId, {
             imageUrl: status.imageUrl,
-            status: taskStillRunning ? 'rendering' : 'done',
+            status: 'done',
           });
         } else if (status.status === 'failed') {
           pending.delete(status.id);
-          const taskStillRunning = Array.from(pending).some((serverTaskId) =>
-            clientTaskByServerTask.get(serverTaskId)?.startsWith(`${taskId}__`)
-          );
           setGeneratedAssets((current) =>
             current.map((asset) =>
               asset.id === assetId ? { ...asset, status: 'failed' } : asset
             )
           );
           updateTask(taskId, {
-            status: taskStillRunning ? 'rendering' : 'failed',
+            status: 'failed',
           });
           if (status.errorMessage) setBatchNotice(status.errorMessage);
         } else {
