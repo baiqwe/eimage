@@ -217,6 +217,7 @@ const WORKBENCH_COPY = {
     reference: '参考图',
     useGlobal: '默认使用全局商品图',
     globalSources: '全局商品图',
+    fallbackDescription: '上传的商品图片',
     excludedGlobalSources: '本任务已排除',
     excludeGlobalSource: '仅从本任务移除',
     restoreGlobalSources: '恢复全局图',
@@ -300,6 +301,7 @@ const WORKBENCH_COPY = {
     reference: 'Reference image',
     useGlobal: 'Uses global product image by default',
     globalSources: 'Global product images',
+    fallbackDescription: 'the uploaded product image',
     excludedGlobalSources: 'Excluded for this task',
     excludeGlobalSource: 'Remove from this task only',
     restoreGlobalSources: 'Restore global images',
@@ -382,6 +384,7 @@ const WORKBENCH_COPY = {
     reference: '参照画像',
     useGlobal: '通常は共通の商品画像を使用',
     globalSources: '共通の商品画像',
+    fallbackDescription: 'アップロードされた商品画像',
     excludedGlobalSources: 'このタスクから除外',
     excludeGlobalSource: 'このタスクからのみ削除',
     restoreGlobalSources: '共通画像を復元',
@@ -465,6 +468,7 @@ const WORKBENCH_COPY = {
     reference: '참조 이미지',
     useGlobal: '기본적으로 전역 상품 이미지 사용',
     globalSources: '전역 상품 이미지',
+    fallbackDescription: '업로드된 상품 이미지',
     excludedGlobalSources: '이 작업에서 제외됨',
     excludeGlobalSource: '이 작업에서만 제거',
     restoreGlobalSources: '전역 이미지 복원',
@@ -548,6 +552,7 @@ const WORKBENCH_COPY = {
     reference: 'Imagen de referencia',
     useGlobal: 'Usa la imagen global por defecto',
     globalSources: 'Imagenes globales del producto',
+    fallbackDescription: 'la imagen de producto subida',
     excludedGlobalSources: 'Excluidas para esta tarea',
     excludeGlobalSource: 'Quitar solo de esta tarea',
     restoreGlobalSources: 'Restaurar imagenes globales',
@@ -991,9 +996,10 @@ export function SuiteWorkbench({
       setBatchNotice(t.insufficientCredits(cost, credits));
       return;
     }
+    const effectiveDescription = getEffectiveDescription(description, locale);
     const promptPatch = task.prompt.trim()
       ? {}
-      : createClientPrompt(task, description, locale);
+      : createClientPrompt(task, effectiveDescription, locale);
     await startGeneration([task], promptPatch);
   }
 
@@ -1013,6 +1019,7 @@ export function SuiteWorkbench({
     runnable: WorkbenchTask[],
     singlePromptPatch?: Partial<WorkbenchTask>
   ) {
+    const effectiveDescription = getEffectiveDescription(description, locale);
     const generationUnits = runnable.flatMap((task) => {
       const taskSources = getTaskSourceAssets(task);
       const [primarySource, ...additionalSources] = taskSources;
@@ -1042,7 +1049,7 @@ export function SuiteWorkbench({
         prompt:
           singlePromptPatch?.prompt ||
           task.prompt.trim() ||
-          createClientPrompt(task, description, locale).prompt,
+          createClientPrompt(task, effectiveDescription, locale).prompt,
         referenceImageDataUrl: source.dataUrl,
         referenceName: source.name,
         referenceImages: references.map((asset) => ({
@@ -1076,7 +1083,7 @@ export function SuiteWorkbench({
       const batch = await createGenerationBatch({
         data: {
           locale,
-          productDescription: description,
+          productDescription: effectiveDescription,
           sourceImageDataUrl: fallbackSource.dataUrl,
           sourceName: fallbackSource.name || 'source-product.png',
           tasks: plannedTasks,
@@ -1128,7 +1135,7 @@ export function SuiteWorkbench({
           if (!submitted) return task;
           const promptPatch = task.prompt.trim()
             ? {}
-            : createClientPrompt(task, description, locale);
+            : createClientPrompt(task, effectiveDescription, locale);
           return {
             ...task,
             ...promptPatch,
@@ -2097,6 +2104,12 @@ function createClientPrompt(
     reasoning: getClientReasoning(locale, isMain),
     keywords: getClientKeywords(locale, isMain),
   };
+}
+
+function getEffectiveDescription(description: string, locale: Locale) {
+  const trimmed = description.trim();
+  if (trimmed.length >= 4) return trimmed;
+  return WORKBENCH_COPY[locale].fallbackDescription;
 }
 
 function createInitialTasks(

@@ -62,7 +62,10 @@ const taskSchema = z.object({
 
 const createBatchSchema = z.object({
   locale: z.enum(['zh', 'en', 'ja', 'ko', 'es']).default('zh'),
-  productDescription: z.string().min(4).max(800),
+  productDescription: z
+    .string()
+    .max(800)
+    .transform((value) => value.trim() || 'the uploaded product image'),
   sourceImageDataUrl: z.string().min(40),
   sourceName: z.string().max(255).default('source-product.png'),
   tasks: z.array(taskSchema).min(1).max(30),
