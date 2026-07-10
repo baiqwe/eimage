@@ -784,7 +784,7 @@ export function SuiteWorkbench({
   function addTask(kind: TaskKind) {
     const id = `task-${kind}-${Date.now()}`;
     const defaultModel = KIE_MODELS[0].id;
-    const defaultAspectRatio = getDefaultKieAspectRatio(defaultModel);
+    const defaultAspectRatio = getDefaultTaskAspectRatio(defaultModel, kind);
     const defaultResolution = getDefaultKieOutputValue(defaultModel);
     const task: WorkbenchTask = {
       id,
@@ -1591,7 +1591,7 @@ function TaskCard({
               onChange={(model) => {
                 onUpdate({
                   model,
-                  aspectRatio: getDefaultKieAspectRatio(model),
+                  aspectRatio: getDefaultTaskAspectRatio(model, task.kind),
                   resolution: getDefaultKieOutputValue(model),
                   imageUrl: undefined,
                   status: 'ready',
@@ -2117,14 +2117,21 @@ function createInitialTasks(
   locale: Locale = 'zh'
 ): WorkbenchTask[] {
   const defaultModel = KIE_MODELS[0].id;
-  const defaultAspectRatio = getDefaultKieAspectRatio(defaultModel);
+  const defaultMainAspectRatio = getDefaultTaskAspectRatio(
+    defaultModel,
+    'main'
+  );
+  const defaultDetailAspectRatio = getDefaultTaskAspectRatio(
+    defaultModel,
+    'detail'
+  );
   const defaultResolution = getDefaultKieOutputValue(defaultModel);
   const mainTask: WorkbenchTask = {
     id: 'task-main',
     kind: 'main',
     style: MAIN_STYLES[0],
     model: defaultModel,
-    aspectRatio: defaultAspectRatio,
+    aspectRatio: defaultMainAspectRatio,
     resolution: defaultResolution,
     prompt: '',
     reasoning: '',
@@ -2139,7 +2146,7 @@ function createInitialTasks(
     kind: 'detail',
     style: DETAIL_STYLES[0],
     model: defaultModel,
-    aspectRatio: defaultAspectRatio,
+    aspectRatio: defaultDetailAspectRatio,
     resolution: defaultResolution,
     prompt: '',
     reasoning: '',
@@ -2173,6 +2180,16 @@ function getStyleLabel(style: string, locale: Locale) {
   return STYLE_LABELS[locale][style] ?? style;
 }
 
+function getDefaultTaskAspectRatio(model: string, kind: TaskKind) {
+  if (kind === 'main') return getDefaultKieAspectRatio(model);
+  const aspectRatios = getKieModelConfig(model).aspectRatios;
+  return (
+    ['3:4', '9:16', '4:5', '2:3'].find((ratio) =>
+      aspectRatios.includes(ratio)
+    ) ?? getDefaultKieAspectRatio(model)
+  );
+}
+
 function getAssetCode(prefix: string, index: number) {
   return `${prefix}${String(index + 1).padStart(2, '0')}`;
 }
@@ -2181,19 +2198,19 @@ function getClientReasoning(locale: Locale, isMain: boolean) {
   const copy = {
     zh: isMain
       ? '用纯净构图和高级布光突出商品轮廓，让主图更适合投放和货架展示。'
-      : '用具体场景补足商品使用氛围，同时保持主体不被 AI 改形。',
+      : '用竖版多板块结构呈现商品场景、材质细节和卖点信息，让结果更接近电商详情页长图。',
     en: isMain
       ? 'A clean composition and premium lighting make the product suitable for marketplace hero placement.'
-      : 'A concrete lifestyle scene adds buying context while preserving the uploaded product shape.',
+      : 'A vertical multi-section layout shows lifestyle context, material closeups, and selling points like an ecommerce detail-page image.',
     ja: isMain
       ? 'クリーンな構図と上質な照明で商品輪郭を強調し、EC の主画像に適した見え方にします。'
-      : '具体的な利用シーンを加えながら、アップロード商品の形状は維持します。',
+      : '縦長の複数セクションで利用シーン、素材のディテール、訴求ポイントを見せ、EC 詳細ページらしく構成します。',
     ko: isMain
       ? '깔끔한 구도와 고급 조명으로 상품 윤곽을 강조해 마켓플레이스 메인 이미지에 적합하게 만듭니다.'
-      : '구체적인 사용 장면을 더하면서 업로드된 상품 형태는 유지합니다.',
+      : '세로형 다중 섹션으로 사용 장면, 소재 디테일, 핵심 포인트를 보여 주어 이커머스 상세페이지처럼 구성합니다.',
     es: isMain
       ? 'Una composición limpia y luz premium hacen que el producto funcione como imagen principal de marketplace.'
-      : 'Una escena lifestyle añade contexto de compra sin alterar la forma del producto subido.',
+      : 'Un diseño vertical con varias secciones muestra contexto, detalles de material y puntos de venta como una imagen de ficha ecommerce.',
   };
   return copy[locale];
 }
@@ -2211,9 +2228,9 @@ function getClientPrompt(
       `风格方向：${style}。`,
       isMain
         ? '画面用于平台主图，主体居中，构图干净，高级棚拍背景。'
-        : '画面用于详情场景图，环境真实自然，保留生活化氛围。',
+        : '画面用于电商详情页长图，请生成竖版信息型版式，而不是单张主图。使用 3 到 4 个上下分区：顶部生活场景展示商品，中段展示材质纹理和工艺细节，下段展示使用方式、尺寸感或核心卖点。整体像高级详情页视觉海报，可包含抽象信息块、图标感标签和留白，但不要生成可读文字。',
       '严格保留商品原始形状、轮廓、材质、颜色、标签和几何结构。',
-      '只允许调整背景、光线、阴影、反射和氛围，不要改动商品本体。',
+      '只允许调整背景、光线、阴影、反射、氛围和版式，不要改动商品本体。',
     ],
     en: [
       'Create a photorealistic ecommerce image using the uploaded product as the immutable source.',
@@ -2221,9 +2238,9 @@ function getClientPrompt(
       `Style direction: ${style}.`,
       isMain
         ? 'Use a marketplace-ready hero composition with the product centered and a premium studio background.'
-        : 'Use a realistic lifestyle detail composition with believable environmental context.',
+        : 'Create a vertical ecommerce detail-page poster, not a single hero image. Use 3 to 4 stacked sections: top lifestyle product scene, middle material and craftsmanship closeups, lower usage context, scale cues, or key selling-point panels. The layout should feel like a premium product detail page with abstract info blocks, icon-like badges, and clean spacing, but do not generate readable text.',
       'Preserve the exact product shape, silhouette, material, color, labels, and geometry.',
-      'Change only the background, lighting, shadow, reflection, and atmosphere.',
+      'Change only the background, lighting, shadow, reflection, atmosphere, and page layout.',
     ],
     ja: [
       'アップロードした商品画像を不変の主体として、高精細な EC 商品画像を生成してください。',
@@ -2231,9 +2248,9 @@ function getClientPrompt(
       `スタイル方針：${style}。`,
       isMain
         ? 'マーケットプレイス向け主画像として、商品を中央に配置し、上質なスタジオ背景で構成します。'
-        : '詳細ページ向けに、自然で信頼感のあるライフスタイルシーンで構成します。',
+        : '単一の主画像ではなく、縦長の EC 詳細ページ用ビジュアルとして構成してください。上から 3〜4 セクションに分け、上部は利用シーン、中段は素材感や工芸ディテール、下段は使用方法、サイズ感、主要な訴求ポイントを表現します。抽象的な情報ブロックやアイコン風ラベル、余白を使って高級な商品詳細ページらしくし、読める文字は生成しないでください。',
       '商品の形状、輪郭、素材、色、ラベル、幾何構造は厳密に維持してください。',
-      '変更してよいのは背景、照明、影、反射、空気感のみです。',
+      '変更してよいのは背景、照明、影、反射、空気感、ページ構成のみです。',
     ],
     ko: [
       '업로드한 상품 이미지를 변경 불가한 기준으로 사용해 사실적인 이커머스 이미지를 생성하세요.',
@@ -2241,9 +2258,9 @@ function getClientPrompt(
       `스타일 방향: ${style}.`,
       isMain
         ? '마켓플레이스용 메인 이미지처럼 상품을 중앙에 두고 프리미엄 스튜디오 배경으로 구성합니다.'
-        : '상세 페이지용 라이프스타일 장면처럼 자연스럽고 믿을 수 있는 환경 맥락을 구성합니다.',
+        : '단일 메인 이미지가 아니라 세로형 이커머스 상세페이지 포스터로 구성하세요. 위에서 아래로 3~4개의 섹션을 만들고, 상단은 라이프스타일 상품 장면, 중간은 소재 질감과 공예 디테일, 하단은 사용 방식, 크기감 또는 핵심 판매 포인트 패널을 보여 주세요. 추상 정보 블록, 아이콘 느낌의 배지, 깔끔한 여백은 허용하지만 읽을 수 있는 텍스트는 만들지 마세요.',
       '상품의 형태, 윤곽, 재질, 색상, 라벨, 기하 구조를 정확히 유지하세요.',
-      '배경, 조명, 그림자, 반사, 분위기만 변경하고 상품 본체는 바꾸지 마세요.',
+      '배경, 조명, 그림자, 반사, 분위기, 페이지 레이아웃만 변경하고 상품 본체는 바꾸지 마세요.',
     ],
     es: [
       'Genera una imagen ecommerce fotorrealista usando el producto subido como fuente inmutable.',
@@ -2251,9 +2268,9 @@ function getClientPrompt(
       `Dirección de estilo: ${style}.`,
       isMain
         ? 'Usa una composición principal lista para marketplace, con el producto centrado y fondo de estudio premium.'
-        : 'Usa una composición lifestyle de detalle con un contexto ambiental creíble.',
+        : 'Crea un poster vertical para una página de detalle ecommerce, no una sola imagen principal. Usa 3 o 4 secciones apiladas: escena lifestyle superior, primeros planos de material y acabado en el centro, y contexto de uso, escala o paneles de beneficios en la parte inferior. Debe parecer una página de detalle premium con bloques informativos abstractos, etiquetas tipo icono y buen espacio en blanco, pero sin texto legible.',
       'Conserva exactamente la forma, silueta, material, color, etiquetas y geometría del producto.',
-      'Cambia solo el fondo, la iluminación, la sombra, el reflejo y la atmósfera.',
+      'Cambia solo el fondo, la iluminación, la sombra, el reflejo, la atmósfera y el layout.',
     ],
   };
   return promptByLocale[locale].join(' ');
