@@ -107,26 +107,30 @@ export function GeneratorWorkbenchHeader({
   return (
     <header className="sticky top-0 z-30 border-[#dfe3d8] border-b bg-[#fbfcf7]/95 backdrop-blur">
       <div className="flex min-h-16 flex-wrap items-center justify-between gap-3 px-4 py-2 md:px-6">
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2 md:gap-3">
           <Button
             type="button"
             variant="ghost"
-            className="shrink-0 text-[#2f352c] hover:bg-[#eef1e8] hover:text-[#20231e]"
+            size="sm"
+            className="shrink-0 px-2 text-[#5f6759] hover:bg-[#eef1e8] hover:text-[#20231e]"
             render={<Link to={getProductHomePath(locale)} />}
           >
             <IconArrowLeft className="size-4" />
             <span className="hidden sm:inline">{copy.back}</span>
           </Button>
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#22251f] text-[#f5f7ed]">
-            <IconSparkles className="size-5" />
-          </div>
-          <div className="min-w-0">
-            <p className="truncate font-bold text-lg leading-none">
-              ProdList AI
-            </p>
-            <p className="truncate text-[#74796d] text-xs">
-              {copy.appSubtitle}
-            </p>
+          <div className="h-8 w-px bg-[#dfe3d8]" />
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#22251f] text-[#f5f7ed]">
+              <IconSparkles className="size-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate font-bold text-base leading-none">
+                ProdList AI
+              </p>
+              <p className="hidden truncate text-[#74796d] text-xs sm:block">
+                {copy.appSubtitle}
+              </p>
+            </div>
           </div>
         </div>
 

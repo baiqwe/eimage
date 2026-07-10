@@ -77,6 +77,7 @@ type WorkbenchTask = {
   reasoning: string;
   keywords: string[];
   referenceAssets: SourceAsset[];
+  excludedGlobalSourceIds: string[];
   imageUrl?: string;
   serverTaskId?: string;
   providerTaskId?: string;
@@ -216,6 +217,9 @@ const WORKBENCH_COPY = {
     reference: '参考图',
     useGlobal: '默认使用全局商品图',
     globalSources: '全局商品图',
+    excludedGlobalSources: '本任务已排除',
+    excludeGlobalSource: '仅从本任务移除',
+    restoreGlobalSources: '恢复全局图',
     addReference: '添加参考图',
     removeReference: '移除参考图',
     promptPlaceholder:
@@ -296,6 +300,9 @@ const WORKBENCH_COPY = {
     reference: 'Reference image',
     useGlobal: 'Uses global product image by default',
     globalSources: 'Global product images',
+    excludedGlobalSources: 'Excluded for this task',
+    excludeGlobalSource: 'Remove from this task only',
+    restoreGlobalSources: 'Restore global images',
     addReference: 'Add reference',
     removeReference: 'Remove reference',
     promptPlaceholder:
@@ -375,6 +382,9 @@ const WORKBENCH_COPY = {
     reference: '参照画像',
     useGlobal: '通常は共通の商品画像を使用',
     globalSources: '共通の商品画像',
+    excludedGlobalSources: 'このタスクから除外',
+    excludeGlobalSource: 'このタスクからのみ削除',
+    restoreGlobalSources: '共通画像を復元',
     addReference: '参照画像を追加',
     removeReference: '参照画像を削除',
     promptPlaceholder:
@@ -455,6 +465,9 @@ const WORKBENCH_COPY = {
     reference: '참조 이미지',
     useGlobal: '기본적으로 전역 상품 이미지 사용',
     globalSources: '전역 상품 이미지',
+    excludedGlobalSources: '이 작업에서 제외됨',
+    excludeGlobalSource: '이 작업에서만 제거',
+    restoreGlobalSources: '전역 이미지 복원',
     addReference: '참조 추가',
     removeReference: '참조 삭제',
     promptPlaceholder:
@@ -535,6 +548,9 @@ const WORKBENCH_COPY = {
     reference: 'Imagen de referencia',
     useGlobal: 'Usa la imagen global por defecto',
     globalSources: 'Imagenes globales del producto',
+    excludedGlobalSources: 'Excluidas para esta tarea',
+    excludeGlobalSource: 'Quitar solo de esta tarea',
+    restoreGlobalSources: 'Restaurar imagenes globales',
     addReference: 'Agregar referencia',
     removeReference: 'Quitar referencia',
     promptPlaceholder:
@@ -727,7 +743,7 @@ export function SuiteWorkbench({
           sum + estimateTaskCreditCost(task) * getTaskRunCount(task),
         0
       ),
-    [tasks, sourceAssets.length]
+    [tasks, sourceAssets]
   );
   const running = tasks.some((task) =>
     ['queued', 'rendering'].includes(task.status)
@@ -775,6 +791,7 @@ export function SuiteWorkbench({
           reasoning: '',
           keywords: [],
           referenceAssets: [],
+          excludedGlobalSourceIds: [],
           status: 'idle',
           expanded: true,
         },
@@ -782,6 +799,7 @@ export function SuiteWorkbench({
         locale
       ),
       referenceAssets: [],
+      excludedGlobalSourceIds: [],
       status: 'idle',
       expanded: true,
     };
@@ -800,12 +818,13 @@ export function SuiteWorkbench({
     });
   }
 
-  function getTaskRunCount(_task: WorkbenchTask) {
-    return sourceAssets.length;
+  function getTaskRunCount(task: WorkbenchTask) {
+    return getTaskSourceAssets(task).length;
   }
 
-  function getTaskSourceAssets(_task: WorkbenchTask): SourceAsset[] {
-    return sourceAssets;
+  function getTaskSourceAssets(task: WorkbenchTask): SourceAsset[] {
+    const excluded = new Set(task.excludedGlobalSourceIds ?? []);
+    return sourceAssets.filter((asset) => !excluded.has(asset.id));
   }
 
   function getTaskReferenceAssets(task: WorkbenchTask): SourceAsset[] {
@@ -830,6 +849,14 @@ export function SuiteWorkbench({
 
   function removeSourceAsset(id: string) {
     setSourceAssets((current) => current.filter((asset) => asset.id !== id));
+    setTasks((current) =>
+      current.map((task) => ({
+        ...task,
+        excludedGlobalSourceIds: (task.excludedGlobalSourceIds ?? []).filter(
+          (sourceId) => sourceId !== id
+        ),
+      }))
+    );
   }
 
   async function onTaskFilesChange(id: string, fileList?: FileList | File[]) {
@@ -877,6 +904,40 @@ export function SuiteWorkbench({
           : task
       )
     );
+  }
+
+  function excludeTaskGlobalSource(id: string, sourceId: string) {
+    setTasks((current) =>
+      current.map((task) =>
+        task.id === id
+          ? {
+              ...task,
+              excludedGlobalSourceIds: Array.from(
+                new Set([...(task.excludedGlobalSourceIds ?? []), sourceId])
+              ),
+              imageUrl: undefined,
+              status:
+                getTaskSourceAssets({
+                  ...task,
+                  excludedGlobalSourceIds: [
+                    ...(task.excludedGlobalSourceIds ?? []),
+                    sourceId,
+                  ],
+                }).length > 0
+                  ? 'ready'
+                  : 'idle',
+            }
+          : task
+      )
+    );
+  }
+
+  function restoreTaskGlobalSources(id: string) {
+    updateTask(id, {
+      excludedGlobalSourceIds: [],
+      imageUrl: undefined,
+      status: sourceAssets.length > 0 ? 'ready' : 'idle',
+    });
   }
 
   function clearTaskReferences(id: string) {
@@ -1219,41 +1280,30 @@ export function SuiteWorkbench({
               void onFilesChange(event.dataTransfer.files);
             }}
             className={cn(
-              'relative flex min-h-44 w-full items-center justify-center',
-              'overflow-hidden rounded-lg border border-[#d9ded1]',
-              'border-dashed bg-white text-left shadow-sm hover:border-[#9aa48d]'
+              'relative flex min-h-28 w-full items-center justify-center',
+              'overflow-hidden rounded-xl border border-[#d9ded1]',
+              'border-dashed bg-[#fbfcf7] p-3 text-left shadow-sm transition hover:border-[#9aa48d] hover:bg-white'
             )}
           >
-            <div className="flex w-full flex-col gap-3 p-3">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-3 rounded-md text-left text-[#74796d] transition hover:text-[#20231e]"
-              >
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#eef1e8]">
-                  <IconUpload className="size-5" />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex w-full items-center gap-4 rounded-lg p-2 text-left text-[#74796d] transition hover:text-[#20231e]"
+            >
+              <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-[#eef1e8] text-[#5e6a58] shadow-inner">
+                <IconUpload className="size-7" />
+              </span>
+              <span className="min-w-0">
+                <span className="block font-semibold text-[#2f352c] text-base">
+                  {t.upload}
                 </span>
-                <span className="font-medium text-sm">{t.upload}</span>
-              </button>
-              {sourceAssets.length > 0 ? (
-                <div className="grid grid-cols-3 gap-2">
-                  {sourceAssets.slice(0, 9).map((asset, index) => (
-                    <ImageAssetChip
-                      key={asset.id}
-                      asset={asset}
-                      code={getAssetCode('G', index)}
-                      onRemove={() => removeSourceAsset(asset.id)}
-                      removeLabel={t.removeTask}
-                    />
-                  ))}
-                  {sourceAssets.length > 9 ? (
-                    <span className="flex aspect-square items-center justify-center rounded-lg border border-[#dfe3d8] bg-[#f7f8f4] font-semibold text-[#74796d] text-xs">
-                      +{sourceAssets.length - 9}
-                    </span>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
+                <span className="block text-[#74796d] text-xs">
+                  {sourceAssets.length > 0
+                    ? `${sourceAssets.length} ${t.file}`
+                    : t.globalSubtitle}
+                </span>
+              </span>
+            </button>
           </div>
           <input
             ref={fileInputRef}
@@ -1359,9 +1409,7 @@ export function SuiteWorkbench({
                 locale={locale}
                 selected={task.id === selectedTask?.id}
                 sourceReady={getTaskSourceAssets(task).length > 0}
-                globalSourceCodes={sourceAssets.map((_, index) =>
-                  getAssetCode('G', index)
-                )}
+                globalSources={sourceAssets}
                 baseDescription={description}
                 descriptionReady={description.trim().length > 0}
                 onSelect={() => setSelectedTaskId(task.id)}
@@ -1374,6 +1422,10 @@ export function SuiteWorkbench({
                   removeTaskReference(task.id, referenceId)
                 }
                 onClearTaskReferences={() => clearTaskReferences(task.id)}
+                onExcludeGlobalSource={(sourceId) =>
+                  excludeTaskGlobalSource(task.id, sourceId)
+                }
+                onRestoreGlobalSources={() => restoreTaskGlobalSources(task.id)}
                 onDraft={() => void draftPrompt(task)}
                 onRender={() => void renderTask(task)}
               />
@@ -1402,7 +1454,7 @@ function TaskCard({
   locale,
   selected,
   sourceReady,
-  globalSourceCodes,
+  globalSources,
   baseDescription,
   descriptionReady,
   onSelect,
@@ -1411,6 +1463,8 @@ function TaskCard({
   onTaskFilesChange,
   onRemoveTaskReference,
   onClearTaskReferences,
+  onExcludeGlobalSource,
+  onRestoreGlobalSources,
   onDraft,
   onRender,
 }: {
@@ -1419,7 +1473,7 @@ function TaskCard({
   locale: Locale;
   selected: boolean;
   sourceReady: boolean;
-  globalSourceCodes: string[];
+  globalSources: SourceAsset[];
   baseDescription: string;
   descriptionReady: boolean;
   onSelect: () => void;
@@ -1428,6 +1482,8 @@ function TaskCard({
   onTaskFilesChange: (files?: FileList | File[]) => void;
   onRemoveTaskReference: (referenceId: string) => void;
   onClearTaskReferences: () => void;
+  onExcludeGlobalSource: (sourceId: string) => void;
+  onRestoreGlobalSources: () => void;
   onDraft: () => void;
   onRender: () => void;
 }) {
@@ -1440,6 +1496,13 @@ function TaskCard({
   const styleLabels = getStyleLabels(locale);
   const resolutionLabel = task.resolution || t.modelDefault;
   const referenceAssets = task.referenceAssets ?? [];
+  const excludedGlobalSourceIds = new Set(task.excludedGlobalSourceIds ?? []);
+  const activeGlobalSources = globalSources.filter(
+    (asset) => !excludedGlobalSourceIds.has(asset.id)
+  );
+  const excludedGlobalSources = globalSources.filter((asset) =>
+    excludedGlobalSourceIds.has(asset.id)
+  );
 
   return (
     <article
@@ -1583,9 +1646,10 @@ function TaskCard({
               <div>
                 <p className="font-semibold text-sm">{t.reference}</p>
                 <p className="text-[#74796d] text-xs">
+                  {activeGlobalSources.length > 0 ? t.useGlobal : t.noFile}
                   {referenceAssets.length > 0
-                    ? `${t.useGlobal} + R${String(referenceAssets.length).padStart(2, '0')}`
-                    : t.useGlobal}
+                    ? ` + R${String(referenceAssets.length).padStart(2, '0')}`
+                    : ''}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -1615,16 +1679,64 @@ function TaskCard({
             <div className="space-y-3">
               <div>
                 <p className="mb-1 text-[#74796d] text-xs">{t.globalSources}</p>
-                {globalSourceCodes.length > 0 ? (
+                {activeGlobalSources.length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
-                    {globalSourceCodes.map((code) => (
-                      <AssetCodeBadge key={code}>{code}</AssetCodeBadge>
-                    ))}
+                    {activeGlobalSources.map((asset) => {
+                      const code = getAssetCode(
+                        'G',
+                        globalSources.findIndex((item) => item.id === asset.id)
+                      );
+                      return (
+                        <AssetCodeBadge
+                          key={asset.id}
+                          title={asset.name}
+                          actionLabel={t.excludeGlobalSource}
+                          onRemove={() => onExcludeGlobalSource(asset.id)}
+                        >
+                          {code}
+                        </AssetCodeBadge>
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-[#74796d] text-xs">{t.noFile}</p>
                 )}
               </div>
+              {excludedGlobalSources.length > 0 ? (
+                <div>
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <p className="text-[#74796d] text-xs">
+                      {t.excludedGlobalSources}
+                    </p>
+                    <button
+                      type="button"
+                      className="font-medium text-[#2f5f4f] text-xs hover:text-[#203f35]"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onRestoreGlobalSources();
+                      }}
+                    >
+                      {t.restoreGlobalSources}
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {excludedGlobalSources.map((asset) => (
+                      <span
+                        key={asset.id}
+                        className="rounded-md border border-[#ead8cf] bg-[#fff7f3] px-2 py-1 font-semibold text-[#a33b16] text-xs"
+                        title={asset.name}
+                      >
+                        {getAssetCode(
+                          'G',
+                          globalSources.findIndex(
+                            (item) => item.id === asset.id
+                          )
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               {referenceAssets.length > 0 ? (
                 <div>
                   <p className="mb-1 text-[#74796d] text-xs">{t.reference}</p>
@@ -1780,10 +1892,36 @@ function ImageAssetChip({
   );
 }
 
-function AssetCodeBadge({ children }: { children: string }) {
+function AssetCodeBadge({
+  children,
+  title,
+  actionLabel,
+  onRemove,
+}: {
+  children: string;
+  title?: string;
+  actionLabel?: string;
+  onRemove?: () => void;
+}) {
   return (
-    <span className="rounded-md border border-[#dfe3d8] bg-white px-2 py-1 font-semibold text-[#2f352c] text-xs">
+    <span
+      className="inline-flex items-center gap-1 rounded-md border border-[#dfe3d8] bg-white px-2 py-1 font-semibold text-[#2f352c] text-xs"
+      title={title}
+    >
       {children}
+      {onRemove ? (
+        <button
+          type="button"
+          className="-mr-1 rounded p-0.5 text-[#8b9286] hover:bg-[#fff1eb] hover:text-[#d33b00]"
+          aria-label={actionLabel}
+          onClick={(event) => {
+            event.stopPropagation();
+            onRemove();
+          }}
+        >
+          <IconTrash className="size-3" />
+        </button>
+      ) : null}
     </span>
   );
 }
@@ -1978,6 +2116,7 @@ function createInitialTasks(
     reasoning: '',
     keywords: [],
     referenceAssets: [],
+    excludedGlobalSourceIds: [],
     status: 'idle',
     expanded: true,
   };
@@ -1992,6 +2131,7 @@ function createInitialTasks(
     reasoning: '',
     keywords: [],
     referenceAssets: [],
+    excludedGlobalSourceIds: [],
     status: 'idle',
     expanded: false,
   };
